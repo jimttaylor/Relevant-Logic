@@ -76,9 +76,10 @@ Theorem g_equiv_replacement:
           (goldblatt_provable (C &ₐ A) ⇔ goldblatt_provable (C &ₐ A)) ∧
           (goldblatt_provable (A <->ₐ C) ⇔ goldblatt_provable (B <->ₐ C)) ∧
           (goldblatt_provable (C <->ₐ A) ⇔ goldblatt_provable (C <->ₐ B)) ∧
+          (goldblatt_provable ((~ₐ A) <->ₐ ~ₐ B)) ∧ 
           (goldblatt_provable A ⇔ goldblatt_provable B)
 Proof
-  rpt strip_tac >> EQ_TAC >> gs [g_DIMP_def] >>
+  rpt strip_tac >> gs [EQ_IMP_THM, g_DIMP_def] >>
   metis_tac[goldblatt_provable_rules]
 QED
 
@@ -138,5 +139,10 @@ Proof
      )                
 QED
 
-
+Theorem g_double_neg:
+  ∀A. goldblatt_provable (A -->ₐ ~ₐ (~ₐ A))
+Proof
+  metis_tac[g_DIMP_def, goldblatt_provable_rules]
+QED
+        
 val _ = export_theory();

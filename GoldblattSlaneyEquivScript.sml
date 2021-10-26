@@ -387,7 +387,7 @@ Proof
   metis_tac[slaney_provable_rules, s_assertion, s_OR_definable, s_equiv_replacement, s_disjunction_OR_def]
 QED
         
-Theorem slaney_impliesgoldblatt:
+Theorem slaney_implies_goldblatt:
   ∀A. slaney_provable A ⇒ goldblatt_provable $ sg A
 Proof
   Induct_on ‘slaney_provable ’ >> rpt strip_tac >> gs [sg_translation_def] >>
