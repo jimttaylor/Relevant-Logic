@@ -39,7 +39,11 @@ QED
 Definition j_def:
   j CS X = {w | w ∈ CS.W ∧ ∃Z. CS.COVER Z w ∧ Z ⊆ X}
 End
-        
+
+Definition Localized_def:
+  Localized CS X ⇔ j CS X ⊆ X
+End
+
 Theorem Lemma6_3_1:
   Is_Cover_System CS ∧ Upset CS X ⇒ X ⊆ j CS X
 Proof
@@ -129,7 +133,11 @@ Proof
 QED
 
 Definition Is_Prop_def:
-  Is_Prop RCS X ⇔ (j (to_CS RCS) X ⊆ X ∧ Upset (to_CS RCS) X)
+  Is_Prop RCS X ⇔ (Localized (to_CS RCS) X ∧ Upset (to_CS RCS) X)
+End
+
+Definition IMP_def:
+  IMP RCS X Y = {w | w ∈ RCS.W ∧ {RCS.FUSE w x | x ∈ X} ⊆ Y}
 End
         
 Theorem lemma6_4_1_1:
@@ -151,7 +159,7 @@ Theorem lemma6_4_1_2:
   ∀RCS X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ⇒
           Is_Prop RCS (Orthocompliment RCS X)
 Proof
-  reverse $ rw[Is_Prop_def, Orthocompliment_def] 
+  reverse $ rw[Is_Prop_def, Localized_def, Orthocompliment_def] 
   >- (rw[Upset_def, SUBSET_DEF] >> irule RCS_REFINEMENT_ORTHOGONAL >>
       simp[] >> qexistsl_tac [‘d’, ‘x’] >> simp[] >>
       metis_tac[PreOrder, RCS_PREORDER, reflexive_def])
@@ -172,5 +180,56 @@ Proof
       rw[EXTENSION, EQ_IMP_THM] >> metis_tac[])
 QED
 
-        
+Theorem lemma6_4_1_3:
+  ∀RCS X Y. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ∧
+            Y ⊆ RCS.W ∧ Upset (to_CS RCS) Y ⇒
+            Upset (to_CS RCS) (IMP RCS X Y)
+Proof
+  rw[Upset_def]
+  >- simp[IMP_def, Once SUBSET_DEF]
+  >- (rw[IMP_def, SUBSET_DEF] >> rename [‘x ∈ X’, ‘d ∈ IMP RCS X Y’] >>
+      last_x_assum irule >> rw[]
+      >- gs[SUBSET_DEF, RCS_REFINEMENT_CLOSURE, RCS_FUSION_CLOSURE]
+      >- (qexists_tac ‘RCS.FUSE d x’ >> rw[]
+          >- (gs[IMP_def, SUBSET_DEF] >> metis_tac[])
+          >- (irule RCS_FUSION_MONO_REFINEMENT >>
+              simp[] >> metis_tac[PreOrder, RCS_PREORDER, reflexive_def]
+             )
+         )
+     )
+QED
+
+Theorem lemma6_4_1_4:
+  ∀RCS X Y. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ∧
+            Y ⊆ RCS.W ∧ Localized (to_CS RCS) Y ⇒
+            Localized (to_CS RCS) (IMP RCS X Y)
+Proof
+  rw[SUBSET_DEF, Localized_def, IMP_def, j_def] >>
+  rename[‘RCS.FUSE x y ∈ Y’] >> first_x_assum irule >>
+  simp[RCS_FUSION_CLOSURE] >> qexists_tac ‘{RCS.FUSE z y | z ∈ Z}’ >> rw[]
+  >- simp[RCS_FUSION_COVERING]
+  >- (first_x_assum $ qspec_then ‘z’ strip_assume_tac >> gs[] >>
+      last_x_assum irule >> metis_tac[]
+     )
+QED
+
+Theorem lemma6_4_1_5:
+  ∀RCS x X. Is_Relevant_Cover_System RCS ∧ x ∈ RCS.W ∧ X ⊆ RCS.W ∧
+            (∀y. y ∈ X ⇒ RCS.ORTH x y) ⇒
+            (∀y. y ∈ j (to_CS RCS) X ⇒ RCS.ORTH x y)
+Proof
+  rw[j_def] >> irule (iffRL lemma6_4_1_1) >> simp[] >>
+  irule RCS_IDENTITY_ORTH_IS_LOCAL >> simp[] >>
+  qexists_tac ‘{RCS.FUSE z x | z ∈ Z}’ >>
+  ‘{z | z ∈ {RCS.FUSE z x | z ∈ Z} ∧ RCS.ORTH z RCS.E}
+   = {RCS.FUSE z x | z ∈ Z}’ by 
+    (rw[EXTENSION, EQ_IMP_THM] >> metis_tac[RCS_FUSION_COMM, lemma6_4_1_1, SUBSET_DEF]) >>
+  gs[] >>
+  ‘RCS.COVER {RCS.FUSE z x | z ∈ Z} (RCS.FUSE y x)’ suffices_by
+    metis_tac[RCS_FUSION_COMM] >>
+  irule RCS_FUSION_COVERING >> simp[]
+QED
+
+
+
 val _ = export_theory();
