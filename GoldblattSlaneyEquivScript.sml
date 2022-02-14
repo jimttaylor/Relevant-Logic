@@ -178,19 +178,19 @@ Theorem gs_sg_equiv_1:
 Proof
   Induct_on ‘A’ >> rpt strip_tac >> gs[]
   >- (qexists_tac ‘s_VAR s’ >> gs[gs_translation_def, sg_translation_def, s_equiv_identity])
-  >- (qexists_tac ‘B' -->ₛ B’ >> gs[gs_translation_def, sg_translation_def, s_double_dimp_equiv])
-  >- (qexists_tac ‘B' &ₛ B’ >> gs[gs_translation_def, sg_translation_def, s_double_dimp_equiv])
-  >- (qexists_tac ‘B' Vₛ B’ >> gs[gs_translation_def, sg_translation_def, g_OR_def] >> 
+  >- (qexists_tac ‘B -->ₛ B'’ >> gs[gs_translation_def, sg_translation_def, s_double_dimp_equiv])
+  >- (qexists_tac ‘B &ₛ B'’ >> gs[gs_translation_def, sg_translation_def, s_double_dimp_equiv])
+  >- (qexists_tac ‘B Vₛ B'’ >> gs[gs_translation_def, sg_translation_def, g_OR_def] >> 
       assume_tac s_OR_definable >>
-      last_x_assum $ qspecl_then [‘gs $ sg B'’, ‘gs $ sg B’] strip_assume_tac >> 
-      ‘slaney_provable ((A Vₛ A') <->ₛ (gs $ sg B') Vₛ (gs $ sg B))’ suffices_by metis_tac[s_equiv_symmetry, s_equiv_transitivity]
+      last_x_assum $ qspecl_then [‘gs $ sg B’, ‘gs $ sg B'’] strip_assume_tac >> 
+      ‘slaney_provable ((A Vₛ A') <->ₛ (gs $ sg B) Vₛ (gs $ sg B'))’ suffices_by metis_tac[s_equiv_symmetry, s_equiv_transitivity]
       >> simp[s_DIMP_def] >> irule s_adjunction_rule >> strip_tac >> 
       metis_tac [s_equiv_replacement, s_equiv_stronger_replacement, s_double_dimp_equiv, slaney_provable_rules]
      )
-  >- (qexists_tac ‘B' ioₛ B’ >> gs[gs_translation_def, sg_translation_def, g_ICONJ_def] >> 
+  >- (qexists_tac ‘B ioₛ B'’ >> gs[gs_translation_def, sg_translation_def, g_ICONJ_def] >> 
       assume_tac s_IO_definable >>
-      last_x_assum $ qspecl_then [‘gs $ sg B'’, ‘gs $ sg B’] strip_assume_tac >> 
-      ‘slaney_provable ((A ioₛ A') <->ₛ (gs $ sg B') ioₛ (gs $ sg B))’ suffices_by metis_tac[s_equiv_symmetry, s_equiv_transitivity]
+      last_x_assum $ qspecl_then [‘gs $ sg B’, ‘gs $ sg B'’] strip_assume_tac >> 
+      ‘slaney_provable ((A ioₛ A') <->ₛ (gs $ sg B) ioₛ (gs $ sg B'))’ suffices_by metis_tac[s_equiv_symmetry, s_equiv_transitivity]
       >> simp[s_DIMP_def] >> irule s_adjunction_rule >> strip_tac >> 
       metis_tac [s_equiv_replacement, s_equiv_stronger_replacement, s_double_dimp_equiv, slaney_provable_rules]
      )

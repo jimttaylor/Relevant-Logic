@@ -44,11 +44,24 @@ Theorem g_strong_equiv_replacement:
   ∀A B C. |- (A <-> B) ⇒
           |- ((A --> C) <-> (B --> C)) ∧
           |- ((C --> A) <-> (C --> B)) ∧
-          |- (~A <-> ~B)
+          |- (~A <-> ~B) ∧
+          |- ((A & C) <-> (B & C)) ∧
+          |- ((C & A) <-> (C & B))
 Proof
   rw[g_DIMP_def] >> irule g_adjunction_rule >> rw[]
-  >> metis_tac[g_modus_ponens, g_conjunction_r, g_conjunction_l, g_suffixing,
+  >- metis_tac[g_modus_ponens, g_conjunction_r, g_conjunction_l, g_suffixing,
                g_permutation, g_contrapositive_alt, g_DIMP_def]
+  >- metis_tac[g_modus_ponens, g_conjunction_r, g_conjunction_l, g_suffixing,
+               g_permutation, g_contrapositive_alt, g_DIMP_def]
+  >- metis_tac[g_modus_ponens, g_conjunction_r, g_conjunction_l, g_suffixing,
+               g_permutation, g_contrapositive_alt, g_DIMP_def]
+  >- metis_tac[g_modus_ponens, g_conjunction_r, g_conjunction_l, g_suffixing,
+               g_permutation, g_contrapositive_alt, g_DIMP_def]
+  >- metis_tac[g_modus_ponens, g_conjunction_r, g_conjunction_l, g_suffixing,
+               g_permutation, g_contrapositive_alt, g_DIMP_def]
+  >- metis_tac[g_modus_ponens, g_conjunction_r, g_conjunction_l, g_suffixing,
+               g_permutation, g_contrapositive_alt, g_DIMP_def]
+  >> metis_tac[g_conj_introduction, g_conjunction_l, g_conjunction_r, g_adjunction_rule, g_modus_ponens, g_suffixing]
 QED
 
 Theorem g_equiv_commutative:
@@ -62,7 +75,14 @@ Theorem g_equiv_associaive:
 Proof
   rw[g_DIMP_def] >> metis_tac[g_conjunction_r, g_conjunction_l, g_suffixing, g_modus_ponens, g_adjunction_rule]
 QED
-  
+
+Theorem g_equiv_AND:
+  ∀A B C D. |- (A <-> B) ∧ |- (C <-> D) ⇒
+            |- ((A & C) <-> (B & D))
+Proof
+  rw[g_DIMP_def] >> irule g_adjunction_rule >> rw[] >> 
+  metis_tac[g_conj_introduction, g_conjunction_l, g_conjunction_r, g_adjunction_rule, g_modus_ponens, g_suffixing]
+QED
         
 Theorem g_strong_io_rule:
   ∀A B C. |- (((A ∘ᵣ B) --> C ) <-> (A --> B --> C))
@@ -249,5 +269,22 @@ Proof
   metis_tac[g_ICONJ_def, g_modus_ponens, g_contrapositive, g_io_imp]
 QED
         
+Theorem g_AND_MP:
+  ∀A B. |- ((A & (A --> B)) --> B) 
+Proof
+  rpt strip_tac >> 
+  ‘|- ((A & (A --> B)) --> A)’ by simp[g_conjunction_l] >>
+  ‘|- ((A & (A --> B)) --> (A --> B))’ by simp[g_conjunction_r] >>
+  ‘|- ((A & (A --> B)) --> (A & (A --> B)) --> B)’ by
+    metis_tac[g_suffixing, g_modus_ponens, g_permutation] >>
+  metis_tac[g_modus_ponens, g_contraction]
+QED
 
+Theorem g_AND_STRENGTHEN:
+  ∀A B C. |- ((A --> C) --> ((A & B) --> C)) ∧
+          |- ((B --> C) --> ((A & B) --> C))
+Proof
+  metis_tac[goldblatt_provable_rules]
+QED
+         
 val _ = export_theory();
