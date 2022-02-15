@@ -1289,10 +1289,104 @@ Proof
       >- metis_tac [g_suffixing, g_modus_ponens, g_adjunction_rule, g_distribution, g_disjunction_elim]
      )
 QED
+
+Theorem B_WORLD_non_element:
+  ∀ θ x w z C. Prime z ∧ S_Theory θ z ∧ S_Theory θ w ∧
+               C ∉ B_WORLD θ x {p | ∃q. p --> q ∈ w ∧ q ∉ z} ⇒
+               ∃D. D ∉ z ∧ D ∈ APPLYING w (B_WORLD θ x {p | ∃q. p --> q ∈ w ∧ q ∉ z} ∪ {C}) 
+Proof
+  rw[APPLYING_def, PULL_EXISTS] >> CCONTR_TAC >>
+  qpat_x_assum ‘C ∉ B_WORLD θ x {p | (∃q. p --> q ∈ w ∧ q ∉ z)}’ mp_tac >> gs[] >>
+  ‘{C} ⊆ B_WORLD θ x {p | (∃q. p --> q ∈ w ∧ q ∉ z)}’ suffices_by simp[] >> 
+  irule (iffRL FINITE_SUBSET_B_WORLD) >> simp[] >>
+  qexists_tac ‘SUC (R_gn C)’ >> simp[B_WORLD_i_def] >> 
+  ‘¬∃A. (∃q. A --> q ∈ w ∧ q ∉ z) ∧
+        sENTAILS θ (B_WORLD_i (R_gn C) θ x {p | (∃q. p --> q ∈ w ∧ q ∉ z)} ∪
+                    {LINV R_gn 𝕌(:g_prop) (R_gn C)}) A’ suffices_by
+    (‘LINV R_gn 𝕌(:g_prop) (R_gn C) = C’ by
+       (‘C ∈ 𝕌(:g_prop)’ by simp[] >>
+        ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
+        metis_tac [LINV_DEF]
+       ) >> strip_tac >> simp[]
+    ) >>
+  rw[] >> Cases_on ‘∀q. A --> q ∉ w ∨ q ∈ z’ >> simp[] >>
+  ‘LINV R_gn 𝕌(:g_prop) (R_gn C) = C’ by
+    (‘C ∈ 𝕌(:g_prop)’ by simp[] >>
+     ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
+     metis_tac [LINV_DEF]
+    ) >> gs[] >>
+  simp[sENTAILS_def] >> rw[] >>
+  Cases_on ‘γ = []’ >>
+  Cases_on ‘CONJl γ --> A ∈ θ’ >> simp[] >>
+  last_x_assum $ qspecl_then [‘q’, ‘γ’] strip_assume_tac
+  >- (CCONTR_TAC >> gs[S_Theory_def, Ordinary_def, Regular_def, R_Theory_def] >>
+      ‘(A --> q) --> CONJl γ --> q ∈ θ’ by
+        (last_x_assum irule >> simp[pENTAIL_def] >> qexists_tac ‘[CONJl γ --> A]’ >>
+         gs[g_suffixing, CONJl_def]
+        ) >> 
+      ‘CONJl γ --> q ∈ w’ by
+        (last_x_assum irule >> simp[sENTAILS_def] >>
+         qexists_tac ‘[A --> q]’ >> simp[CONJl_def]
+        )
+     )
+  >- (CCONTR_TAC >>
+      qpat_x_assum ‘¬(set γ ⊆ B_WORLD θ x {p | (∃q. p --> q ∈ w ∧ q ∉ z)} ∪ {C})’ mp_tac >>
+      gs[SUBSET_DEF] >> rw[] >> rename[‘MEM α γ’] >> last_x_assum $ qspec_then ‘α’ strip_assume_tac >> gs[] >>
+      simp[B_WORLD_def, BIGUNION, PULL_EXISTS] >> metis_tac[]
+     )        
+QED
+
+Theorem B_WORLD_prop_exists:
+ ∀ θ x w z C. Prime z ∧ S_Theory θ z ∧ S_Theory θ w ∧
+              S_Theory θ (B_WORLD θ x {p | ∃q. p --> q ∈ w ∧ q ∉ z}) ∧ 
+              C ∉ B_WORLD θ x {p | ∃q. p --> q ∈ w ∧ q ∉ z} ∧ B_WORLD θ x {p | ∃q. p --> q ∈ w ∧ q ∉ z} ≠ ∅ ⇒
+              ∃D d. D ∉ z ∧ d ∈ B_WORLD θ x {p | ∃q. p --> q ∈ w ∧ q ∉ z} ∧
+                    d & C --> D ∈ w
+Proof
+  rw[] >> assume_tac B_WORLD_non_element >>
+  last_x_assum $ qspecl_then [‘θ’, ‘x’, ‘w’, ‘z’, ‘C’] strip_assume_tac >> gs[APPLYING_def] >>
+  ‘∃α. α ∈ B_WORLD θ x {p | ∃q. p --> q ∈ w ∧ q ∉ z}’ by metis_tac[MEMBER_NOT_EMPTY] >> 
+  qexistsl_tac [‘D’, ‘CONJl (α::(FILTER (λx. x ≠ C) γ))’] >> rw[]
+  >- (‘set (α::(FILTER (λx. x ≠ C) γ)) ⊆ B_WORLD θ x {p | (∃q. p --> q ∈ w ∧ q ∉ z)}’ by
+        (gs[SUBSET_DEF] >> rpt strip_tac >> simp[] >>
+         last_x_assum $ qspec_then ‘x'’ strip_assume_tac >>
+         ‘MEM x' γ’ by metis_tac[MEM_FILTER_LEMMA] >> gs[NOT_MEM_FILTER_LEMMA]
+        ) >> irule (iffRL CONJl_IN_R_Theory_IMP) >> simp[] >>
+      metis_tac[S_Theory_imp_R_Theory]
+     )
+  >- (Cases_on ‘FILTER (λx. x ≠ C) γ = []’ >> gs[CONJl_def]
+      >- (‘set γ ⊆ {C}’ by gs[EMPTY_FILTER_LEMMA] >>
+          gs[S_Theory_def] >> last_x_assum irule >> rw[sENTAILS_def] >> 
+          qexists_tac ‘[CONJl γ --> D]’ >> rw[CONJl_def] >>
+          metis_tac[goldblatt_provable_rules, g_A_CONJl_A, Ordinary_def, Regular_def]
+         )
+      >- (‘CONJl (α::FILTER (λx. x ≠ C) γ) = α & CONJl (FILTER (λx. x ≠ C) γ)’ by
+            (Cases_on ‘FILTER (λx. x ≠ C) γ’ >> gs[CONJl_def]) >>
+          gs[S_Theory_def] >> last_assum irule >> rw[sENTAILS_def] >> 
+          qexists_tac ‘[CONJl (FILTER (λx. x ≠ C) γ) & C --> D]’ >>
+          rw[CONJl_def]
+          >- (last_x_assum irule >> rw[sENTAILS_def] >>
+              qexists_tac ‘[CONJl γ --> D]’ >> simp[CONJl_def] >>
+              gs[Ordinary_def, Regular_def, R_Theory_def, pENTAIL_def] >>
+              last_x_assum irule >> qexists_tac ‘[CONJl (FILTER (λx. x ≠ C) γ) & C --> CONJl γ]’ >>
+              simp[CONJl_def, g_suffixing] >> last_x_assum irule >>
+              Cases_on ‘MEM C γ’
+              >- gs[FILTER_AND_FILTERED_IMP_CONJl]
+              >- metis_tac[goldblatt_provable_rules, FILTER_NON_MEM_EQUAL]
+             )
+          >- (gs[Ordinary_def, Regular_def] >> last_x_assum irule >> 
+              irule g_modus_ponens >>
+              qexists_tac
+              ‘(α & (CONJl (FILTER (λx. x ≠ C) γ) & C) --> D) -->
+               (α & CONJl (FILTER (λx. x ≠ C) γ) & C --> D)’ >>
+              reverse $ strip_tac >> metis_tac[goldblatt_provable_rules, g_AND_associative_rl]
+             )
+         )
+     )
+QED
                                      
 Theorem Canonical_Frame_is_R_Frame:
-  ∀A.
-    ¬ |-A ⇒ Reduced_R_Frame (Canonical_Frame A)
+  ∀A. ¬|-A ⇒ Reduced_R_Frame (Canonical_Frame A)
 Proof
   simp[Reduced_R_Frame_def] >> rpt strip_tac >>
   gs[Canonical_Frame_def] >>
@@ -1511,12 +1605,50 @@ Proof
       >- metis_tac[S_Theory_imp_R_Theory]
       >- (CCONTR_TAC >> gs[] >>
           rename[‘C V D ∈ B_WORLD (Theta A) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)}’] >>
-          qabbrev_tac ‘bw =  B_WORLD (Theta A) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)}’ >> 
-          drule_then drule Maximal_S_Theory_prop_exists >>
-          simp[GSYM MEMBER_NOT_EMPTY, PULL_EXISTS] >>
-          first_assum $ irule_at Any >> 
-          cheat                                  
-         )
+          assume_tac B_WORLD_prop_exists >>
+          ‘B_WORLD (Theta A) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)} ≠ ∅’ by metis_tac[MEMBER_NOT_EMPTY] >> 
+          last_assum $ qspecl_then [‘Theta A’, ‘APPLYING x y’, ‘w’, ‘z’, ‘C’] strip_assume_tac >> 
+          last_x_assum $ qspecl_then [‘Theta A’, ‘APPLYING x y’, ‘w’, ‘z’, ‘D’] strip_assume_tac >> gs[] >>
+          rename[‘C V D ∈ B_WORLD (Theta A) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)}’,
+                 ‘c & C --> α ∈ w’, ‘d & D --> β ∈ w’] >>
+          ‘c & d & (C V D) --> α V β ∈ w’ suffices_by
+            (CCONTR_TAC >> gs[] >>
+             ‘α V β ∈ z’ by
+               (qpat_x_assum ‘_ ⊆ z’ mp_tac >> rw[Once SUBSET_DEF, Once APPLYING_def] >> 
+                last_x_assum irule >> qexists_tac ‘[c & d; C V D]’ >>
+                simp[CONJl_def] >> qpat_x_assum ‘S_Theory _ (B_WORLD _ _ _)’ mp_tac >>
+                rw[S_Theory_def, sENTAILS_def] >> last_x_assum irule >>
+                qexists_tac ‘[c; d]’ >> simp[CONJl_def] >> metis_tac[Ordinary_def, Regular_def, g_identity]
+               ) >> metis_tac[Prime_def]
+            ) >>
+          qpat_x_assum ‘ S_Theory (Theta A) w’ mp_tac >>
+          rw[S_Theory_def, sENTAILS_def] >>
+          ‘c & C --> α V β ∈ w’ by
+            (last_assum irule >> qexists_tac ‘[c & C --> α]’ >>
+             simp[CONJl_def] >> gs[Ordinary_def, Regular_def] >>
+             last_x_assum irule >> metis_tac[goldblatt_provable_rules, g_permutation]
+            ) >>
+          ‘c & d & C --> α V β ∈ w’ by
+            (last_assum irule >> qexists_tac ‘[c & C --> α V β]’ >>
+             simp[CONJl_def] >> gs[Ordinary_def, Regular_def] >>
+             last_x_assum irule >>
+             metis_tac[goldblatt_provable_rules, g_permutation, g_AND_associative_rl, g_AND_associative_lr, g_AND_STRENGTHEN]
+            ) >> 
+          ‘d & D --> α V β ∈ w’ by
+            (last_assum irule >> qexists_tac ‘[d & D --> β]’ >>
+             simp[CONJl_def] >> gs[Ordinary_def, Regular_def] >>
+             last_x_assum irule >> metis_tac[goldblatt_provable_rules, g_permutation]
+            ) >>
+          ‘c & d & D --> α V β ∈ w’ by
+            (last_assum irule >> qexists_tac ‘[d & D --> α V β]’ >>
+             simp[CONJl_def] >> gs[Ordinary_def, Regular_def] >>
+             last_x_assum irule >>
+             metis_tac[goldblatt_provable_rules, g_permutation, g_AND_associative_rl, g_AND_associative_lr, g_AND_STRENGTHEN]
+            ) >> 
+          last_x_assum irule >> qexists_tac ‘[ c & d & C --> α V β; c & d & D --> α V β]’ >>
+          simp[CONJl_def] >> gs[Ordinary_def, Regular_def] >> last_x_assum irule >>
+          metis_tac [g_suffixing, g_modus_ponens, g_adjunction_rule, g_distribution, g_disjunction_elim]
+        )
      )
 QED
 
