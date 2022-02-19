@@ -44,7 +44,7 @@ Definition Localized_def:
   Localized CS X ⇔ j CS X ⊆ X
 End
 
-Theorem Lemma6_3_1:
+Theorem lemma6_3_1:
   Is_Cover_System CS ∧ Upset CS X ⇒ X ⊆ j CS X
 Proof
   rw[j_def, SUBSET_DEF]
@@ -159,9 +159,12 @@ Proof
   rw[Is_Cover_System_def]
 QED
         
-Definition Orthocompliment_def:
-  Orthocompliment RCS X = {y | y ∈ RCS.W ∧ ∀x. x ∈ X ⇒ RCS.ORTH y x}
+Definition Perp_def:
+  Perp RCS X = {y | y ∈ RCS.W ∧ ∀x. x ∈ X ⇒ RCS.ORTH y x}
 End
+
+Overload "Perp" = “λ (X: α set). Perp RCS X”
+
 
 Theorem to_CS_IS_COVER:
   ∀RCS. Is_Relevant_Cover_System RCS ⇒
@@ -197,9 +200,9 @@ QED
         
 Theorem lemma6_4_1_2:
   ∀RCS X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ⇒
-          Is_Prop RCS (Orthocompliment RCS X)
+          Is_Prop RCS (Perp X)
 Proof
-  reverse $ rw[Is_Prop_def, Localized_def, Orthocompliment_def] 
+  reverse $ rw[Is_Prop_def, Localized_def, Perp_def] 
   >- (rw[Upset_def, SUBSET_DEF, to_CS_def] >> irule RCS_REFINEMENT_ORTHOGONAL >>
       simp[] >> qexistsl_tac [‘d’, ‘x’] >> simp[] >>
       metis_tac[PreOrder, RCS_PREORDER, reflexive_def]
@@ -262,6 +265,60 @@ Proof
       metis_tac[lemma6_4_1_1, RCS_FUSION_COMM, SUBSET_DEF]
      )
 QED
+ 
+Theorem lemma6_4_1_5_alt:
+  ∀RCS (x: α) X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ⇒
+                 Perp X ⊆ Perp (j X) 
+Proof
+  rw[SUBSET_DEF, Perp_def] >> rename[‘x ⊥ y’] >>
+  assume_tac lemma6_4_1_5 >> gs[rel_Lift_2] >> first_x_assum irule >>
+  simp[] >> qexists_tac ‘X’ >> gs[SUBSET_DEF]
+QED
 
+Theorem lemma6_4_1_6:
+  ∀RCS X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ⇒
+          j X ⊆ Perp (Perp (j X)) ∧ Perp (Perp (j X)) ⊆ Perp (Perp X) 
+Proof
+  rw[]
+  >- (rw[SUBSET_DEF, j_def, to_CS_def, Perp_def] >>
+      rename [‘x ⊥ y’] >>
+      ‘y ⊥ x’ suffices_by
+        metis_tac[lemma6_4_1_1, RCS_FUSION_COMM] >>
+      last_x_assum irule >> metis_tac[]
+     ) 
+  >- (‘Perp X ⊆ Perp (j X)’ suffices_by 
+        rw[Perp_def, SUBSET_DEF] >>
+      rw[Perp_def, SUBSET_DEF] >>
+      rename [‘x ⊥ y’] >>
+      assume_tac lemma6_4_1_5 >>
+      pop_assum $ qspecl_then [‘RCS’, ‘x’, ‘X’] strip_assume_tac >>
+      gs[rel_Lift_2]
+     )
+QED
         
+Theorem lemma6_4_1_7:
+  ∀(RCS : α R_COVER_SYSTEM) X x. Is_Relevant_Cover_System RCS ∧ Upset X ∧ X ⊆ RCS.W ∧ x ∈ RCS.W ⇒
+            (x ⊥ X ⇔ x ⊥ j X)
+Proof
+  rw[] >>
+  EQ_TAC >> strip_tac
+  >- gs[lemma6_4_1_5]
+  >- (gs[rel_Lift_2] >> rw[] >>
+      metis_tac[lemma6_3_1, RCS_COVER_SYSTEM, SUBSET_DEF])
+QED
+
+Theorem lemma6_4_1_7_alt:
+  ∀RCS (x: α) X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ∧ Upset X ⇒
+                 Perp X = Perp (j X)
+Proof
+  rw[Perp_def, EXTENSION] >> metis_tac[lemma6_4_1_7, rel_Lift_2]
+QED
+
+Theorem lemma6_4_1_8:
+  ∀RCS (x: α) X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ∧ Upset X ⇒
+                 X ⊆ j X ∧ j X ⊆ Perp (Perp (j X)) ∧ Perp (Perp (j X)) = Perp (Perp X)
+Proof
+  rw[lemma6_4_1_7_alt, lemma6_4_1_6, lemma6_3_1, RCS_COVER_SYSTEM]  
+QED
+
 val _ = export_theory();
