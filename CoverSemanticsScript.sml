@@ -790,5 +790,128 @@ Proof
                 RCS_PREORDER, PreOrder, reflexive_def])                
 QED
 
+Definition ENTAILS_def:
+  ENTAILS A B ⇔
+    |- (A --> B)
+End
+
+val _ = set_fixity "|-^" (Infixr 490); 
+
+Overload "|-^" = “ENTAILS”
+
+Theorem ENTAILS_PREORDER:
+  PreOrder ENTAILS
+Proof
+  rw[PreOrder, reflexive_def, transitive_def, ENTAILS_def] >>
+  metis_tac[goldblatt_provable_rules]
+QED
+
+Theorem ENTAILS_AND:
+  ∀ A B C. A |-^ (B & C) ⇔ (A |-^ B ∧ A |-^ C)
+Proof
+  rw[EQ_IMP_THM, ENTAILS_def] >>
+  metis_tac[goldblatt_provable_rules]
+QED
+
+Theorem OR_ENTAILS:
+  ∀ A B C. A |-^ C ∧ B |-^ C ⇒ (A V B) |-^ C
+Proof
+  rw[EQ_IMP_THM, ENTAILS_def] >>
+  metis_tac[goldblatt_provable_rules]
+QED
+
+Theorem ENTAILS_CONTRAPOS:
+  ∀A B. A |-^ (~B) ⇒ B |-^ (~A)
+Proof
+  rw[EQ_IMP_THM, ENTAILS_def] >>
+  metis_tac[goldblatt_provable_rules]
+QED
+
+Theorem ENTAILS_DOUBLE_NEG:
+  ∀A. A |-^ (~~A) ∧ A |-^ (~~A)
+Proof
+  rw[ENTAILS_def] >>
+  metis_tac[goldblatt_provable_rules]
+QED
+
+Theorem ENTAILS_CONTRAPOS_alt:
+  ∀A B. A |-^ B ⇒ (~B) |-^ (~A)
+Proof
+  metis_tac[ENTAILS_CONTRAPOS, ENTAILS_DOUBLE_NEG, ENTAILS_PREORDER,
+            PreOrder, transitive_def]
+QED
+
+Theorem ENTAILS_ICONJ_COMM:
+  ∀A B. (A ∘ᵣ B) |-^ (B ∘ᵣ A)
+Proof
+  rw[ENTAILS_def] >> 
+  metis_tac[goldblatt_provable_rules, g_io_commutative_lr]
+QED
+        
+Theorem ENTAILS_ICONJ_MONOTONE:
+  ∀A B C. A |-^ B ⇒
+          (A ∘ᵣ C) |-^ (B ∘ᵣ C) ∧ (C ∘ᵣ A) |-^ (C ∘ᵣ B)
+Proof
+   metis_tac[yeet, ENTAILS_PREORDER, PreOrder, reflexive_def, ENTAILS_def]
+QED
+
+Theorem ENTAILS_ICONJ_RULE:
+  ∀A B C. (A ∘ᵣ B) |-^ C ⇒
+          A |-^ (B --> C)
+Proof
+  metis_tac[EQ_IMP_THM, g_io_rule, ENTAILS_def]
+QED
+
+Theorem ENTAILS_ICONJ_ASSOC:
+  ∀A B C. ((A ∘ᵣ B)∘ᵣ C) |-^ (A ∘ᵣ ( B ∘ᵣ C)) ∧
+          (A ∘ᵣ ( B ∘ᵣ C)) |-^ ((A ∘ᵣ B)∘ᵣ C)
+Proof
+  metis_tac[g_io_associative_rl, ENTAILS_def, ENTAILS_PREORDER,
+            PreOrder, transitive_def, ENTAILS_ICONJ_COMM]
+QED
+
+Theorem ENTAILS_ICONJ_T:
+  ∀A. (τ ∘ᵣ A) |-^ A ∧ A |-^ (τ ∘ᵣ A)
+Proof
+  metis_tac[ENTAILS_def, g_DIMP_def, goldblatt_provable_rules, g_io_true]
+QED
+
+Theorem ENTAILS_ICONJ_SELF:
+  ∀A. A |-^ (A ∘ᵣ A)
+Proof
+  metis_tac[g_io_imp, ENTAILS_def]
+QED
+        
+Definition Theory_def:
+  Theory A = {B | A |-^ B}
+End
+
+Theorem Theory_closed_ENTAILS:
+  ∀ A B C. B ∈ Theory A ∧ B |-^ C ⇒
+           C ∈ Theory A
+Proof
+  rw[Theory_def] >>
+  metis_tac[ENTAILS_PREORDER, PreOrder, transitive_def]
+QED
+
+Theorem Theory_closed_CONJ:
+  ∀A B C. B ∈ Theory A ∧ C ∈ Theory A ⇒
+          B & C ∈ Theory A
+Proof
+  rw[Theory_def, ENTAILS_AND]
+QED
+
+Theorem Theory_SUBSET:
+  ∀A B. A |-^ B ⇔ Theory B ⊆ Theory A
+Proof
+  rw[SUBSET_DEF, ENTAILS_def, Theory_def, EQ_IMP_THM]
+  >> metis_tac[goldblatt_provable_rules]  
+QED
+
+Theorem Theory_EQ:
+  ∀A B. A |-^ B ∧ B |-^ A ⇔ Theory A = Theory B
+Proof
+  metis_tac[Theory_SUBSET, SUBSET_ANTISYM_EQ]
+QED  
 
 val _ = export_theory();
