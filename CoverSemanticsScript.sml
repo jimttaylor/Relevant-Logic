@@ -408,6 +408,7 @@ Overload "IMPP" = “λ (x : α set) y. IMP RCS x y”
 
 Overload "Orthojoin" = “λ (X: α set). Orthojoin RCS X”
 *)
+
 val _= set_mapped_fixity {term_name = "gBOT", fixity = Infix (NONASSOC, 450), tok="⊥"};
 val _= set_mapped_fixity {term_name = "gFUSE", fixity = Infix (NONASSOC, 450), tok="⬝"};
 val _= set_mapped_fixity {term_name = "gREF", fixity = Infix (NONASSOC, 450), tok="≼"};
@@ -855,6 +856,13 @@ Proof
    metis_tac[yeet, ENTAILS_PREORDER, PreOrder, reflexive_def, ENTAILS_def]
 QED
 
+Theorem ENTAILS_ICONJ_MONOTONE_alt:
+  ∀A B C D. A |-^ B ∧ C |-^ D ⇒
+          (A ∘ᵣ C) |-^ (B ∘ᵣ D) ∧ (C ∘ᵣ A) |-^ (D ∘ᵣ B)
+Proof
+   metis_tac[yeet, ENTAILS_PREORDER, PreOrder, reflexive_def, ENTAILS_def]
+QED
+
 Theorem ENTAILS_ICONJ_RULE:
   ∀A B C. (A ∘ᵣ B) |-^ C ⇒
           A |-^ (B --> C)
@@ -912,6 +920,127 @@ Theorem Theory_EQ:
   ∀A B. A |-^ B ∧ B |-^ A ⇔ Theory A = Theory B
 Proof
   metis_tac[Theory_SUBSET, SUBSET_ANTISYM_EQ]
-QED  
+QED
 
+Definition gens_def:
+  gens X = {A | Theory A = X}
+End
+        
+Definition EQUIV_def:
+  EQUIV A = {B | B |-^ A ∧ A |-^ B}
+End
+
+Definition is_EQUIV_def: 
+  is_EQUIV X ⇔ ∃A. X = EQUIV A ∨ X = ∅
+End
+
+Definition Theory_set_def:
+  Theory_set X = BIGUNION {Theory A | A ∈ X}
+End
+
+Theorem gens_is_EQUIV:
+  ∀X. is_EQUIV (gens X) 
+Proof
+  rw[] >> Cases_on ‘gens X = ∅’
+  >- rw[is_EQUIV_def]
+  >- (‘∃x. x ∈ gens X’ by metis_tac[MEMBER_NOT_EMPTY] >>
+      gs[gens_def] >> rw[is_EQUIV_def, EQUIV_def] >>
+      qexists_tac ‘x’ >> simp[EXTENSION] >>
+      rw[Once EQ_IMP_THM]
+      >- gs[Theory_def, g_identity, ENTAILS_def] 
+      >- (last_x_assum $ qspec_then ‘x'’ strip_assume_tac >> 
+          gs[Theory_def, g_identity, ENTAILS_def])
+      >- (rw[Theory_def, EQ_IMP_THM] >>
+           metis_tac[ENTAILS_PREORDER, PreOrder, transitive_def])
+     )
+QED
+
+Theorem Theorem_EQUIV:
+  ∀A. Theory_set (EQUIV A) = Theory A
+Proof
+  rw[EQUIV_def, EQ_IMP_THM] >>
+  irule SUBSET_ANTISYM >> reverse $ rw[]
+  >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
+      qexists_tac ‘A’ >> metis_tac[ENTAILS_PREORDER, PreOrder, reflexive_def]
+     )
+  >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF, Theory_EQ] >>
+     gs[])
+QED
+        
+Definition CAN_FUSION_def:
+  CAN_FUSION X Y =
+  if ∃A B. X = Theory A ∧ Y = Theory B
+  then Theory_set {x ∘ᵣ y | x ∈ gens X ∧ y ∈ gens Y}
+  else ∅
+End
+
+Definition CAN_ORTH_def:
+  CAN_ORTH X Y =
+  if ∃A B. X = Theory A ∧ Y = Theory B
+  then ∃A B. A ∈ gens X ∧ B ∈ gens Y ∧ A |-^ (~B)
+  else F
+End
+         
+Definition Canonical_System_def:
+  Canonical_System = <|W := {Theory A | A ∈ 𝕌(:g_prop)}; REF := (λx y. x ⊆ y); COVER := (λZ x. BIGINTER Z = x); E := Theory τ; 
+                       FUSE := CAN_FUSION; ORTH := CAN_ORTH |>
+End
+
+Definition Canonical_System_Ps_def:
+  Canonical_System_Ps A = {{w | A ∈ w ∧ w ∈ Canonical_System.W} | A ∈ 𝕌(:g_prop)}
+End
+
+         
+val _= set_mapped_fixity {term_name = "gBOTc", fixity = Infix (NONASSOC, 450), tok="⊥ₘ"};
+val _= set_mapped_fixity {term_name = "gFUSEc", fixity = Infix (NONASSOC, 450), tok="⬝ₘ"};
+val _= set_mapped_fixity {term_name = "gREFc", fixity = Infix (NONASSOC, 450), tok="≼ₘ"};
+val _= set_mapped_fixity {term_name = "gCOVERc", fixity = Infix (NONASSOC, 450), tok="▹ₘ"};
+val _= set_mapped_fixity {term_name = "gIMPPc", fixity = Infix (NONASSOC, 450), tok="⟹ₘ"};
+
+Overload "gBOTc" = “λ x y. Canonical_System.ORTH (x: g_prop set) y”
+Overload "gBOTc" = “λ x y. rel_Lift_1 Canonical_System.ORTH (x: (g_prop set) set) y”
+Overload "gBOTc" = “λ x y. rel_Lift_2 Canonical_System.ORTH (x: g_prop set) y”
+
+Overload "gFUSEc" = “λ x y. Canonical_System.FUSE (x: g_prop set) y”
+Overload "gFUSEc" = “λ x y. op_Lift_1 Canonical_System.FUSE (x: (g_prop set) set) y”
+Overload "gFUSEc" = “λ x y. op_Lift_2 Canonical_System.FUSE (x: g_prop set) y”
+
+Overload "gREFc" = “λ x y. Canonical_System.REF (x: g_prop set) y”
+
+Overload "gCOVERc" = “λ (x : (g_prop set) set) y. Canonical_System.COVER x y”
+                     
+         
+Overload "j" = “λ (X: (g_prop set) set). j (to_CS Canonical_System) X”
+Overload "Upset" = “λ (X: (g_prop set) set). Upset (to_CS Canonical_System) X”
+Overload "Localized" = “λ (X: (g_prop set) set). Localized (to_CS Canonical_System) X”
+Overload "Perp" = “λ (X: (g_prop set) set). Perp Canonical_System X”
+Overload "gIMPPc" = “λ (x : (g_prop set) set) y. IMP Canonical_System x y” 
+Overload "Orthojoin" = “λ (X: (g_prop set) set). Orthojoin Canonical_System X”
+
+Theorem CAN_FUSION_alt:
+  ∀A B. Canonical_System.FUSE (Theory A) (Theory B) = Theory (A ∘ᵣ B)
+Proof
+  reverse $ rw[CAN_FUSION_def, Canonical_System_def]
+  >- metis_tac[]
+  >- (irule SUBSET_ANTISYM >> reverse $ rw[]
+      >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
+          qexistsl_tac [‘A’, ‘B’] >> simp[gens_def])
+      >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
+          gs[gens_def, GSYM Theory_EQ] >> gs[Theory_def] >>
+          metis_tac[ENTAILS_PREORDER, PreOrder, transitive_def,
+                    ENTAILS_ICONJ_MONOTONE_alt])
+     )
+QED
+
+Theorem CAN_ORTH_alt:
+  ∀A B. Canonical_System.ORTH (Theory A) (Theory B) ⇔ A |-^ (~B)
+Proof
+  rw[CAN_ORTH_def, Canonical_System_def, EQ_IMP_THM, gens_def]
+  >- (gs[GSYM Theory_EQ] >>
+      metis_tac[ENTAILS_PREORDER, PreOrder, transitive_def, ENTAILS_CONTRAPOS_alt])
+  >- metis_tac[]
+  >- metis_tac[]
+QED
+
+        
 val _ = export_theory();
