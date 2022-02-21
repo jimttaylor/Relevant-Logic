@@ -100,21 +100,21 @@ Definition to_CS_def:
   (to_CS: α R_COVER_SYSTEM -> α COVER_SYSTEM) RCS = <|W := RCS.W; REF := RCS.REF; COVER := RCS.COVER |>
 End
            
-val _= set_mapped_fixity {term_name = "BOT", fixity = Infix (NONASSOC, 450), tok="⊥"};
-Overload "BOT" = “λ x y. RCS.ORTH (x: α) y”
+val _= set_mapped_fixity {term_name = "BOT", fixity = Infix (NONASSOC, 450), tok="⊥ₐ"};
 Overload "BOT" = “λ x y. rel_Lift_1 RCS.ORTH (x: α set) y”
 Overload "BOT" = “λ x y. rel_Lift_2 RCS.ORTH (x: α) y”
+Overload "BOT" = “λ x y. RCS.ORTH (x: α) y”
 
-val _= set_mapped_fixity {term_name = "FUSE", fixity = Infix (NONASSOC, 450), tok="⬝"};
-Overload "FUSE" = “λ x y. RCS.FUSE (x: α) y”
+val _= set_mapped_fixity {term_name = "FUSE", fixity = Infix (NONASSOC, 450), tok="⬝ₐ"};
 Overload "FUSE" = “λ x y. op_Lift_1 RCS.FUSE (x: α set) y”
 Overload "FUSE" = “λ x y. op_Lift_2 RCS.FUSE (x: α) y”
+Overload "FUSE" = “λ x y. RCS.FUSE (x: α) y”
 
-val _= set_mapped_fixity {term_name = "REF", fixity = Infix (NONASSOC, 450), tok="≼"};
+val _= set_mapped_fixity {term_name = "REF", fixity = Infix (NONASSOC, 450), tok="≼ₐ"};
 Overload "REF" = “λ x y. RCS.REF (x: α) y”
 
 
-val _= set_mapped_fixity {term_name = "COVER", fixity = Infix (NONASSOC, 450), tok="▹"};
+val _= set_mapped_fixity {term_name = "COVER", fixity = Infix (NONASSOC, 450), tok="▹ₐ"};
 Overload "COVER" = “λ (x : α set) y. RCS.COVER x y”
                      
          
@@ -126,25 +126,25 @@ Overload "Localized" = “λ (X: α set). Localized (to_CS RCS) X”
 Definition Is_Relevant_Cover_System_def:
   Is_Relevant_Cover_System RCS ⇔
     RCS.E ∈ RCS.W ∧
-    (∀x y. x ≼ y ⇒ x ∈ RCS.W ∧ y ∈ RCS.W) ∧
-    (∀x Z. Z ▹ x ⇒ x ∈ RCS.W ∧ Z ⊆ RCS.W) ∧
-    (∀x y. x ∈ RCS.W ∧ y ∈ RCS.W ⇒ x ⬝ y ∈ RCS.W) ∧
-    (∀x y. x ⊥ y ⇒ x ∈ RCS.W ∧ y ∈ RCS.W) ∧
+    (∀x y. x ≼ₐ y ⇒ x ∈ RCS.W ∧ y ∈ RCS.W) ∧
+    (∀x Z. Z ▹ₐ x ⇒ x ∈ RCS.W ∧ Z ⊆ RCS.W) ∧
+    (∀x y. x ∈ RCS.W ∧ y ∈ RCS.W ⇒ x ⬝ₐ y ∈ RCS.W) ∧
+    (∀x y. x ⊥ₐ y ⇒ x ∈ RCS.W ∧ y ∈ RCS.W) ∧
     Is_Cover_System (to_CS RCS) ∧
 
     (* SQUARE-DECREASING COMMUNITIVE ORDERED MONOID *)
-    (∀x. x ∈ RCS.W ⇒ (x ⬝ RCS.E) = x) ∧
-    (∀x. x ∈ RCS.W ⇒ (RCS.E ⬝ x) = x) ∧
-    (∀x y. x ∈ RCS.W ∧ y ∈ RCS.W ⇒ (x ⬝ y) = (y ⬝ x)) ∧
-    (∀x y z. x ∈ RCS.W ∧ y ∈ RCS.W ∧ z ∈ RCS.W ⇒ (x ⬝ (y ⬝ z)) = ((x ⬝ y) ⬝ z)) ∧
-    (∀x x' y y'. x ≼ x' ∧ y ≼ y' ⇒ (x ⬝ y) ≼ (x' ⬝ y')) ∧
-    (∀x. x ∈ RCS.W ⇒ (x ⬝ x) ≼ x) ∧
+    (∀x. x ∈ RCS.W ⇒ (x ⬝ₐ RCS.E) = x) ∧
+    (∀x. x ∈ RCS.W ⇒ (RCS.E ⬝ₐ x) = x) ∧
+    (∀x y. x ∈ RCS.W ∧ y ∈ RCS.W ⇒ (x ⬝ₐ y) = (y ⬝ₐ x)) ∧
+    (∀x y z. x ∈ RCS.W ∧ y ∈ RCS.W ∧ z ∈ RCS.W ⇒ (x ⬝ₐ (y ⬝ₐ z)) = ((x ⬝ₐ y) ⬝ₐ z)) ∧
+    (∀x x' y y'. x ≼ₐ x' ∧ y ≼ₐ y' ⇒ (x ⬝ₐ y) ≼ₐ (x' ⬝ₐ y')) ∧
+    (∀x. x ∈ RCS.W ⇒ (x ⬝ₐ x) ≼ₐ x) ∧
         
     (* OTHER *)
-    (∀x y Z. Z ▹ x ⇒ (Z ⬝ y) ▹ (x ⬝ y)) ∧
-    (∀x x' y y'. x ≼ x' ∧ y ≼ y' ∧ x ⊥ y ⇒ x' ⊥ y') ∧
-    (∀x Z. Z ▹ x ∧ Z ⊥ RCS.E ⇒ x ⊥ RCS.E) ∧ 
-    (∀x y z. x ∈ RCS.W ∧ y ∈ RCS.W ∧ z ∈ RCS.W ∧ (x ⬝ y) ⊥ z ⇒ (x ⬝ z) ⊥ y)
+    (∀x y Z. Z ▹ₐ x ⇒ (Z ⬝ₐ y) ▹ₐ (x ⬝ₐ y)) ∧
+    (∀x x' y y'. x ≼ₐ x' ∧ y ≼ₐ y' ∧ x ⊥ₐ y ⇒ x' ⊥ₐ y') ∧
+    (∀x Z. Z ▹ₐ x ∧ Z ⊥ₐ RCS.E ⇒ x ⊥ₐ RCS.E) ∧ 
+    (∀x y z. x ∈ RCS.W ∧ y ∈ RCS.W ∧ z ∈ RCS.W ∧ (x ⬝ₐ y) ⊥ₐ z ⇒ (x ⬝ₐ z) ⊥ₐ y)
 End
         
 Theorem RCS_IDENTITY               = Is_Relevant_Cover_System_def |> iffLR |> cj 1
@@ -175,11 +175,10 @@ Proof
 QED
         
 Definition Perp_def:
-  Perp RCS X = {y | y ∈ RCS.W ∧ ∀x. x ∈ X ⇒ RCS.ORTH y x}
+  Perp RCS (X: α set) = {y | y ∈ RCS.W ∧ ∀x. x ∈ X ⇒ y ⊥ₐ x}
 End
 
 Overload "Perp" = “λ (X: α set). Perp RCS X”
-
 
 Theorem to_CS_IS_COVER:
   ∀RCS. Is_Relevant_Cover_System RCS ⇒
@@ -193,15 +192,15 @@ Definition Is_Prop_def:
 End
 
 Definition IMP_def:
-  IMP RCS X Y = {w | w ∈ RCS.W ∧ {RCS.FUSE w x | x ∈ X} ⊆ Y}
+  IMP RCS X Y = {w | w ∈ RCS.W ∧ {w ⬝ₐ x | x ∈ X} ⊆ Y}
 End
 
-val _= set_mapped_fixity {term_name = "IMPP", fixity = Infix (NONASSOC, 450), tok="⟹"};
+val _= set_mapped_fixity {term_name = "IMPP", fixity = Infix (NONASSOC, 450), tok="⟹ₐ"};
 Overload "IMPP" = “λ (x : α set) y. IMP RCS x y”
         
 Theorem lemma6_4_1_1:
   ∀RCS x y. Is_Relevant_Cover_System RCS ∧ x ∈ RCS.W ∧ y ∈ RCS.W ⇒
-            (RCS.ORTH x y ⇔ RCS.ORTH (RCS.FUSE x y) RCS.E)
+            (x ⊥ₐ y ⇔ (x ⬝ₐ y) ⊥ₐ RCS.E)
 Proof
   rw[EQ_IMP_THM]
   >- (irule RCS_CONTRAPOSITION >> simp[RCS_IDENTITY] >>
@@ -222,31 +221,31 @@ Proof
       simp[] >> qexistsl_tac [‘d’, ‘x’] >> simp[] >>
       metis_tac[PreOrder, RCS_PREORDER, reflexive_def]
      )
-  >- (rw[j_def, Once SUBSET_DEF, to_CS_def] >> rename[‘x ⊥ y’] >>
+  >- (rw[j_def, Once SUBSET_DEF, to_CS_def] >> rename[‘x ⊥ₐ y’] >>
       irule (iffRL lemma6_4_1_1) >> rw[]
       >- gs[SUBSET_DEF]
-      >> ‘∀z. z ∈ Z ⇒ z ⊥ y’ by gs[SUBSET_DEF] >> 
-      ‘∀z. z ∈ Z ⇒ (z ⬝ y) ⊥ RCS.E’ by
+      >> ‘∀z. z ∈ Z ⇒ z ⊥ₐ y’ by gs[SUBSET_DEF] >> 
+      ‘∀z. z ∈ Z ⇒ (z ⬝ₐ y) ⊥ₐ RCS.E’ by
         (rw[] >> irule (iffLR lemma6_4_1_1) >>
          gs[SUBSET_DEF]) >>
       drule_then strip_assume_tac RCS_FUSION_COVERING >> 
       pop_assum $ qspecl_then [‘x’, ‘y’, ‘Z’] strip_assume_tac >>
       gs[] >> irule RCS_IDENTITY_ORTH_IS_LOCAL >> simp[] >> 
-      qexists_tac ‘Z ⬝ y’ >> rw[op_Lift_1, rel_Lift_1] >>
+      qexists_tac ‘Z ⬝ₐ y’ >> rw[op_Lift_1, rel_Lift_1] >>
       gs[SUBSET_DEF])
 QED   
         
 Theorem lemma6_4_1_3:
   ∀RCS X Y. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ∧
             Y ⊆ RCS.W ∧ Upset Y ⇒
-            Upset (X ⟹ Y)
+            Upset (X ⟹ₐ Y)
 Proof
   rw[Upset_def, to_CS_def]
   >- simp[IMP_def, Once SUBSET_DEF]
-  >- (rw[IMP_def, SUBSET_DEF] >> rename [‘x ∈ X’, ‘d ∈ X ⟹ Y’] >>
+  >- (rw[IMP_def, SUBSET_DEF] >> rename [‘x ∈ X’, ‘d ∈ X ⟹ₐ Y’] >>
       last_x_assum irule >> rw[]
       >- gs[SUBSET_DEF, RCS_REFINEMENT_CLOSURE, RCS_FUSION_CLOSURE]
-      >- (qexists_tac ‘RCS.FUSE d x’ >> rw[]
+      >- (qexists_tac ‘d ⬝ₐ x’ >> rw[]
           >- (gs[IMP_def, SUBSET_DEF] >> metis_tac[])
           >- (irule RCS_FUSION_MONO_REFINEMENT >>
               simp[] >> metis_tac[PreOrder, RCS_PREORDER, reflexive_def]
@@ -258,23 +257,23 @@ QED
 Theorem lemma6_4_1_4:
   ∀RCS X Y. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ∧
             Y ⊆ RCS.W ∧ Localized Y ⇒
-            Localized (X ⟹ Y)
+            Localized (X ⟹ₐ Y)
 Proof
   rw[SUBSET_DEF, Localized_def, IMP_def, j_def, to_CS_def] >>
-  rename[‘x ⬝ y ∈ Y’] >> first_x_assum irule >>
-  simp[RCS_FUSION_CLOSURE] >> qexists_tac ‘Z ⬝ y’ >>
+  rename[‘x ⬝ₐ y ∈ Y’] >> first_x_assum irule >>
+  simp[RCS_FUSION_CLOSURE] >> qexists_tac ‘Z ⬝ₐ y’ >>
   rw[RCS_FUSION_COVERING, op_Lift_1] >> 
   metis_tac[]
 QED
 
 Theorem lemma6_4_1_5:
   ∀RCS (x: α) X. Is_Relevant_Cover_System RCS ∧ x ∈ RCS.W ∧ X ⊆ RCS.W ∧
-                 x ⊥ X ⇒
-                 x ⊥ j X
+                 x ⊥ₐ X ⇒
+                 x ⊥ₐ j X
 Proof
   rw[j_def, rel_Lift_2, to_CS_def] >> irule (iffRL lemma6_4_1_1) >> simp[] >>
   irule RCS_IDENTITY_ORTH_IS_LOCAL >> simp[] >>
-  qexists_tac ‘Z ⬝ x’ >> rw[]
+  qexists_tac ‘Z ⬝ₐ x’ >> rw[]
   >- metis_tac[RCS_FUSION_COVERING, RCS_FUSION_COMM]
   >- (pop_assum mp_tac >> rw[SUBSET_DEF, op_Lift_1, rel_Lift_1] >>
       metis_tac[lemma6_4_1_1, RCS_FUSION_COMM, SUBSET_DEF]
@@ -285,7 +284,7 @@ Theorem lemma6_4_1_5_alt:
   ∀RCS (x: α) X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ⇒
                  Perp X ⊆ Perp (j X) 
 Proof
-  rw[SUBSET_DEF, Perp_def] >> rename[‘x ⊥ y’] >>
+  rw[SUBSET_DEF, Perp_def] >> rename[‘x ⊥ₐ y’] >>
   assume_tac lemma6_4_1_5 >> gs[rel_Lift_2] >> first_x_assum irule >>
   simp[] >> qexists_tac ‘X’ >> gs[SUBSET_DEF]
 QED
@@ -296,15 +295,15 @@ Theorem lemma6_4_1_6:
 Proof
   rw[]
   >- (rw[SUBSET_DEF, j_def, to_CS_def, Perp_def] >>
-      rename [‘x ⊥ y’] >>
-      ‘y ⊥ x’ suffices_by
+      rename [‘x ⊥ₐ y’] >>
+      ‘y ⊥ₐ x’ suffices_by
         metis_tac[lemma6_4_1_1, RCS_FUSION_COMM] >>
       last_x_assum irule >> metis_tac[]
      ) 
   >- (‘Perp X ⊆ Perp (j X)’ suffices_by 
         rw[Perp_def, SUBSET_DEF] >>
       rw[Perp_def, SUBSET_DEF] >>
-      rename [‘x ⊥ y’] >>
+      rename [‘x ⊥ₐ y’] >>
       assume_tac lemma6_4_1_5 >>
       pop_assum $ qspecl_then [‘RCS’, ‘x’, ‘X’] strip_assume_tac >>
       gs[rel_Lift_2]
@@ -313,7 +312,7 @@ QED
         
 Theorem lemma6_4_1_7:
   ∀(RCS : α R_COVER_SYSTEM) X x. Is_Relevant_Cover_System RCS ∧ Upset X ∧ X ⊆ RCS.W ∧ x ∈ RCS.W ⇒
-            (x ⊥ X ⇔ x ⊥ j X)
+            (x ⊥ₐ X ⇔ x ⊥ₐ j X)
 Proof
   rw[] >>
   EQ_TAC >> strip_tac
@@ -352,12 +351,12 @@ Overload "Orthojoin" = “λ (X: α set). Orthojoin RCS X”
         
 Definition R_MODEL_SYSTEM_def:
   R_MODEL_SYSTEM RCS Ps ⇔ Is_Relevant_Cover_System RCS ∧
-                          ({w | RCS.E ≼ w ∧ w ∈ RCS.W} ∈ Ps) ∧
+                          ({w | RCS.E ≼ₐ w ∧ w ∈ RCS.W} ∈ Ps) ∧
                           (∀X. X ∈ Ps ⇒ Upset X) ∧
                           (∀X. X ∈ Ps ⇒ X = Perp (Perp X)) ∧ 
                           (∀X. X ∈ Ps ⇒ Perp X ∈ Ps) ∧
                           (∀X Y. X ∈ Ps ∧ Y ∈ Ps ⇒ X ∩ Y ∈ Ps) ∧
-                          (∀X Y. X ∈ Ps ∧ Y ∈ Ps ⇒ X ⟹ Y ∈ Ps) ∧
+                          (∀X Y. X ∈ Ps ∧ Y ∈ Ps ⇒ X ⟹ₐ Y ∈ Ps) ∧
                           (∀X Y. X ∈ Ps ∧ Y ∈ Ps ⇒ Orthojoin X Y = j (X ∪ Y))
 End
         
@@ -409,25 +408,30 @@ Overload "IMPP" = “λ (x : α set) y. IMP RCS x y”
 
 Overload "Orthojoin" = “λ (X: α set). Orthojoin RCS X”
 *)
+val _= set_mapped_fixity {term_name = "gBOT", fixity = Infix (NONASSOC, 450), tok="⊥"};
+val _= set_mapped_fixity {term_name = "gFUSE", fixity = Infix (NONASSOC, 450), tok="⬝"};
+val _= set_mapped_fixity {term_name = "gREF", fixity = Infix (NONASSOC, 450), tok="≼"};
+val _= set_mapped_fixity {term_name = "gCOVER", fixity = Infix (NONASSOC, 450), tok="▹"};
+val _= set_mapped_fixity {term_name = "gIMPP", fixity = Infix (NONASSOC, 450), tok="⟹"};
 
-Overload "BOT" = “λ x y. RCS.ORTH (x: g_prop set) y”
-Overload "BOT" = “λ x y. rel_Lift_1 RCS.ORTH (x: (g_prop set) set) y”
-Overload "BOT" = “λ x y. rel_Lift_2 RCS.ORTH (x: g_prop set) y”
+Overload "gBOT" = “λ x y. RCS.ORTH (x: g_prop set) y”
+Overload "gBOT" = “λ x y. rel_Lift_1 RCS.ORTH (x: (g_prop set) set) y”
+Overload "gBOT" = “λ x y. rel_Lift_2 RCS.ORTH (x: g_prop set) y”
 
-Overload "FUSE" = “λ x y. RCS.FUSE (x: g_prop set) y”
-Overload "FUSE" = “λ x y. op_Lift_1 RCS.FUSE (x: (g_prop set) set) y”
-Overload "FUSE" = “λ x y. op_Lift_2 RCS.FUSE (x: g_prop set) y”
+Overload "gFUSE" = “λ x y. RCS.FUSE (x: g_prop set) y”
+Overload "gFUSE" = “λ x y. op_Lift_1 RCS.FUSE (x: (g_prop set) set) y”
+Overload "gFUSE" = “λ x y. op_Lift_2 RCS.FUSE (x: g_prop set) y”
 
-Overload "REF" = “λ x y. RCS.REF (x: g_prop set) y”
+Overload "gREF" = “λ x y. RCS.REF (x: g_prop set) y”
 
-Overload "COVER" = “λ (x : (g_prop set) set) y. RCS.COVER x y”
+Overload "gCOVER" = “λ (x : (g_prop set) set) y. RCS.COVER x y”
                      
          
 Overload "j" = “λ (X: (g_prop set) set). j (to_CS RCS) X”
 Overload "Upset" = “λ (X: (g_prop set) set). Upset (to_CS RCS) X”
 Overload "Localized" = “λ (X: (g_prop set) set). Localized (to_CS RCS) X”
 Overload "Perp" = “λ (X: (g_prop set) set). Perp RCS X”
-Overload "IMPP" = “λ (x : (g_prop set) set) y. IMP RCS x y” 
+Overload "gIMPP" = “λ (x : (g_prop set) set) y. IMP RCS x y” 
 Overload "Orthojoin" = “λ (X: (g_prop set) set). Orthojoin RCS X”
         
 Definition Model_Function_def:
