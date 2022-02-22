@@ -1,4 +1,3 @@
-
 open HolKernel Parse boolLib bossLib pred_setTheory;
 open relationTheory;
 open GoldblattRLTheory RLRulesTheory;
@@ -17,9 +16,16 @@ End
 Definition Up_def:
   Up CS x = {u | u ∈ CS.W ∧ ∃w. w ∈ x ∧ CS.REF w u}
 End
-     
+
+Definition PREORDER_def:
+  PREORDER R X ⇔
+    (∀x. x ∈ X ⇒ R x x) ∧
+    (∀x y z. x ∈ X ∧ y ∈ X ∧ z ∈ X ∧ R x y ∧ R y z ⇒
+             R x z)
+End
+        
 Definition Is_Cover_System_def:
-  Is_Cover_System CS ⇔ PreOrder CS.REF ∧
+  Is_Cover_System CS ⇔ PREORDER CS.REF CS.W ∧
                        (∀x y. CS.REF x y ⇒ x ∈ CS.W ∧ y ∈ CS.W) ∧
                        (∀x. x ∈ CS.W ⇒ ∃Z. CS.COVER Z x) ∧
                        (∀x Z. x ∈ CS.W ∧ CS.COVER Z x ⇒ Z ⊆ Up CS {x})
@@ -31,7 +37,7 @@ Theorem Upset_up:
 Proof
   rw[Up_def, Upset_def, EXTENSION, EQ_IMP_THM]
   >- metis_tac[SUBSET_DEF]
-  >- (qexists_tac ‘x’ >> gs[Is_Cover_System_def, PreOrder, reflexive_def])
+  >- (qexists_tac ‘x’ >> metis_tac[Is_Cover_System_def, PREORDER_def, SUBSET_DEF])
   >- gs[SUBSET_DEF]
   >- metis_tac[Is_Cover_System_def]
 QED
@@ -141,7 +147,7 @@ Definition Is_Relevant_Cover_System_def:
     (∀x. x ∈ RCS.W ⇒ (x ⬝ₐ x) ≼ₐ x) ∧
         
     (* OTHER *)
-    (∀x y Z. Z ▹ₐ x ⇒ (Z ⬝ₐ y) ▹ₐ (x ⬝ₐ y)) ∧
+    (∀x y Z. Z ▹ₐ x ∧ y ∈ RCS.W ⇒ (Z ⬝ₐ y) ▹ₐ (x ⬝ₐ y)) ∧
     (∀x x' y y'. x ≼ₐ x' ∧ y ≼ₐ y' ∧ x ⊥ₐ y ⇒ x' ⊥ₐ y') ∧
     (∀x Z. Z ▹ₐ x ∧ Z ⊥ₐ RCS.E ⇒ x ⊥ₐ RCS.E) ∧ 
     (∀x y z. x ∈ RCS.W ∧ y ∈ RCS.W ∧ z ∈ RCS.W ∧ (x ⬝ₐ y) ⊥ₐ z ⇒ (x ⬝ₐ z) ⊥ₐ y)
@@ -168,7 +174,7 @@ Theorem RCS_CONTRAPOSITION         = Is_Relevant_Cover_System_def |> iffLR |> cj
 
 Theorem RCS_PREORDER:
   Is_Relevant_Cover_System RCS ⇒
-  PreOrder RCS.REF
+  PREORDER RCS.REF RCS.W
 Proof
   rw[] >> drule RCS_COVER_SYSTEM >> simp[to_CS_def] >> 
   rw[Is_Cover_System_def]
@@ -219,7 +225,7 @@ Proof
   reverse $ rw[Is_Prop_def, Localized_def, Perp_def] 
   >- (rw[Upset_def, SUBSET_DEF, to_CS_def] >> irule RCS_REFINEMENT_ORTHOGONAL >>
       simp[] >> qexistsl_tac [‘d’, ‘x’] >> simp[] >>
-      metis_tac[PreOrder, RCS_PREORDER, reflexive_def]
+      metis_tac[PREORDER_def, RCS_PREORDER, SUBSET_DEF]
      )
   >- (rw[j_def, Once SUBSET_DEF, to_CS_def] >> rename[‘x ⊥ₐ y’] >>
       irule (iffRL lemma6_4_1_1) >> rw[]
@@ -231,8 +237,8 @@ Proof
       drule_then strip_assume_tac RCS_FUSION_COVERING >> 
       pop_assum $ qspecl_then [‘x’, ‘y’, ‘Z’] strip_assume_tac >>
       gs[] >> irule RCS_IDENTITY_ORTH_IS_LOCAL >> simp[] >> 
-      qexists_tac ‘Z ⬝ₐ y’ >> rw[op_Lift_1, rel_Lift_1] >>
-      gs[SUBSET_DEF])
+      qexists_tac ‘Z ⬝ₐ y’ >> gs[op_Lift_1, rel_Lift_1, SUBSET_DEF] >> 
+      metis_tac[SUBSET_DEF])
 QED   
         
 Theorem lemma6_4_1_3:
@@ -248,7 +254,7 @@ Proof
       >- (qexists_tac ‘d ⬝ₐ x’ >> rw[]
           >- (gs[IMP_def, SUBSET_DEF] >> metis_tac[])
           >- (irule RCS_FUSION_MONO_REFINEMENT >>
-              simp[] >> metis_tac[PreOrder, RCS_PREORDER, reflexive_def]
+              simp[] >> metis_tac[PREORDER_def, RCS_PREORDER, SUBSET_DEF]
              )
          )
      )
@@ -592,7 +598,7 @@ Proof
                      metis_tac [M_SUBSET_RCS_W, SUBSET_DEF, R_MODEL_SYSTEM_R_COVER_SYSTEM]) >> 
                   gs[] >> irule RCS_FUSION_MONO_REFINEMENT >> rw[] >> 
                   metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_FUSION_SQUARE_DECREASE,
-                            M_SUBSET_RCS_W, SUBSET_DEF, RCS_PREORDER, PreOrder, reflexive_def])
+                            M_SUBSET_RCS_W, SUBSET_DEF, RCS_PREORDER, PREORDER_def])
               >- (last_x_assum $ qspec_then ‘x ⬝ y’ strip_assume_tac >>
                   ‘∀x'. (∃x''. x' = ((x ⬝ y) ⬝ x'') ∧ x'' ∈ M A) ⇒ x' ∈ M B’ by metis_tac[] >>
                   last_x_assum irule >> metis_tac[]
@@ -778,7 +784,7 @@ Proof
               ‘(RCS.E ⬝ RCS.E) ≼ (RCS.E ⬝ x')’ suffices_by
                 metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_FUSION_LEFT_IDENTITY] >>
               irule RCS_FUSION_MONO_REFINEMENT >> simp[] >>
-              metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_PREORDER, PreOrder, reflexive_def])
+              metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_PREORDER, PREORDER_def, SUBSET_DEF, RCS_IDENTITY])
          )
      )  
   >- (‘C_Holds RCS Ps M RCS.E (τ --> p)’ by gs[] >> 
@@ -788,7 +794,7 @@ Proof
       last_x_assum irule >>
       qexists_tac ‘RCS.E’ >> 
       metis_tac[RCS_FUSION_RIGHT_IDENTITY, R_MODEL_SYSTEM_R_COVER_SYSTEM,
-                RCS_PREORDER, PreOrder, reflexive_def])                
+                RCS_PREORDER, PREORDER_def, SUBSET_DEF, RCS_IDENTITY])                
 QED
 
 Definition ENTAILS_def:
@@ -801,9 +807,24 @@ val _ = set_fixity "|-^" (Infixr 490);
 Overload "|-^" = “ENTAILS”
 
 Theorem ENTAILS_PREORDER:
-  PreOrder ENTAILS
+  PREORDER ENTAILS (𝕌(:g_prop))
 Proof
-  rw[PreOrder, reflexive_def, transitive_def, ENTAILS_def] >>
+  rw[PREORDER_def, ENTAILS_def] >>
+  metis_tac[goldblatt_provable_rules]
+QED
+
+Theorem ENTAILS_REFL:
+  ∀A. A |-^ A
+Proof
+  rw[ENTAILS_def] >>
+  metis_tac[goldblatt_provable_rules]
+QED
+        
+Theorem ENTAILS_TRANS:
+  ∀A B C. A |-^ B ∧ B |-^ C ⇒
+      A |-^ C
+Proof
+  rw[ENTAILS_def] >>
   metis_tac[goldblatt_provable_rules]
 QED
 
@@ -838,8 +859,8 @@ QED
 Theorem ENTAILS_CONTRAPOS_alt:
   ∀A B. A |-^ B ⇒ (~B) |-^ (~A)
 Proof
-  metis_tac[ENTAILS_CONTRAPOS, ENTAILS_DOUBLE_NEG, ENTAILS_PREORDER,
-            PreOrder, transitive_def]
+  rw[] >>
+  metis_tac[ENTAILS_CONTRAPOS, ENTAILS_DOUBLE_NEG, ENTAILS_TRANS]
 QED
 
 Theorem ENTAILS_ICONJ_COMM:
@@ -853,18 +874,18 @@ Theorem ENTAILS_ICONJ_MONOTONE:
   ∀A B C. A |-^ B ⇒
           (A ∘ᵣ C) |-^ (B ∘ᵣ C) ∧ (C ∘ᵣ A) |-^ (C ∘ᵣ B)
 Proof
-   metis_tac[yeet, ENTAILS_PREORDER, PreOrder, reflexive_def, ENTAILS_def]
+   metis_tac[yeet, ENTAILS_REFL, ENTAILS_def]
 QED
 
 Theorem ENTAILS_ICONJ_MONOTONE_alt:
   ∀A B C D. A |-^ B ∧ C |-^ D ⇒
           (A ∘ᵣ C) |-^ (B ∘ᵣ D) ∧ (C ∘ᵣ A) |-^ (D ∘ᵣ B)
 Proof
-   metis_tac[yeet, ENTAILS_PREORDER, PreOrder, reflexive_def, ENTAILS_def]
+   metis_tac[yeet, ENTAILS_REFL, ENTAILS_def]
 QED
 
 Theorem ENTAILS_ICONJ_RULE:
-  ∀A B C. (A ∘ᵣ B) |-^ C ⇒
+  ∀A B C. (A ∘ᵣ B) |-^ C ⇔
           A |-^ (B --> C)
 Proof
   metis_tac[EQ_IMP_THM, g_io_rule, ENTAILS_def]
@@ -874,8 +895,7 @@ Theorem ENTAILS_ICONJ_ASSOC:
   ∀A B C. ((A ∘ᵣ B)∘ᵣ C) |-^ (A ∘ᵣ ( B ∘ᵣ C)) ∧
           (A ∘ᵣ ( B ∘ᵣ C)) |-^ ((A ∘ᵣ B)∘ᵣ C)
 Proof
-  metis_tac[g_io_associative_rl, ENTAILS_def, ENTAILS_PREORDER,
-            PreOrder, transitive_def, ENTAILS_ICONJ_COMM]
+  metis_tac[g_io_associative_rl, ENTAILS_def, ENTAILS_TRANS, ENTAILS_ICONJ_COMM]
 QED
 
 Theorem ENTAILS_ICONJ_T:
@@ -899,7 +919,7 @@ Theorem Theory_closed_ENTAILS:
            C ∈ Theory A
 Proof
   rw[Theory_def] >>
-  metis_tac[ENTAILS_PREORDER, PreOrder, transitive_def]
+  metis_tac[ENTAILS_TRANS]
 QED
 
 Theorem Theory_closed_CONJ:
@@ -951,7 +971,7 @@ Proof
       >- (last_x_assum $ qspec_then ‘x'’ strip_assume_tac >> 
           gs[Theory_def, g_identity, ENTAILS_def])
       >- (rw[Theory_def, EQ_IMP_THM] >>
-           metis_tac[ENTAILS_PREORDER, PreOrder, transitive_def])
+           metis_tac[ENTAILS_TRANS])
      )
 QED
 
@@ -961,7 +981,7 @@ Proof
   rw[EQUIV_def, EQ_IMP_THM] >>
   irule SUBSET_ANTISYM >> reverse $ rw[]
   >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
-      qexists_tac ‘A’ >> metis_tac[ENTAILS_PREORDER, PreOrder, reflexive_def]
+      qexists_tac ‘A’ >> metis_tac[ENTAILS_REFL]
      )
   >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF, Theory_EQ] >>
      gs[])
@@ -982,7 +1002,10 @@ Definition CAN_ORTH_def:
 End
          
 Definition Canonical_System_def:
-  Canonical_System = <|W := {Theory A | A ∈ 𝕌(:g_prop)}; REF := (λx y. x ⊆ y); COVER := (λZ x. BIGINTER Z = x); E := Theory τ; 
+  Canonical_System = <|W := {Theory A | A ∈ 𝕌(:g_prop)};
+                       REF := (λx y. x ⊆ y ∧ x ∈ {Theory A | A ∈ 𝕌(:g_prop)} ∧ y ∈ {Theory A | A ∈ 𝕌(:g_prop)});
+                       COVER := (λZ x. BIGINTER Z = x ∧ x ∈ {Theory A | A ∈ 𝕌(:g_prop)} ∧ Z ⊆ {Theory A | A ∈ 𝕌(:g_prop)});
+                       E := Theory τ; 
                        FUSE := CAN_FUSION; ORTH := CAN_ORTH |>
 End
 
@@ -1018,29 +1041,116 @@ Overload "gIMPPc" = “λ (x : (g_prop set) set) y. IMP Canonical_System x y”
 Overload "Orthojoin" = “λ (X: (g_prop set) set). Orthojoin Canonical_System X”
 
 Theorem CAN_FUSION_alt:
-  ∀A B. Canonical_System.FUSE (Theory A) (Theory B) = Theory (A ∘ᵣ B)
+  ∀A B. CAN_FUSION (Theory A) (Theory B) = Theory (A ∘ᵣ B)
 Proof
-  reverse $ rw[CAN_FUSION_def, Canonical_System_def]
+  reverse $ rw[CAN_FUSION_def]
   >- metis_tac[]
   >- (irule SUBSET_ANTISYM >> reverse $ rw[]
       >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
           qexistsl_tac [‘A’, ‘B’] >> simp[gens_def])
       >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
           gs[gens_def, GSYM Theory_EQ] >> gs[Theory_def] >>
-          metis_tac[ENTAILS_PREORDER, PreOrder, transitive_def,
-                    ENTAILS_ICONJ_MONOTONE_alt])
+          metis_tac[ENTAILS_TRANS, ENTAILS_ICONJ_MONOTONE_alt])
      )
 QED
 
 Theorem CAN_ORTH_alt:
-  ∀A B. Canonical_System.ORTH (Theory A) (Theory B) ⇔ A |-^ (~B)
+  ∀A B. CAN_ORTH (Theory A) (Theory B) ⇔ A |-^ (~B)
 Proof
-  rw[CAN_ORTH_def, Canonical_System_def, EQ_IMP_THM, gens_def]
+  rw[CAN_ORTH_def, EQ_IMP_THM, gens_def]
   >- (gs[GSYM Theory_EQ] >>
-      metis_tac[ENTAILS_PREORDER, PreOrder, transitive_def, ENTAILS_CONTRAPOS_alt])
+      metis_tac[ENTAILS_TRANS, ENTAILS_CONTRAPOS_alt])
   >- metis_tac[]
   >- metis_tac[]
 QED
 
+Theorem Canonical_System_is_RCS:
+  Is_Relevant_Cover_System Canonical_System
+Proof
+  rw[Is_Relevant_Cover_System_def]
+  >- (gs[Canonical_System_def] >> metis_tac[])
+  >- (gs[Canonical_System_def] >> metis_tac[])
+  >- (gs[Canonical_System_def] >> metis_tac[])
+  >- (gs[Canonical_System_def] >> metis_tac[])
+  >- (gs[Canonical_System_def] >> metis_tac[])
+  >- (gs[Canonical_System_def] >> metis_tac[CAN_FUSION_alt])
+  >- (gs[Canonical_System_def] >> metis_tac[CAN_ORTH_def])
+  >- (gs[Canonical_System_def] >> metis_tac[CAN_ORTH_def])
+  >- (rw[Canonical_System_def, to_CS_def, Is_Cover_System_def]
+      >- (rw[PREORDER_def] >> metis_tac[SUBSET_TRANS])
+      >- (qexists_tac ‘{Theory A}’ >> simp[BIGINTER] >> metis_tac[])
+      >- (rw[Up_def, SUBSET_DEF] >> gs[SUBSET_DEF, BIGINTER, EXTENSION] >>
+          metis_tac[])
+     )
+  >- (gs[Canonical_System_def, CAN_FUSION_alt, GSYM Theory_EQ] >>
+      metis_tac[ENTAILS_ICONJ_T, ENTAILS_ICONJ_COMM, ENTAILS_TRANS])
+  >- gs[Canonical_System_def, CAN_FUSION_alt, GSYM Theory_EQ, ENTAILS_ICONJ_T]
+  >- gs[Canonical_System_def, CAN_FUSION_alt, GSYM Theory_EQ, ENTAILS_ICONJ_COMM]
+  >- gs[Canonical_System_def, CAN_FUSION_alt, GSYM Theory_EQ, ENTAILS_ICONJ_ASSOC]
+  >- (gs[Canonical_System_def] >> rw[]
+      >- gs[CAN_FUSION_alt, GSYM Theory_SUBSET, ENTAILS_ICONJ_MONOTONE_alt] 
+      >- metis_tac[CAN_FUSION_alt, GSYM Theory_EQ]
+      >- metis_tac[CAN_FUSION_alt, GSYM Theory_EQ]
+     )
+  >- (gs[Canonical_System_def] >> rw[]
+      >- gs[CAN_FUSION_alt, GSYM Theory_SUBSET, ENTAILS_ICONJ_SELF] 
+      >- metis_tac[CAN_FUSION_alt, GSYM Theory_EQ]
+      >- metis_tac[] 
+     )
+  >- (gs[Canonical_System_def] >> rw[]
+      >- (irule SUBSET_ANTISYM >> reverse $ rw[] 
+          >- (rw[op_Lift_1, BIGINTER, PULL_EXISTS, SUBSET_DEF] >>
+              gs[SUBSET_DEF] >>
+              last_x_assum $ qspec_then ‘x'’ strip_assume_tac >>
+              gs[] >>
+              rename [‘BIGINTER Z = Theory A’,
+                      ‘x ∈ CAN_FUSION (Theory A) (Theory B)’,
+                      ‘x' = Theory C’] >> gs[CAN_FUSION_alt] >>
+              qpat_x_assum ‘x ∈ Theory (A ∘ᵣ B)’ mp_tac >> rw[Theory_def] >>
+              ‘C |-^ A’ suffices_by 
+                metis_tac[ENTAILS_ICONJ_MONOTONE, ENTAILS_TRANS] >>
+              gs[BIGINTER, Theory_def, EXTENSION] >>
+                 last_x_assum $ qspec_then ‘A’ strip_assume_tac >>
+                 gs[ENTAILS_REFL] >> last_x_assum $ qspec_then ‘{B | C |-^ B}’ strip_assume_tac >> 
+                 gs[])
+          >- (rw[SUBSET_DEF, op_Lift_1] >>
+              rename[‘D ∈ CAN_FUSION (Theory A) (Theory B)’] >>
+              gs[CAN_FUSION_alt, PULL_EXISTS, SUBSET_DEF] >>
+              ‘∀C. Theory C ∈ Z ⇒ B --> D ∈ Theory C’ by
+                (rw[] >> first_x_assum $ qspec_then ‘Theory C’ strip_assume_tac >>
+                 gs[CAN_FUSION_alt, Theory_def, ENTAILS_ICONJ_RULE]) >> 
+              ‘B --> D ∈ Theory A’ suffices_by
+                gs[Theory_def, GSYM ENTAILS_ICONJ_RULE] >>
+              gs[BIGINTER, EXTENSION] >> last_x_assum $ qspec_then ‘B --> D’ strip_assume_tac >>
+              pop_assum mp_tac >> rw[EQ_IMP_THM] >> qpat_x_assum ‘_ ⇒ B --> D ∈ Theory A’ irule >>
+              rw[] >> last_x_assum $ qspec_then ‘P’ strip_assume_tac >> gs[] >> 
+              metis_tac[EXTENSION])
+         )
+      >- (gs[] >> metis_tac[CAN_FUSION_alt])
+      >- (simp[op_Lift_1] >> gs[SUBSET_DEF] >> rw[] >>
+          metis_tac[CAN_FUSION_alt])
+     )
+  >- (gs[Canonical_System_def] >> rw[] >> 
+      rename[‘Theory A ⊆ Theory A'’,
+             ‘Theory B ⊆ Theory B'’] >>
+      gs[CAN_ORTH_alt, GSYM Theory_SUBSET] >>
+      metis_tac[ENTAILS_TRANS, ENTAILS_CONTRAPOS_alt]
+     )
+  >- (gs[Canonical_System_def, rel_Lift_1] >> rw[] >> 
+      ‘∀C. Theory C ∈ Z ⇒ CAN_ORTH (Theory C) (Theory τ)’ by gs[] >>
+      gs[CAN_ORTH_alt] >>
+      ‘~τ ∈ BIGINTER Z’ suffices_by
+        (strip_tac >> gs[Theory_def, EXTENSION]) >>
+      gs[SUBSET_DEF] >> rw[] >>
+      last_x_assum $ qspec_then ‘P’ strip_assume_tac >> gs[] >>
+      simp[Theory_def]
+     )
+  >- (gs[Canonical_System_def, CAN_ORTH_alt, CAN_FUSION_alt] >>
+      pop_assum mp_tac >> 
+      rename[‘(A ∘ᵣ B) |-^ ~C ⇒ (A ∘ᵣ C) |-^ ~B’] >> rw[] >>
+      gs[ENTAILS_ICONJ_RULE] >> metis_tac[ENTAILS_TRANS, ENTAILS_def, g_contrapositive]
+     )
+QED
+        
         
 val _ = export_theory();
