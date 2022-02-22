@@ -1009,8 +1009,12 @@ Definition Canonical_System_def:
                        FUSE := CAN_FUSION; ORTH := CAN_ORTH |>
 End
 
+Definition EQUIV_W_def:
+  EQUIV_W A = {w | A ∈ w ∧ w ∈ Canonical_System.W}
+End
+        
 Definition Canonical_System_Ps_def:
-  Canonical_System_Ps A = {{w | A ∈ w ∧ w ∈ Canonical_System.W} | A ∈ 𝕌(:g_prop)}
+  Canonical_System_Ps = {EQUIV_W A | A ∈ 𝕌(:g_prop)}
 End
 
          
@@ -1151,6 +1155,62 @@ Proof
       gs[ENTAILS_ICONJ_RULE] >> metis_tac[ENTAILS_TRANS, ENTAILS_def, g_contrapositive]
      )
 QED
-        
+
+Theorem lemma6_5_3_1:
+ ∀A. Up (to_CS Canonical_System) {Theory A} = EQUIV_W A
+Proof
+  rw[Up_def, Once EXTENSION, Once EQ_IMP_THM, to_CS_def, Canonical_System_def, EQUIV_W_def]
+  >- (gs[SUBSET_DEF, Theory_def] >> last_x_assum irule >>
+      gs[EXTENSION] >> metis_tac[ENTAILS_REFL])
+  >- (gs[SUBSET_DEF, Theory_def] >> metis_tac[ENTAILS_TRANS])
+  >- metis_tac[]
+QED
+
+Theorem lemma6_5_3_2:
+  ∀A B. EQUIV_W A ∩ EQUIV_W B = EQUIV_W (A & B)
+Proof
+  rw[EQUIV_W_def, Canonical_System_def, Once EXTENSION, EQ_IMP_THM] >>
+  gs[Theory_def] >> metis_tac[ENTAILS_AND]
+QED
+
+Theorem lemma6_5_3_3:
+  ∀A. Perp (EQUIV_W A) = EQUIV_W (~A)
+Proof
+  rw[] >> irule SUBSET_ANTISYM >> rw[]
+  >- (rw[Once SUBSET_DEF, EQUIV_W_def] >> gs[Perp_def] >>
+      last_x_assum $ qspec_then ‘Theory A’ strip_assume_tac >>
+      gs[Canonical_System_def] >>
+      ‘CAN_ORTH (Theory A') (Theory A)’ by (gs[Theory_def, ENTAILS_REFL] >> metis_tac[]) >>
+      gs[CAN_ORTH_alt, Theory_def])
+  >- (rw[Once SUBSET_DEF, EQUIV_W_def, Perp_def, Canonical_System_def] >>
+      gs[CAN_ORTH_alt, Theory_def] >> metis_tac[ENTAILS_TRANS, ENTAILS_CONTRAPOS])
+QED
+
+Theorem lemma6_5_3_4:
+  ∀A B. (EQUIV_W A ⟹ₘ EQUIV_W B) = EQUIV_W (A --> B)
+Proof
+  rw[] >> irule SUBSET_ANTISYM >> rw[] 
+  >- (rw[Once SUBSET_DEF, EQUIV_W_def]
+      >- (gs[IMP_def, Canonical_System_def] >>
+          rename[‘x = Theory C’] >> gs[SUBSET_DEF, PULL_EXISTS, CAN_FUSION_alt] >>
+          last_x_assum $ qspec_then ‘A’ strip_assume_tac >>
+          gs[Theory_def, ENTAILS_REFL, ENTAILS_ICONJ_RULE])
+      >- gs[IMP_def]
+     )
+  >- (rw[Once SUBSET_DEF, EQUIV_W_def, IMP_def, Canonical_System_def] >> 
+      rename[‘A --> B ∈ Theory C’] >> rw[SUBSET_DEF, PULL_EXISTS, CAN_FUSION_alt] >>
+      qexists_tac ‘C ∘ᵣ A'’ >> gs[Theory_def] >>
+      metis_tac[ENTAILS_ICONJ_RULE, ENTAILS_ICONJ_MONOTONE, ENTAILS_TRANS])
+QED
+
+Theorem lemma6_5_3_5:
+   ∀A B. Orthojoin (EQUIV_W A) (EQUIV_W B) = EQUIV_W (A V B)
+Proof
+  rw[Orthojoin_def, g_OR_def] >> simp[GSYM lemma6_5_3_2, GSYM lemma6_5_3_3] >>
+  ‘Perp (EQUIV_W A ∪ EQUIV_W B) = Perp (EQUIV_W A) ∩ Perp (EQUIV_W B)’ suffices_by
+    metis_tac[] >>
+  simp[Perp_def, EXTENSION] >> metis_tac[]
+QED
+
         
 val _ = export_theory();
