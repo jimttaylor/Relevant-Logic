@@ -66,7 +66,7 @@ Definition Localized_def:
 End
 
 Theorem lemma6_3_1:
-  Is_Cover_System CS ∧ Upset CS X ⇒ X ⊆ j CS X
+  ∀CS X. Is_Cover_System CS ∧ Upset CS X ⇒ X ⊆ j CS X
 Proof
   rw[j_def, SUBSET_DEF]
   >- gs[Upset_def, SUBSET_DEF]
@@ -384,37 +384,6 @@ Proof
   gs[Upset_def] >> gs[SUBSET_DEF, to_CS_def]
 QED
 
-(*     
-val _= set_mapped_fixity {term_name = "BOT", fixity = Infix (NONASSOC, 450), tok="⊥"};
-Overload "BOT" = “λ x y. RCS.ORTH (x: α) y”
-Overload "BOT" = “λ x y. rel_Lift_1 RCS.ORTH (x: α set) y”
-Overload "BOT" = “λ x y. rel_Lift_2 RCS.ORTH (x: α) y”
-
-val _= set_mapped_fixity {term_name = "FUSE", fixity = Infix (NONASSOC, 450), tok="⬝"};
-Overload "FUSE" = “λ x y. RCS.FUSE (x: α) y”
-Overload "FUSE" = “λ x y. op_Lift_1 RCS.FUSE (x: α set) y”
-Overload "FUSE" = “λ x y. op_Lift_2 RCS.FUSE (x: α) y”
-
-val _= set_mapped_fixity {term_name = "REF", fixity = Infix (NONASSOC, 450), tok="≼"};
-Overload "REF" = “λ x y. RCS.REF (x: α) y”
-
-
-val _= set_mapped_fixity {term_name = "COVER", fixity = Infix (NONASSOC, 450), tok="▹"};
-Overload "COVER" = “λ (x : α set) y. RCS.COVER x y”
-                     
-         
-Overload "j" = “λ (X: α set). j (to_CS RCS) X”
-Overload "Upset" = “λ (X: α set). Upset (to_CS RCS) X”
-Overload "Localized" = “λ (X: α set). Localized (to_CS RCS) X”
-Overload "Perp" = “λ (X: α set). Perp RCS X”
-
-
-val _= set_mapped_fixity {term_name = "IMPP", fixity = Infix (NONASSOC, 450), tok="⟹"};
-Overload "IMPP" = “λ (x : α set) y. IMP RCS x y” 
-
-Overload "Orthojoin" = “λ (X: α set). Orthojoin RCS X”
-*)
-
 val _= set_mapped_fixity {term_name = "gBOT", fixity = Infix (NONASSOC, 450), tok="⊥"};
 val _= set_mapped_fixity {term_name = "gFUSE", fixity = Infix (NONASSOC, 450), tok="⬝"};
 val _= set_mapped_fixity {term_name = "gREF", fixity = Infix (NONASSOC, 450), tok="≼"};
@@ -443,7 +412,7 @@ Overload "Orthojoin" = “λ (X: (g_prop set) set). Orthojoin RCS X”
         
 Definition Model_Function_def:
   Model_Function (RCS: (g_prop set) R_COVER_SYSTEM) Ps M ⇔ 
-    (∀a A. M (g_VAR a) = A ⇔ A ∈ Ps) ∧ 
+    (∀a A. M (g_VAR a) = A ⇒ A ∈ Ps) ∧ 
     (M τ = {w | RCS.E ≼ w ∧ w ∈ RCS.W}) ∧
     (∀A B. M (A & B) = M A ∩ M B) ∧
     (∀A B. M (A --> B) = (M A ⟹ M B)) ∧
@@ -487,7 +456,7 @@ Proof
 QED 
                                                                     
 Definition C_Holds_def:
-  C_Holds RCS Ps M w A ⇔ w ∈ M A ∧ Model_Function RCS Ps M
+  C_Holds RCS Ps M w A ⇔ w ∈ M A ∧ Model_Function RCS Ps M ∧ R_MODEL_SYSTEM RCS Ps
 End
         
 Theorem C_Holds_conditions:
@@ -850,7 +819,7 @@ Proof
 QED
 
 Theorem ENTAILS_DOUBLE_NEG:
-  ∀A. A |-^ (~~A) ∧ A |-^ (~~A)
+  ∀A. A |-^ (~~A) ∧ (~~A) |-^ A
 Proof
   rw[ENTAILS_def] >>
   metis_tac[goldblatt_provable_rules]
@@ -1212,5 +1181,117 @@ Proof
   simp[Perp_def, EXTENSION] >> metis_tac[]
 QED
 
+Theorem Canonical_System_is_R_Model_system:
+  R_MODEL_SYSTEM Canonical_System Canonical_System_Ps
+Proof
+  rw[R_MODEL_SYSTEM_def, Canonical_System_is_RCS] 
+  >- (simp[Canonical_System_Ps_def, GSYM lemma6_5_3_1, Up_def, Theory_def, to_CS_def, EXTENSION] >>
+      qexists_tac ‘τ’ >> rw[Once EQ_IMP_THM]
+      >- (qexists_tac ‘Canonical_System.E’ >>
+          rw[Canonical_System_def] >> gs[Theory_def])
+      >- (gs[Canonical_System_def] >> rw[]
+          >- gs[SUBSET_DEF, EXTENSION, Theory_def]
+          >- metis_tac[]
+          >- metis_tac[]
+         )      
+     )
+  >- gs[Canonical_System_Ps_def, Upset_def, to_CS_def,
+        EQUIV_W_def, Canonical_System_def, SUBSET_DEF]
+  >- (gs[Canonical_System_Ps_def, lemma6_5_3_3] >>
+      rw[EQUIV_W_def, Canonical_System_def, Once EXTENSION, EQ_IMP_THM, Theory_def] >>
+      gs[] >> metis_tac[ENTAILS_DOUBLE_NEG, ENTAILS_TRANS])
+  >- (gs[Canonical_System_Ps_def] >> metis_tac[lemma6_5_3_3])
+  >- (gs[Canonical_System_Ps_def] >> metis_tac[lemma6_5_3_2])
+  >- (gs[Canonical_System_Ps_def] >> metis_tac[lemma6_5_3_4])
+  >- (gs[Canonical_System_Ps_def] >>
+      rename[‘Orthojoin (EQUIV_W A) (EQUIV_W B) = j (EQUIV_W A ∪ EQUIV_W B)’] >>
+      irule SUBSET_ANTISYM >> reverse $ rw[]
+      >- (simp[Orthojoin_def] >> assume_tac Canonical_System_is_RCS >>
+          drule_then strip_assume_tac lemma6_4_1_6 >>
+          pop_assum $ qspec_then ‘EQUIV_W A ∪ EQUIV_W B’ strip_assume_tac >>
+          ‘EQUIV_W A ∪ EQUIV_W B ⊆ Canonical_System.W’ by
+            simp[SUBSET_DEF, EQUIV_W_def] >>
+          metis_tac[SUBSET_TRANS])
+      >- (rw[lemma6_5_3_5, SUBSET_DEF] >>
+          ‘∃C. x = Theory C’ by
+            (gs[EQUIV_W_def, Canonical_System_def] >> metis_tac[]) >> gs[] >>
+          ‘Up (to_CS Canonical_System) {x} = EQUIV_W C’ by gs[lemma6_5_3_1] >>
+          rpt strip_tac >> simp[j_def, to_CS_def, PULL_EXISTS] >> 
+          qexists_tac ‘(EQUIV_W C ∩ EQUIV_W A) ∪ (EQUIV_W C ∩ EQUIV_W B)’ >> rw[SUBSET_DEF]
+          >- (simp[Canonical_System_def] >> metis_tac[])
+          >- (qabbrev_tac ‘Z = EQUIV_W C ∩ EQUIV_W A ∪ EQUIV_W C ∩ EQUIV_W B’ >>
+              reverse $ rw[Canonical_System_def]
+              >- simp[EQUIV_W_def, SUBSET_DEF, Canonical_System_def, Abbr‘Z’]
+              >- metis_tac[]
+              >- (irule SUBSET_ANTISYM >> reverse $ rw[]
+                  >- (‘Z ⊆ EQUIV_W C’ by simp[Abbr‘Z’] >> 
+                      rw[SUBSET_DEF] >> gs[EQUIV_W_def, SUBSET_DEF] >>
+                      last_x_assum $ qspec_then ‘P’ strip_assume_tac >> gs[] >> 
+                      ‘∃D. P = Theory D’ by
+                        (gs[Canonical_System_def] >> metis_tac[]) >> gs[Theory_def] >>
+                      metis_tac[ENTAILS_TRANS])
+                  >- (gs[lemma6_5_3_2] >> rw[SUBSET_DEF, Abbr‘Z’] >>
+                      ‘x ∈ Theory (C & A)’ by
+                        (last_x_assum irule >> 
+                         simp[EQUIV_W_def, Canonical_System_def, Theory_def] >> 
+                         metis_tac[ENTAILS_REFL]) >> 
+                      ‘x ∈ Theory (C & B)’ by 
+                         (last_x_assum irule >> 
+                         simp[EQUIV_W_def, Canonical_System_def, Theory_def] >> 
+                          metis_tac[ENTAILS_REFL]) >>
+                      gs[Theory_def, EQUIV_W_def] >>
+                      ‘(C & A V B) |-^ ((C & A) V C & B)’ by metis_tac[ENTAILS_def, g_distribution] >> 
+                      ‘C |-^ (C & A) V C & B’ by 
+                        metis_tac[OR_ENTAILS, ENTAILS_TRANS, ENTAILS_AND, ENTAILS_REFL] >> 
+                      metis_tac[OR_ENTAILS, ENTAILS_TRANS])
+                 )
+             )
+         )
+     )
+QED
+
+Theorem Model_System_Characterisation_1_2:
+  ∀p. |- p ⇒ (∀RCS Ps M. R_MODEL_SYSTEM RCS Ps ∧ Model_Function RCS Ps M ⇒ C_Holds RCS Ps M RCS.E p)
+Proof
+  gs[soundness]
+QED
+
+Theorem Model_System_Characterisation_2_3:
+  ∀p. (∀RCS Ps M. C_Holds RCS Ps M RCS.E p) ⇒
+      ∀M. C_Holds Canonical_System Canonical_System_Ps M Canonical_System.E p
+Proof
+   rw[]
+QED
         
+Theorem Model_System_Characterisation_3_1:
+  ∀p. (∀M. Model_Function Canonical_System Canonical_System_Ps M ⇒ 
+            C_Holds Canonical_System Canonical_System_Ps M Canonical_System.E p)
+      ⇒ |- p
+Proof
+  rw[] >> last_x_assum $ qspec_then ‘λx. EQUIV_W x’ strip_assume_tac >>
+  ‘Model_Function Canonical_System Canonical_System_Ps (λx. EQUIV_W x)’ by
+    (rw[Model_Function_def] 
+     >- (rw[Canonical_System_Ps_def] >> metis_tac[])
+     >- (rw[GSYM lemma6_5_3_1, Up_def, Theory_def, to_CS_def, EXTENSION, Once EQ_IMP_THM]
+         >- (gs[Canonical_System_def, to_CS_def, Theory_def] >> metis_tac[])
+         >- (qexists_tac ‘Canonical_System.E’ >>
+             gs[Canonical_System_def, Theory_def] >> metis_tac[])
+        )
+     >- gs[GSYM lemma6_5_3_2]
+     >- gs[GSYM lemma6_5_3_4]
+     >- gs[GSYM lemma6_5_3_3]
+    ) >>
+   gs[C_Holds_def, EQUIV_W_def, Canonical_System_def, Theory_def] >>
+  metis_tac[goldblatt_provable_rules, ENTAILS_def]
+QED
+        
+Theorem completeness:
+  (∀(RCS: ((g_prop set) R_COVER_SYSTEM)) Ps M. C_Holds RCS Ps M RCS.E p) ⇒
+             |- p
+Proof
+  rw[] >> drule_then strip_assume_tac Model_System_Characterisation_2_3 >>
+  rw[] >> irule Model_System_Characterisation_3_1 >> gs[]
+QED
+    
 val _ = export_theory();
+
