@@ -1,6 +1,9 @@
 *Theory.*
-.HOLMK/*
-.hollogs/*
+*/.HOLMK/*
+.HOLMK
+.hollogs
+*/.DS_Store
+*/.hollogs/*
 */tmp/*
 *munger*
 chpt1intro.tex
