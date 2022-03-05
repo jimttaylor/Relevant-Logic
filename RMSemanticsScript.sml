@@ -6,7 +6,7 @@ open listTheory;
 open pred_setTheory;
 open numpairTheory string_numTheory;
      
-val _ = new_theory "Semantics";
+val _ = new_theory "RMSemantics";
 
 
 val _ = set_fixity "-->" (Infixr 490);
