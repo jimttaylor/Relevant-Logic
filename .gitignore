@@ -10,4 +10,8 @@
 *.out
 *.run
 *.xml
-
+*.toc
+*.lot
+*.lof
+*.idx
+chpt*.pdf
