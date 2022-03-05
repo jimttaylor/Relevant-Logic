@@ -15,3 +15,11 @@
 *.lof
 *.idx
 chpt*.pdf
+*munger*
+chpt1intro.tex
+chpt2background.tex
+chpt3hilbert.tex
+chpt4deduction.tex
+chpt5rmsemantics.tex
+chpt6coversemantics.tex
+chpt7conclusion.tex
