@@ -1,12 +1,36 @@
 \chapter{Hilbert Systems}
-\label{cha:hilbert}
+\label{cha:proof-systems}
 Same as the last chapter, introduce the motivation and the high-level picture to
 readers, and introduce the sections in this chapter.
 
 
-\section{Smart Design}
-\label{sec:des-hotpath}
+\section{An Equivalent Hilbert System}
+\label{sec:another-hilert-system}
 
-\section{Summary}
-Same as the last chapter, summary what you discussed in this chapter and
-be the bridge to next chapter.
+\subsection{The New System}
+\label{subsec:newhilbert}
+
+\subsection{Equivalence between our systems}
+\label{subsec:hilbertequiv}
+
+
+
+\begin{holmath}
+  \HOLthm{GoldblattSlaneyEquiv.goldblatt_implies_slaney}
+\end{holmath}
+
+\begin{holmath}
+  \HOLthm{GoldblattSlaneyEquiv.slaney_implies_goldblatt}
+\end{holmath}
+
+\begin{holmath}
+  \HOLthm{GoldblattSlaneyEquiv.g_trans_invarient}
+\end{holmath}
+
+\begin{holmath}
+  \HOLthm{GoldblattSlaneyEquiv.s_trans_invarient}
+\end{holmath}
+
+
+\section{A Natural Deduction System}
+\label{sec:nd-system}

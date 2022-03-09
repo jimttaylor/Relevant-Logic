@@ -37,6 +37,15 @@
 
 \usepackage{holtexbasic}
 
+\renewcommand{\HOLConst}[1]{{\textsf{\upshape\small #1}}}
+\renewcommand{\HOLTyOp}[1]{\mbox{\fontencoding{T1}\fontfamily{bch}\fontseries{m}\fontshape{it}\fontsize{9.5}{10}\selectfont #1}}
+\renewcommand{\HOLinline}[1]{\ensuremath{#1}}
+\newcommand{\holthmenv}[1]{\begin{array}[t]{l}#1\end{array}}
+\renewcommand{\HOLKeyword}[1]{\texttt{#1}}
+
+\newenvironment{holmath}{\begin{displaymath}\begin{array}{l}}{\end{array}\end{displaymath}\ignorespacesafterend}
+
+
 
 \renewcommand*{\backref}[1]{}
 \renewcommand*{\backrefalt}[4]{

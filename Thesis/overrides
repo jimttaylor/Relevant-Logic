@@ -1,0 +1,17 @@
+s_VAR 5 \ensuremath{\texttt{str}_s}
+-->ₛ 4 \ensuremath{\rightarrow_s}
+<->ₛ 4 \ensuremath{\leftrightarrow_s} 
+&ₛ 2 \ensuremath{\land_s}
+~ₛ 2 \ensuremath{\sim_s}
+Vₛ 2 \ensuremath{\lor_s}
+ioₛ 3 \ensuremath{\circ_s}
+τₛ 2 \ensuremath{\tau_s}
+
+g_VAR 5 \ensuremath{\texttt{str}_g}
+-->ₐ 4 \ensuremath{\rightarrow_g}
+<->ₐ 4 \ensuremath{\leftrightarrow_g} 
+&ₐ 2 \ensuremath{\land_g}
+~ₐ 2 \ensuremath{\sim_g}
+Vₐ 2 \ensuremath{\lor_g}
+ioₐ 3 \ensuremath{\circ_g}
+τₐ 2 \ensuremath{\tau_g}
