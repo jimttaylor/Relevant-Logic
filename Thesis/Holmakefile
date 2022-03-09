@@ -1,17 +1,25 @@
 RELEVANT_DIR = ../
 INCLUDES = $(RELEVANT_DIR)
 MASTER_THEORY = $(RELEVANT_DIR)/GoldblattRLTheory
-EXTRA_CLEANS = holtexbasic.sty munger munder.o chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt4deduction.tex chpt5rmsemantics.tex chpt6coversemantics.tex chpt7conclusion.tex thesis.pdf thesis.toc thesis.out thesis.lot thesis.log thesis.lof thesis.idx thesis.aux chpt1.aux chpt1.idx chpt1.lof chpt1.log chpt1.lot chpt1.out chpt1.pdf chpt1.toc chpt2.aux chpt2.idx chpt2.lof chpt2.log chpt2.lot chpt2.out chpt2.pdf chpt2.toc chpt3.aux chpt3.idx chpt3.lof chpt3.log chpt3.lot chpt3.out chpt3.pdf chpt3.toc chpt4.aux chpt4.idx chpt4.lof chpt4.log chpt4.lot chpt4.out chpt4.pdf chpt4.toc chpt5.aux chpt5.idx chpt5.lof chpt5.log chpt5.lot chpt5.out chpt5.pdf chpt5.toc chpt6.aux chpt6.idx chpt6.lof chpt6.log chpt6.lot chpt6.out chpt6.pdf chpt6.toc chpt7.aux chpt7.idx chpt7.lof chpt7.log chpt7.lot chpt7.out chpt7.pdf chpt7.toc tmp/ PDFs/
-pdfs: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt4deduction.tex chpt5rmsemantics.tex chpt6coversemantics.tex chpt7conclusion.tex tmp_dir output_dir
-	pdflatex -output-directory=tmp chpt1.tex
-	pdflatex -output-directory=tmp chpt2.tex
-	pdflatex -output-directory=tmp chpt3.tex
-	pdflatex -output-directory=tmp chpt4.tex
-	pdflatex -output-directory=tmp chpt5.tex
-	pdflatex -output-directory=tmp chpt6.tex
-	pdflatex -output-directory=tmp chpt7.tex
-	pdflatex -output-directory=tmp thesis.tex
+EXTRA_CLEANS = holtexbasic.sty munger munder.o chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt4deduction.tex chpt5rmsemantics.tex chpt6coversemantics.tex chpt7conclusion.tex tmp/ PDFs/
+all: output_dir thesis chpt1 chpt2 chpt3 chpt4 chpt5 chpt6 chpt7 thesis
 	mv tmp/*.pdf PDFs
+thesis: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt4deduction.tex chpt5rmsemantics.tex chpt6coversemantics.tex chpt7conclusion.tex tmp_dir
+	pdflatex -output-directory=tmp thesis.tex
+chpt1: chpt1intro.tex tmp_dir
+	pdflatex -output-directory=tmp chpt1.tex
+chpt2: chpt2background.tex tmp_dir
+	pdflatex -output-directory=tmp chpt2.tex
+chpt3: chpt3hilbert.tex tmp_dir
+	pdflatex -output-directory=tmp chpt3.tex
+chpt4: chpt4deduction.tex tmp_dir
+	pdflatex -output-directory=tmp chpt4.tex
+chpt5: chpt5rmsemantics.tex tmp_dir
+	pdflatex -output-directory=tmp chpt5.tex
+chpt6: chpt6coversemantics.tex tmp_dir
+	pdflatex -output-directory=tmp chpt6.tex
+chpt7: chpt7conclusion.tex tmp_dir
+	pdflatex -output-directory=tmp chpt7.tex
 tmp_dir: tmp_clean
 	mkdir tmp
 tmp_clean:	
