@@ -101,8 +101,7 @@ Theorem s_equiv_replacement:
           (slaney_provable (C Vₛ A) ⇔ slaney_provable (C Vₛ A)) ∧
           (slaney_provable (A) ⇔ slaney_provable (B))
 Proof
-  rpt strip_tac >> EQ_TAC >>
-  gs [s_DIMP_def]
+  rpt strip_tac >> EQ_TAC >> gs [s_DIMP_def]
   >- metis_tac [s_conjunction_r, s_conjunction_l, s_transitivity, s_modus_ponens, s_adjunction_rule]
   >- metis_tac [s_conjunction_r, s_conjunction_l, s_transitivity, s_modus_ponens, s_adjunction_rule]                          
   >- metis_tac [s_conjunction_r, s_conjunction_l, s_transitivity, s_modus_ponens, s_adjunction_rule]
@@ -147,7 +146,7 @@ Theorem s_double_negative_implication_equiv:
  ∀A B. slaney_provable((A -->ₛ B) <->ₛ (A -->ₛ ~ₛ (~ₛ B)))
 Proof
   rw[s_DIMP_def] >> irule s_adjunction_rule >> strip_tac
-  >- ( irule s_modus_ponens >> qexists_tac ‘B -->ₛ ~ₛ(~ₛ B)’ >> strip_tac
+  >- (irule s_modus_ponens >> qexists_tac ‘B -->ₛ ~ₛ(~ₛ B)’ >> strip_tac
        >- metis_tac[s_DIMP_def, s_double_negative_equiv, slaney_provable_rules]
        >- metis_tac[slaney_provable_rules, s_permutation]
      )
@@ -227,18 +226,15 @@ Proof
       irule s_adjunction_rule >>  metis_tac[slaney_provable_rules])
   >- (‘slaney_provable (~ₛ (~ₛ A &ₛ ~ₛ B) -->ₛ ~ₛ (~ₛ(A Vₛ B)))’ suffices_by
         metis_tac [s_double_negative_equiv, s_equiv_replacement] >>
-      irule s_modus_ponens >> qexists_tac ‘~ₛ (A Vₛ B) -->ₛ ~ₛ (~ₛ(~ₛ A &ₛ ~ₛ B))’ >> strip_tac
-      >- (‘slaney_provable (~ₛ (A Vₛ B) -->ₛ (~ₛ A &ₛ ~ₛ B))’ suffices_by 
-            metis_tac [s_double_negative_equiv, s_equiv_replacement] >>
-          assume_tac s_conj_introduction >>
-          last_x_assum $ qspecl_then [‘~ₛ (A Vₛ B)’, ‘~ₛ A’, ‘~ₛ B’] strip_assume_tac >>
-          ‘slaney_provable (((~ₛ (A Vₛ B) -->ₛ ~ₛ A) &ₛ ~ₛ (A Vₛ B) -->ₛ ~ₛ B))’ suffices_by
-            metis_tac[s_modus_ponens] >>
-          irule s_adjunction_rule >> strip_tac 
-          >> metis_tac[s_contrapositive, s_modus_ponens, s_double_negative_equiv, s_equiv_replacement, s_disjunction_l, s_disjunction_r]
-       )      
-      >- simp[s_contrapositive]
-     )
+      irule s_modus_ponens >> qexists_tac ‘~ₛ (A Vₛ B) -->ₛ ~ₛ (~ₛ(~ₛ A &ₛ ~ₛ B))’ >>
+      simp[s_contrapositive] >> 
+      ‘slaney_provable (~ₛ (A Vₛ B) -->ₛ (~ₛ A &ₛ ~ₛ B))’ suffices_by 
+        metis_tac [s_double_negative_equiv, s_equiv_replacement] >>
+      assume_tac s_conj_introduction >>
+      last_x_assum $ qspecl_then [‘~ₛ (A Vₛ B)’, ‘~ₛ A’, ‘~ₛ B’] strip_assume_tac >>
+      ‘slaney_provable (((~ₛ (A Vₛ B) -->ₛ ~ₛ A) &ₛ ~ₛ (A Vₛ B) -->ₛ ~ₛ B))’ suffices_by
+        metis_tac[s_modus_ponens] >>
+      metis_tac[slaney_provable_rules, s_double_negative_equiv, s_equiv_replacement])
 QED
 
 Theorem s_IO_definable:
