@@ -1,23 +1,34 @@
-goldblatt_provable 18 \ensuremath{\vdash_\textbf{R}}
-gs 2 \ensuremath{\theta_{G\rightarrow S}}
-s_VAR 5 \ensuremath{\texttt{VAR}_s}
--->ₛ 4 \ensuremath{\rightarrow_s}
-<->ₛ 4 \ensuremath{\leftrightarrow_s} 
+goldblatt_provable 2 \ensuremath{\vdash_\textbf{R}}
+gs 4 \ensuremath{\theta_{G\rightarrow S}}
+s_VAR  4\ensuremath{\texttt{VAR}_s}
+-->ₛ 2 \ensuremath{\rightarrow_s}
+<->ₛ 2 \ensuremath{\leftrightarrow_s} 
 &ₛ 2 \ensuremath{\&_s}
-~ₛ 2 \ensuremath{\sim_s}
+~ₛ 2 \ensuremath{{\sim_s}}
 Vₛ 2 \ensuremath{\text{V}_s}
-ioₛ 3 \ensuremath{\circ_s}
+ioₛ 2 \ensuremath{\circ_s}
 τₛ 2 \ensuremath{\tau_s}
 
-slaney_provable 15 \ensuremath{\vdash_\textbf{S}}
-sg 2 \ensuremath{\theta_{S\rightarrow G}}
-g_VAR 5 \ensuremath{\texttt{VAR}_g}
--->ₐ 4 \ensuremath{\rightarrow_g}
-<->ₐ 4 \ensuremath{\leftrightarrow_g} 
+slaney_provable 2 \ensuremath{\vdash_\textbf{S}}
+sg 4 \ensuremath{\theta_{S\rightarrow G}}
+g_VAR 4 \ensuremath{\texttt{VAR}_g}
+-->ₐ 2 \ensuremath{\rightarrow_g}
+<->ₐ 2 \ensuremath{\leftrightarrow_g} 
 &ₐ 2 \ensuremath{\&_g}
-~ₐ 2 \ensuremath{\sim_g}
+~ₐ 2 \ensuremath{{\sim_g}}
 Vₐ 2 \ensuremath{\text{V}_g}
-ioₐ 3 \ensuremath{\circ_g}
+ioₐ 2 \ensuremath{\circ_g}
 τₐ 2 \ensuremath{\tau_g}
 
-⇔ 1 \ensuremath{\Leftrightarrow}
+⇔ 2 \ensuremath{\Leftrightarrow}
+
+
+phi 1 \ensuremath{\phi}
+psi 1 \ensuremath{\psi}
+
+$Turnstile$ 5 \HOLTokenTurnstile{}
+
+
+
+
+

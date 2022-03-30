@@ -1,13 +1,15 @@
 \chapter{Proof Systems}
 \label{cha:proof-systems}
-This chapter will focus on some basic theorems of relevance  logic, and the establishment of a sort of equivilency between two other ways of characterising relevance logic.
+This chapter focuses on some basic theorems of relevance  logic, and the establishment of a sort of equivalency between two other ways of characterising relevance logic.\fix{brief explaination about what Hilbert systems are and what Natural Deduction systems are. And motivations behind each. }
 \label{sec:another-hilert-system}
 
-\section{Hilbert Presentations}
+\section{A Relevant Hilbert System}
 \label{sec:hilert-system}
 
-In order to reason about relevant logic inside HOL, we will first need to create a new datatype representing our propostions. 
-In Goldblatt's characterisation of relevance logic, propositions are built up of: atomic symbols as $\texttt{VAR}_g p$ with $p$ characterised as a $string$ type, an implication $\phi \rightarrow_g \psi$ between propositions, a conjunction $\phi \&_g \psi$ of propositions, the negation $\sim_g \phi$ of a proposition, or the propositional constant $\tau_g$. 
+In order to reason about relevant logic inside HOL, we need to create a new datatype representing our propositions.
+In Goldblatt's characterisation of relevance logic, propositions are built up of: atomic symbols as \HOLtm{g_VAR s} with $s$ a $string$ type, an implication 
+\HOLtm{phi -->ₐ psi}
+between propositions, a conjunction $\phi \&_g \psi$ of propositions, the negation $\sim_g \phi$ of a proposition, or the propositional constant $\tau_g$. 
 Thus in HOL we introduce our propositions as inductive type called $g\_prop$:
 \begin{defn}[Goldblatt Proposition]
   A \emph{Goldblatt Proposition} is formalised in HOL as an inductive type:  
@@ -18,17 +20,16 @@ Thus in HOL we introduce our propositions as inductive type called $g\_prop$:
 
 We can also introduce disjuction, biconditional, and intensional conjunction in the normal ways:
 \begin{holmath}
-\begin{matrix}
+\begin{matrix*}[l]
   \HOLthm[aligneddef]{GoldblattRL.g_OR_def}\\
   \HOLthm[aligneddef]{GoldblattRL.g_DIMP_def}\\
   \HOLthm[aligneddef]{GoldblattRL.g_ICONJ_def}
-\end{matrix}
+\end{matrix*}
 \end{holmath} 
 
 And now we are ready to Formalise the Hilbert system that we will be using for the majority of this thesis
 \footnote{So that we can reference the individual rules of each of our proof systems, we will not be presenting the full statement of our proof systems in HOL, but rather an abridged and equivalent version. The full HOL definition will be in appendix ...
 }
-\fix{Include definition in the appendix}:
 
 \begin{defn}[Goldblatt provable]\
   A proposition is \emph{Goldblatt provable} (written $\vdash_R$\footnote{the choice of $\vdash_R$ is due the fact that we will choose this system as a sort of `source of truth' for what it means to be a theorem of relevance logic.}) if it is of the form of the following axioms:
@@ -134,7 +135,7 @@ Just like before we will also define the biconditional for this system:
 \end{holmath}
 And now we will introduce a new (though somewhat similar) Hilbert system:
 \begin{defn}[Slaney provable]\
-  A proposition is \emph{Slaney provable} (written $\vdash_S$) if it is of the form of the following axioms\fix{Include definition in the appendix}:
+  A proposition is \emph{Slaney provable} (written $\vdash_S$) if it is of the form of the following axioms:
   \begin{holmath}
   \begin{matrix*}[l]
   \HOLthm[nostile]{SlaneyRL.s_identity} & \text{Identity}\\
@@ -162,8 +163,7 @@ And now we will introduce a new (though somewhat similar) Hilbert system:
   \HOLthm[nostile]{SlaneyRL.s_tt_lr}
   \end{holmath}  
 \end{defn}
-Given that we will be showing that this system is equivalent to the previous hilbert system there are a couple of statements that we will need to show. 
-These are as follows:
+Also just like in the previous system, there are a few useful propositions that we will show immediately. 
 \begin{prop}[Some theorems of the Slaney System]\label{prop:some-theorems-R-1}
   \begin{holmath}
   \begin{matrix*}[l]
@@ -191,7 +191,8 @@ These follow in a similar way to how it's counterpart in the Golblatt system.
 \begin{proof}
   The proof for each connective besides $\text V_s$ is Immediate from the definitions of Goldblatt provable and the biconditional connective.
 
-  For $\text V_s$ the idea is that because of disjunction elimination and introduction it suffices to show that $\vdash_s (A \rightarrow_s B \text V_s C)$. 
+  For $\text V_s$ the idea is that because of disjunction elimination and introduction it suffices to show that 
+  $\HOLtm{slaney_provable (A -->ₛ B Vₛ C)}$. 
   This then follows as the consequent of Transitivity. 
 \end{proof}
 We will now show that there holds an equivalence between the $\text V_s$ and $\circ_s$ connectives and their defined counterparts. 
@@ -225,24 +226,54 @@ We will now show that there holds an equivalence between the $\text V_s$ and $\c
 \subsection{Equivalence to Goldblatt}
 \label{subsec:hilbertequiv}
 
+Given the propositions we have shown in the previous sections and the similarities between these Hilbert systems that there should be a sort of equivalence between theorems in one system and the other. That, is something that looks like:
+$$ \vdash_R A \Leftrightarrow \vdash_S A$$ 
+Sadly this is an illformed expression because the underlying types aren't the same so we will need to establish a different, but similar form of equivalence between these systems. 
+The idea is that, if we can generate 2 translation functions between the propositional types and they preserve validity then the systems prove precisely the same theorems, under equivalence. 
+That is we are attempting to show the following theorem:
+\begin{thm}[Equivalence]
+  The Goldblatt and Slaney proof systems are equivalent, that is given a goldblatt proposition $A$ and a slaney proposition $B$ there exist translation functions 
+  $s:g\_prop \rightarrow s\_prop$ and $g:s\_prop \rightarrow g\_prop$ such that the following conditions hold:
+  $$
+  \begin{matrix*}[l]
+   1. & \vdash_R A \Rightarrow \vdash_S s(A)\\
+   2. & \vdash_S B \Rightarrow \vdash_R g(B)\\
+   3. & \vdash_R A \Rightarrow \vdash_R g(s (A))\\
+   4. & \vdash_S B \Rightarrow \vdash_S s(g (B))
+  \end{matrix*}
+  $$
+  \begin{holmath}
+    \HOLthm{GoldblattSlaneyEquiv.goldblatt_slaney_equiv}
+  \end{holmath}
+\end{thm}
 
+We will first establish the translation fuctions $\theta_{G\rightarrow S}:g\_prop \rightarrow s\_prop$, $\theta_{S\rightarrow G}:s\_prop \rightarrow g\_prop$ that we will be using for the above theorem:
 
 \begin{holmath}
-  \HOLthm{GoldblattSlaneyEquiv.goldblatt_implies_slaney}
+\begin{matrix*}[l]
+    \HOLthm[aligneddef]{GoldblattSlaneyEquiv.gs_translation_def}
+\end{matrix*}
 \end{holmath}
 
 \begin{holmath}
-  \HOLthm{GoldblattSlaneyEquiv.slaney_implies_goldblatt}
+\begin{matrix*}[l]
+    \HOLthm[aligneddef]{GoldblattSlaneyEquiv.sg_translation_def}
+\end{matrix*}
 \end{holmath}
 
-\begin{holmath}
-  \HOLthm{GoldblattSlaneyEquiv.g_trans_invarient}
-\end{holmath}
+\begin{proof}[Proof (Equivalence).]
+  \begin{enumerate}
+    \item Induct on Goldblatt Provable. It then follows immediately from the Slaney Provable rules, Assertion (Slaney), and that $\text V_s$ and $\circ_s$ have an equivalent representation.
+    \item Induct on Slaney Provable. It then follows immediately from Goldblatt Provable rules, Permutation (Goldblatt), and the intentional implication rule. 
+    \item Inducting on the structure of $A$, we get that $\theta_{S\rightarrow G}(\theta_{G\rightarrow S} A) = A$.
+    \item 
+  \end{enumerate}
+\end{proof}
 
-\begin{holmath}
-  \HOLthm{GoldblattSlaneyEquiv.s_trans_invarient}
-\end{holmath}
+
 
 \newpage
 \section{A Natural Deduction System}
+
+\HOLtm{phi}
 \label{sec:nd-system}
