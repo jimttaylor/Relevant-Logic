@@ -197,7 +197,6 @@ Proof
       metis_tac[slaney_provable_rules, s_DIMP_def]
       )
   >> metis_tac[s_modus_ponens, s_identity, s_conjunction_r, s_conjunction_l,  s_intensional_conj_rl,  s_intensional_conj_lr, s_transitivity]
-
 QED
 
 Theorem s_double_dimp_equiv:

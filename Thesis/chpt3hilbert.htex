@@ -1,20 +1,20 @@
 \chapter{Proof Systems}
 \label{cha:proof-systems}
 This chapter focuses on some basic theorems of relevance  logic, and the establishment of a sort of equivalency between two other ways of characterising relevance logic.\fix{brief explaination about what Hilbert systems are and what Natural Deduction systems are. And motivations behind each. }
-\label{sec:another-hilert-system}
 
 \section{A Relevant Hilbert System}
 \label{sec:hilert-system}
 
 In order to reason about relevant logic inside HOL, we need to create a new datatype representing our propositions.
-In Goldblatt's characterisation of relevance logic, propositions are built up of: atomic symbols as \HOLtm{g_VAR s} with $s$ a $string$ type, an implication 
+In Goldblatt's characterisation of relevance logic, propositions are built up of: atomic symbols as \HOLtm{g_VAR s} with \HOLtm{s} a \HOLty{:string} type, an implication 
 \HOLtm{phi -->ₐ psi}
-between propositions, a conjunction $\phi \&_g \psi$ of propositions, the negation $\sim_g \phi$ of a proposition, or the propositional constant $\tau_g$. 
+between propositions, a conjunction \HOLtm{phi &ₐ psi} of propositions, the negation \HOLtm{~ₐ phi} of a proposition, or the propositional constant \HOLtm{τₐ}. 
 Thus in HOL we introduce our propositions as inductive type called $g\_prop$:
 \begin{defn}[Goldblatt Proposition]
+\label{def:props}
   A \emph{Goldblatt Proposition} is formalised in HOL as an inductive type:  
   \begin{holmath}
-    \HOLthm{GoldblattRL.datatype_g_prop}
+    \HOLthm[width=100]{GoldblattRL.datatype_g_prop}
   \end{holmath}  
 \end{defn}
 
@@ -26,47 +26,45 @@ We can also introduce disjuction, biconditional, and intensional conjunction in 
   \HOLthm[aligneddef]{GoldblattRL.g_ICONJ_def}
 \end{matrix*}
 \end{holmath} 
-
-And now we are ready to Formalise the Hilbert system that we will be using for the majority of this thesis
-\footnote{So that we can reference the individual rules of each of our proof systems, we will not be presenting the full statement of our proof systems in HOL, but rather an abridged and equivalent version. The full HOL definition will be in appendix ...
-}
-
-\begin{defn}[Goldblatt provable]\
-  A proposition is \emph{Goldblatt provable} (written $\vdash_R$\footnote{the choice of $\vdash_R$ is due the fact that we will choose this system as a sort of `source of truth' for what it means to be a theorem of relevance logic.}) if it is of the form of the following axioms:
+And now we are ready to formalise the Hilbert system that we use for the majority of this thesis:
+\begin{defn}[Goldblatt provable]
+\label{def:hilbert-provable}
+  A proposition is \emph{Goldblatt provable} (written \HOLtm{goldblatt_provable} \footnote{The choice of \HOLtm{goldblatt_provable} is due to the fact that we will choose this system as a sort of `source of truth' for what it means to be a theorem of relevance logic.}) if it is of the form of the following axioms:
   \begin{holmath}
   \begin{matrix*}[l]
-  \HOLthm[nostile]{GoldblattRL.g_identity} & \text{Identity}\\
-  \HOLthm[nostile]{GoldblattRL.g_suffixing} & \text{Suffixing}\\
-  \HOLthm[nostile]{GoldblattRL.g_assertion} & \text{Assertion}\\
-  \HOLthm[nostile]{GoldblattRL.g_contraction} & \text{Contraction}\\
-  \HOLthm[nostile]{GoldblattRL.g_conjunction_l} & \text{Conjunction Elimination L}\\
-  \HOLthm[nostile]{GoldblattRL.g_conjunction_r} & \text{Conjunction Elimination R}\\
-  \HOLthm[nostile]{GoldblattRL.g_conj_introduction} & \text{Conjunction Introduction}\\
-  \HOLthm[nostile]{GoldblattRL.g_disjunction_l} & \text{Disjunction Introduction L}\\
-  \HOLthm[nostile]{GoldblattRL.g_disjunction_r} & \text{Disjunction Introduction R}\\
-  \HOLthm[nostile]{GoldblattRL.g_disjunction_elim} & \text{Disjunction Elimination}\\
-  \HOLthm[nostile]{GoldblattRL.g_distribution} & \text{Distribution}\\
-  \HOLthm[nostile]{GoldblattRL.g_contrapositive} & \text{Contraposition}\\
-  \HOLthm[nostile]{GoldblattRL.g_double_negation} & \text{Double Negation Elimination}
+  \HOLthm[nostile]{GoldblattRL.g_identity} & \textsf{Identity}\\
+  \HOLthm[nostile]{GoldblattRL.g_suffixing} & \textsf{Suffixing}\\
+  \HOLthm[nostile]{GoldblattRL.g_assertion} & \textsf{Assertion}\\
+  \HOLthm[nostile]{GoldblattRL.g_contraction} & \textsf{Contraction}\\
+  \HOLthm[nostile]{GoldblattRL.g_conjunction_l} & \textsf{Conjunction Elimination L}\\
+  \HOLthm[nostile]{GoldblattRL.g_conjunction_r} & \textsf{Conjunction Elimination R}\\
+  \HOLthm[nostile]{GoldblattRL.g_conj_introduction} & \textsf{Conjunction Introduction}\\
+  \HOLthm[nostile]{GoldblattRL.g_disjunction_l} & \textsf{Disjunction Introduction L}\\
+  \HOLthm[nostile]{GoldblattRL.g_disjunction_r} & \textsf{Disjunction Introduction R}\\
+  \HOLthm[nostile]{GoldblattRL.g_disjunction_elim} & \textsf{Disjunction Elimination}\\
+  \HOLthm[nostile]{GoldblattRL.g_distribution} & \textsf{Distribution}\\
+  \HOLthm[nostile]{GoldblattRL.g_contrapositive} & \textsf{Contraposition}\\
+  \HOLthm[nostile]{GoldblattRL.g_double_negation} & \textsf{Double Negation Elimination}
   \end{matrix*}
   \end{holmath}
-  Or it is derivable from other Goldblatt provable propositions using the following rules:
+  Or it is derivable from other Goldblatt provable propositions using the following rules\fix{figure out how to get nice typesetting of rule names}:
   \begin{holmath}
-  \HOLthm[nostile]{GoldblattRL.g_adjunction_rule}\\
-  \HOLthm[nostile]{GoldblattRL.g_modus_ponens}\\
-  \HOLthm[nostile]{GoldblattRL.g_tt_rl}\\
-  \HOLthm[nostile]{GoldblattRL.g_tt_lr}
+  \HOLthm[rule,rulename=Adjunction]{GoldblattRL.g_adjunction_rule}\\
+  \HOLthm[rule,rulename=Modus Ponens]{GoldblattRL.g_modus_ponens}\\
+  \HOLthm[rule]{GoldblattRL.g_tt_rl}\\
+  \HOLthm[rule]{GoldblattRL.g_tt_lr}
   \end{holmath}  
 \end{defn}
 We can now prove a couple of useful theorem about relevance logic inside this Hilbert system
-\begin{prop}[Some theorems of Relevance Logic]\label{prop:some-theorems-R-1}
+\begin{prop}[Some theorems of Relevance Logic]
+\label{prop:some-theorems-R-1}
   \begin{holmath}
   \begin{matrix*}[l]
-   1. & \HOLthm[nostile]{GoldblattRL.g_permutation} & \text{Permutation}\\
-   2. & \HOLthm[nostile]{GoldblattRL.g_double_neg} & \text{Double Negation Introdution}\\
-   3. & \HOLthm[nostile]{GoldblattRL.g_double_negative_equiv} & \text{Double Negation Equivalence}\\ 
+   1. & \HOLthm[nostile]{GoldblattRL.g_permutation} & \textsf{Permutation}\\
+   2. & \HOLthm[nostile]{GoldblattRL.g_double_neg} & \textsf{Double Negation Introdution}\\
+   3. & \HOLthm[nostile]{GoldblattRL.g_double_negative_equiv} & \textsf{Double Negation Equivalence}\\ 
    4. & \HOLthm[nostile]{GoldblattRL.g_double_negative_implication_equiv} & \\
-   5. & \HOLthm[nostile]{GoldblattRL.g_contrapositive_alt} & \text{Contraposition alt.}
+   5. & \HOLthm[nostile]{GoldblattRL.g_contrapositive_alt} & \textsf{Contraposition alt.}
   \end{matrix*}
   \end{holmath}
 \end{prop}
@@ -80,53 +78,58 @@ $\,$
   \item From the definition of Goldblatt provable, permutation, 3., and the definition of the biconditional connective.
   \item It suffices to show that both directions of the Goldblatt biconditional are Goldblatt provable from the adjuction rule.
   \begin{itemize}
-    \item[$(\rightarrow)$:] Immediate from suffixing, left conjunction, modus ponens, contraposition, and 4. 
-    \item[$(\leftarrow)$:] mmediate from suffixing, right conjunction, modus ponens, contraposition, and 4. 
+    \item[$(\rightarrow_g$:] Immediate from suffixing, left conjunction, modus ponens, contraposition, and 4. 
+    \item[$(\leftarrow_g)$:] Immediate from suffixing, right conjunction, modus ponens, contraposition, and 4. 
   \end{itemize}
   \end{enumerate}
 \end{proof}
 We can also introduce a sort of replacement for sub-propositions:
-\begin{prop}[Propositional Replacement]\label{prop:prop-replacement}
-  If $A$, $B$ are propositions and $A\leftrightarrow_g B$ then:
+\begin{prop}[Propositional Replacement]
+\label{prop:r-prop-replacement}
+  If \HOLtm{A}, \HOLtm{B} are propositions and \HOLtm{A <->ₐ B} then:
   \begin{enumerate}
   \itemsep0em 
-  \item When $A$ appears on either side of the $\rightarrow_g$, $\&_g$, or $\leftrightarrow_g$ connectives, then that statement if Goldblatt provable if and only if the statement resulting from replacing $A$ with $B$ is Goldblatt provable. 
-  \item Similarly, when $A$ appears behind a $\sim_g$ then $\sim_g A$ is Goldblatt provable if and only if $\sim_g B$ is.
-  \item Furthermore, $A$ is goldblatt provable if and only if $B$ is.
+  \item When $A$ appears on either side of the \HOLtm{$-->ₐ}, \HOLtm{$&ₐ}, or \HOLtm{$<->ₐ} connectives, then that statement if Goldblatt provable if and only if the statement resulting from replacing \HOLtm{A} with \HOLtm{B} is Goldblatt provable. 
+  \item Similarly, when \HOLtm{A} appears behind a \HOLtm{~ₐ} then \HOLtm{~ₐ A} is Goldblatt provable if and only if \HOLtm{~ₐ B} is.
+  \item Furthermore, \HOLtm{A} is Goldblatt provable if and only if \HOLtm{B} is.
   \end{enumerate}
   \begin{holmath}
-  \HOLthm{GoldblattRL.g_equiv_replacement}
+  \HOLthm[nostile]{GoldblattRL.g_equiv_replacement}
   \end{holmath}
 \end{prop}
 \begin{proof}
   Immediate from the definitions of Goldblatt provable and the biconditional connective.
 \end{proof}
 We will also find it useful to have another understanding as to how intentional conjuction behaves with implication:
-\begin{prop}[Intensional Conjunction Rule]\label{prop:io-rule}
+\begin{prop}[Intensional Conjunction Rule]
+\label{prop:io-rule}
   \begin{holmath}
   \HOLthm[nostile]{GoldblattRL.g_io_rule}
   \end{holmath}
 \end{prop}
 \begin{proof}
-  Unwrapping the definition for $\circ_g$ we just need to show the biconditional:
+  Unwrapping the definition for \HOLtm{$ioₐ} we just need to show the biconditional:
   \begin{itemize}
     \itemsep0em 
     \item[$(\Rightarrow)$:] By permutation, prop 1.5 and replacement, it suffices to show that:
-      $$\vdash_R (\sim_g C \rightarrow_g (A \rightarrow_g \sim_g B))$$
+      \begin{holmath}
+        \HOLtm{goldblatt_provable (~ₐ C -->ₐ (A -->ₐ ~ₐ B))}
+      \end{holmath}
       which follows by replacement, 1.5, and the Goldblatt axioms. 
     \item[$(\Leftarrow)$:] The reverse of the previous direction. 
   \end{itemize}
 \end{proof}
 \section{A Second Hilbert System}
 \label{subsec:newhilbert}
-In this section we will briefly introduce an alternative Hilbert system and demonstrate a kind of equivalence between these systems. 
+In this section we briefly introduce an alternative Hilbert system and demonstrate a kind of equivalence between these systems. 
 \subsection{The Alternative System}
 Just like in the previous section, we first will need to define a new propositional type, but there are a few things that we will need to take into consideration. 
 In the Goldblatt presentation we defined the disjunction and intensional conjunction connectives from the other connectives; for this new system, however, we will instead be baking them into the underlying language.
 \begin{defn}[Slaney Proposition]
-  A \emph{Slaney Proposition} is formalised in HOL as an inductive type:  
+\label{def:slaney-prop}
+  A \emph{Slaney Proposition} is formalised in HOL as an inductive type: \fix{how to make this wrap nicely}  
   \begin{holmath}
-  \HOLthm{SlaneyRL.datatype_s_prop}
+  \HOLthm[width=200]{SlaneyRL.datatype_s_prop}
   \end{holmath}
 \end{defn}
 Just like before we will also define the biconditional for this system:
@@ -134,37 +137,38 @@ Just like before we will also define the biconditional for this system:
 \HOLthm[def]{SlaneyRL.s_DIMP_def}
 \end{holmath}
 And now we will introduce a new (though somewhat similar) Hilbert system:
-\begin{defn}[Slaney provable]\
-  A proposition is \emph{Slaney provable} (written $\vdash_S$) if it is of the form of the following axioms:
+\begin{defn}[Slaney provable]
+  A proposition is \emph{Slaney provable} (written \HOLtm{slaney_provable}) if it is of the form of the following axioms:
   \begin{holmath}
   \begin{matrix*}[l]
-  \HOLthm[nostile]{SlaneyRL.s_identity} & \text{Identity}\\
-  \HOLthm[nostile]{SlaneyRL.s_permutation} & \text{Permutation}\\
-  \HOLthm[nostile]{SlaneyRL.s_transitivity} & \text{Transitivity}\\
-  \HOLthm[nostile]{SlaneyRL.s_contraction} & \text{Contraction}\\
-  \HOLthm[nostile]{SlaneyRL.s_conjunction_l} & \text{Conjunction Elimination L}\\
-  \HOLthm[nostile]{SlaneyRL.s_conjunction_r} & \text{Conjunction Elimination R}\\
-  \HOLthm[nostile]{SlaneyRL.s_conj_introduction} & \text{Conjunction Introduction}\\
-  \HOLthm[nostile]{SlaneyRL.s_disjunction_l} & \text{Disjunction Introduction L}\\
-  \HOLthm[nostile]{SlaneyRL.s_disjunction_r} & \text{Disjunction Introduction R}\\
-  \HOLthm[nostile]{SlaneyRL.s_disjunction_elim} & \text{Disjunction Elimination}\\
-  \HOLthm[nostile]{SlaneyRL.s_distribution} & \text{Distribution}\\
-  \HOLthm[nostile]{SlaneyRL.s_contrapositive} & \text{Contraposition}\\
-  \HOLthm[nostile]{SlaneyRL.s_double_negation} & \text{Double Negation Elimination}
+  \HOLthm[nostile]{SlaneyRL.s_identity} & \textsf{Identity}\\
+  \HOLthm[nostile]{SlaneyRL.s_permutation} & \textsf{Permutation}\\
+  \HOLthm[nostile]{SlaneyRL.s_transitivity} & \textsf{Transitivity}\\
+  \HOLthm[nostile]{SlaneyRL.s_contraction} & \textsf{Contraction}\\
+  \HOLthm[nostile]{SlaneyRL.s_conjunction_l} & \textsf{Conjunction Elimination L}\\
+  \HOLthm[nostile]{SlaneyRL.s_conjunction_r} & \textsf{Conjunction Elimination R}\\
+  \HOLthm[nostile]{SlaneyRL.s_conj_introduction} & \textsf{Conjunction Introduction}\\
+  \HOLthm[nostile]{SlaneyRL.s_disjunction_l} & \textsf{Disjunction Introduction L}\\
+  \HOLthm[nostile]{SlaneyRL.s_disjunction_r} & \textsf{Disjunction Introduction R}\\
+  \HOLthm[nostile]{SlaneyRL.s_disjunction_elim} & \textsf{Disjunction Elimination}\\
+  \HOLthm[nostile]{SlaneyRL.s_distribution} & \textsf{Distribution}\\
+  \HOLthm[nostile]{SlaneyRL.s_contrapositive} & \textsf{Contraposition}\\
+  \HOLthm[nostile]{SlaneyRL.s_double_negation} & \textsf{Double Negation Elimination}
   \end{matrix*}
   \end{holmath}
   Or it is derivable from other Slaney provable propositions using the following rules:
   \begin{holmath}
-  \HOLthm[nostile]{SlaneyRL.s_adjunction_rule}\\
-  \HOLthm[nostile]{SlaneyRL.s_modus_ponens}\\
-  \HOLthm[nostile]{SlaneyRL.s_intensional_conj_lr}\\
-  \HOLthm[nostile]{SlaneyRL.s_intensional_conj_rl}\\
-  \HOLthm[nostile]{SlaneyRL.s_tt_rl}\\
-  \HOLthm[nostile]{SlaneyRL.s_tt_lr}
+  \HOLthm[rule,rulename=Adjunction]{SlaneyRL.s_adjunction_rule}\\
+  \HOLthm[rule,rulename=Modus Ponens]{SlaneyRL.s_modus_ponens}\\
+  \HOLthm[rule,rulename=Intensional Conjuction LR]{SlaneyRL.s_intensional_conj_lr}\\
+  \HOLthm[rule,rulename=Intensional Conjuction RL]{SlaneyRL.s_intensional_conj_rl}\\
+  \HOLthm[rule]{SlaneyRL.s_tt_rl}\\
+  \HOLthm[rule]{SlaneyRL.s_tt_lr}
   \end{holmath}  
 \end{defn}
 Also just like in the previous system, there are a few useful propositions that we will show immediately. 
-\begin{prop}[Some theorems of the Slaney System]\label{prop:some-theorems-R-1}
+\begin{prop}[Some theorems of the Slaney System]
+\label{prop:some-theorems-R-1}
   \begin{holmath}
   \begin{matrix*}[l]
    1. & \HOLthm[nostile]{SlaneyRL.s_assertion} & \text{Assertion} \\ 
@@ -174,29 +178,42 @@ Also just like in the previous system, there are a few useful propositions that 
   \end{holmath}
 \end{prop}
 \begin{proof}
-These follow in a similar way to how it's counterpart in the Golblatt system.
+These follow in a similar way to their counterparts in the Golblatt system.
 \end{proof}
 \begin{prop}[Propositional Replacement (Slaney)] 
 \label{prop:prop-replacement-s}
-  If $A$, $B$ are propositions and $A\leftrightarrow_s B$ then:
+  If \HOLtm{A}, \HOLtm{B} are propositions and \HOLtm{A <->ₛ B} then:
   \begin{enumerate}
   \itemsep0em 
-  \item When $A$ appears on either side of the $\rightarrow_s$, $\&_s$, or $\text{V}_s$ connectives, then that statement is Slaney provable if and only if the statement resulting from replacing $A$ with $B$ is slaney provable. 
-  \item Furthermore, $A$ is slaney provable if and only if $B$ is.
+  \item When \HOLtm{A} appears on either side of the \HOLtm{$-->ₛ}, \HOLtm{$&ₛ}, or \HOLtm{$Vₛ} connectives, then that statement is Slaney provable if and only if the statement resulting from replacing \HOLtm{A} with \HOLtm{B} is Slaney provable. 
+  \item Furthermore, \HOLtm{A} is slaney provable if and only if \HOLtm{B} is.
   \end{enumerate}
   \begin{holmath}
-  \HOLthm{SlaneyRL.s_equiv_replacement}
+  \HOLthm[nostile,width=50]{SlaneyRL.s_equiv_replacement}
   \end{holmath}
 \end{prop}
 \begin{proof}
-  The proof for each connective besides $\text V_s$ is Immediate from the definitions of Goldblatt provable and the biconditional connective.
+  The proof for each connective besides \HOLtm{$Vₛ} is immediate from the definitions of Goldblatt provable and the biconditional connective.
 
-  For $\text V_s$ the idea is that because of disjunction elimination and introduction it suffices to show that 
-  $\HOLtm{slaney_provable (A -->ₛ B Vₛ C)}$. 
+  For \HOLtm{$Vₛ} the idea is that because of disjunction elimination and introduction it suffices to show that 
+  \begin{holmath}
+  \HOLtm{slaney_provable (A -->ₛ B Vₛ C)}
+  \end{holmath} 
   This then follows as the consequent of Transitivity. 
 \end{proof}
-We will now show that there holds an equivalence between the $\text V_s$ and $\circ_s$ connectives and their defined counterparts. 
-\begin{prop}[$\text{V}_s$ Equivence]
+\begin{cor}
+\label{cor:double-dimp-equiv}
+\begin{holmath}
+  \HOLthm[nostile]{SlaneyRL.s_double_dimp_equiv}
+\end{holmath}
+\end{cor}
+\begin{proof}
+  Immediate from the axioms.
+\end{proof}
+
+We will now show that there holds an equivalence between the \HOLtm{$Vₛ} and \HOLtm{$ioₛ} connectives and their defined counterparts. 
+\begin{prop}[\HOLtm{$Vₛ} Equivence]
+\label{prop:or-s-def}
   \begin{holmath}
   \HOLthm[nostile]{SlaneyRL.s_OR_definable}
   \end{holmath}
@@ -205,11 +222,14 @@ We will now show that there holds an equivalence between the $\text V_s$ and $\c
  \begin{itemize}
     \item[$(\rightarrow)$:] This follows directly from the Slaney Provable axioms.
     \item[$(\leftarrow)$:] Because of equivalence of double negation, replacement, and contradiction we only need that:
-    $$\vdash_S (\sim_s(A \text V_s B) \rightarrow_s (\sim_s A \&_s \sim_s B))$$
+    \begin{holmath}
+      \HOLtm{slaney_provable((~ₛ(A Vₛ B)) -->ₛ ((~ₛ A) &ₛ (~ₛ B)))}
+    \end{holmath}
     We can show this through the application of conjucution introduction and then it follows from the axioms, the equivalence of double negative, and replacement.  
   \end{itemize}
 \end{proof}
-\begin{prop}[$\circ_s$ Equivalence]
+\begin{prop}[\HOLtm{$ioₛ} Equivalence]
+\label{prop:io-s-def}
   \begin{holmath}
   \HOLthm[nostile]{SlaneyRL.s_IO_definable}
   \end{holmath}
@@ -217,9 +237,11 @@ We will now show that there holds an equivalence between the $\text V_s$ and $\c
 \begin{proof}$\,$
  \begin{itemize}
     \item[$(\rightarrow)$:] This follows Intensional conjucntion rule, contraposition, and axioms about implication.
-    \item[$(\leftarrow)$:] It from the axioms that:
-    $$\vdash_S (A \rightarrow_s B \rightarrow_s A \circ_s B$$
-    This then follows from the properties of implication and contraposition
+    \item[$(\leftarrow)$:] It follows from the axioms that:
+    \begin{holmath}
+      \HOLtm{slaney_provable(A -->ₛ B -->ₛ (A ioₛ B))}
+    \end{holmath}
+    This direction then follows from the properties of implication and contraposition.
   \end{itemize}
 \end{proof}
 
@@ -229,51 +251,75 @@ We will now show that there holds an equivalence between the $\text V_s$ and $\c
 Given the propositions we have shown in the previous sections and the similarities between these Hilbert systems that there should be a sort of equivalence between theorems in one system and the other. That, is something that looks like:
 $$ \vdash_R A \Leftrightarrow \vdash_S A$$ 
 Sadly this is an illformed expression because the underlying types aren't the same so we will need to establish a different, but similar form of equivalence between these systems. 
-The idea is that, if we can generate 2 translation functions between the propositional types and they preserve validity then the systems prove precisely the same theorems, under equivalence. 
+The idea is that, if we can generate two translation functions between the propositional types and they preserve validity then the systems prove precisely the same theorems, under equivalence. 
 That is we are attempting to show the following theorem:
 \begin{thm}[Equivalence]
   The Goldblatt and Slaney proof systems are equivalent, that is given a goldblatt proposition $A$ and a slaney proposition $B$ there exist translation functions 
-  $s:g\_prop \rightarrow s\_prop$ and $g:s\_prop \rightarrow g\_prop$ such that the following conditions hold:
+  $s:\HOLty[of]{gs}$ and $g:\HOLty[of]{sg}$ such that the following conditions hold:
   $$
   \begin{matrix*}[l]
-   1. & \vdash_R A \Rightarrow \vdash_S s(A)\\
-   2. & \vdash_S B \Rightarrow \vdash_R g(B)\\
-   3. & \vdash_R A \Rightarrow \vdash_R g(s (A))\\
-   4. & \vdash_S B \Rightarrow \vdash_S s(g (B))
+   1. & \HOLtm{goldblatt_provable A ⇒ slaney_provable (s(A))}\\
+   2. & \HOLtm{slaney_provable B ⇒ goldblatt_provable (g(B))}\\
+   3. & \HOLtm{goldblatt_provable A ⇔ goldblatt_provable (g(s (A)))}\\
+   4. & \HOLtm{slaney_provable B ⇔ slaney_provable (s(g (B)))}
   \end{matrix*}
   $$
+  That is:
   \begin{holmath}
     \HOLthm{GoldblattSlaneyEquiv.goldblatt_slaney_equiv}
   \end{holmath}
 \end{thm}
+We will first establish the translation fuctions $\HOLtm{gs}:\HOLty[of]{gs}$ and $\HOLtm{sg}:\HOLty[of]{sg}$ that we will be using for the above theorem:
 
-We will first establish the translation fuctions $\theta_{G\rightarrow S}:g\_prop \rightarrow s\_prop$, $\theta_{S\rightarrow G}:s\_prop \rightarrow g\_prop$ that we will be using for the above theorem:
+\begin{defn}
+  \HOLtm{gs} is a function of type \HOLty[of]{gs} as defined below
+  \begin{holmath}
+    \begin{matrix*}[l]
+      \HOLthm[aligneddef]{GoldblattSlaneyEquiv.gs_translation_def}
+    \end{matrix*}
+  \end{holmath}
+\end{defn}
 
-\begin{holmath}
-\begin{matrix*}[l]
-    \HOLthm[aligneddef]{GoldblattSlaneyEquiv.gs_translation_def}
-\end{matrix*}
-\end{holmath}
+\begin{defn}
+\HOLtm{sg} is a function of type \HOLty[of]{sg} as defined below
+  \begin{holmath}
+    \begin{matrix*}[l]
+      \HOLthm[aligneddef]{GoldblattSlaneyEquiv.sg_translation_def}
+    \end{matrix*}
+  \end{holmath}
+\end{defn}
 
-\begin{holmath}
-\begin{matrix*}[l]
-    \HOLthm[aligneddef]{GoldblattSlaneyEquiv.sg_translation_def}
-\end{matrix*}
-\end{holmath}
-
-\begin{proof}[Proof (Equivalence).]
-  \begin{enumerate}
-    \item Induct on Goldblatt Provable. It then follows immediately from the Slaney Provable rules, Assertion (Slaney), and that $\text V_s$ and $\circ_s$ have an equivalent representation.
+\begin{lem}
+\label{prop:trans-equiv-def}
+  A proposition \HOLtm{A} is equivalent to its translation \HOLtm{gs (sg A)}. That is:
+  \begin{holmath}
+    \HOLthm[nostile]{GoldblattSlaneyEquiv.gs_sg_equiv}
+  \end{holmath}
+\end{lem}
+\begin{proof}
+  After inducting on the structure of \HOLtm{A}, the base and inductive cases (excepting \HOLtm{$Vₛ} and \HOLtm{$ioₛ}) follow by simplifying against the definitions of the translation functions and then immediately follow from the properties of \HOLtm{$<->ₛ} and the axioms. 
+  \begin{itemize}
+    \item[\HOLtm{$Vₛ}:] Simplifying with the definitions for the translation functions and the definition \HOLtm{$Vₐ} then need to show that
+    \begin{holmath}
+       \HOLtm{slaney_provable ((A Vₛ B) <->ₛ ~ₛ (~ₛ (gs (sg A)) &ₛ ~ₛ (gs (sg B))))}
+     \end{holmath} 
+    Using propostion~\ref{prop:or-s-def}, we note that it suffices to show that: 
+    \begin{holmath}
+       \HOLtm{slaney_provable ((A Vₛ B) <->ₛ (gs $ sg A) Vₛ (gs $ sg B))}
+     \end{holmath} 
+    but then this follows immediately from Corollory~\ref{cor:double-dimp-equiv}. 
+    \item[\HOLtm{$ioₛ}:] Same argument as above but, instead of \HOLtm{$Vₐ} and Proposition, we will use \HOLtm{$ioₛ} and proposition~\ref{prop:io-s-def}. 
+  \end{itemize}
+\end{proof}
+And now we have all that we need for our proof of equivalence.
+\begin{proof}[Proof (Equivalence).]$\,$
+  \begin{enumerate} 
+      \item Induct on Goldblatt Provable. It then follows immediately from the Slaney Provable rules, Assertion (Slaney), and that \HOLtm{$Vₛ} and \HOLtm{$ioₛ} have an equivalent representation.
     \item Induct on Slaney Provable. It then follows immediately from Goldblatt Provable rules, Permutation (Goldblatt), and the intentional implication rule. 
-    \item Inducting on the structure of $A$, we get that $\theta_{S\rightarrow G}(\theta_{G\rightarrow S} A) = A$.
-    \item 
+    \item Inducting on the structure of \HOLtm{A}, we get that $\HOLtm{sg (gs A) = A}$.
+    \item Follows from lemma~\ref{prop:trans-equiv-def} and replacement. 
   \end{enumerate}
 \end{proof}
-
-
-
-\newpage
 \section{A Natural Deduction System}
-
-\HOLtm{phi}
 \label{sec:nd-system}
+
