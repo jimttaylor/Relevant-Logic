@@ -4,7 +4,7 @@ INCLUDES = $(RELEVANT_DIR)
 
 MASTER_THEORY = prettyPrintingTheory
 
-EXTRA_CLEANS = holtexbasic.sty munger munder.o chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt4deduction.tex chpt5rmsemantics.tex chpt6coversemantics.tex chpt7conclusion.tex tmp/ PDFs/
+EXTRA_CLEANS = holtexbasic.sty proof.sty munger munder.o chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt4deduction.tex chpt5rmsemantics.tex chpt6coversemantics.tex chpt7conclusion.tex tmp/ PDFs/
 
 all: output_dir thesis chpt1 chpt2 chpt3 chpt4 chpt5 chpt6 chpt7 thesis
 	mv tmp/*.pdf PDFs
@@ -33,41 +33,38 @@ chpt6: chpt6coversemantics.tex tmp_dir
 chpt7: chpt7conclusion.tex tmp_dir
 	pdflatex -output-directory=tmp chpt7.tex
 
-tmp_dir: tmp_clean
-	mkdir tmp
+tmp_dir: 
+	mkdir -p tmp
 
-tmp_clean:	
-	rm -rf tmp
+output_dir: 
+	mkdir -p PDFs
 
-output_dir: output_clean
-	mkdir PDFs
-
-output_clean:
-	rm -rf PDFs
-
-chpt1intro.tex: chpt1intro.htex munger holtexbasic.sty overrides
+chpt1intro.tex: chpt1intro.htex munger holtexbasic.sty proof.sty overrides
 	./munger -mc overrides < $< > $@
 
-chpt2background.tex: chpt2background.htex munger holtexbasic.sty overrides
+chpt2background.tex: chpt2background.htex munger holtexbasic.sty proof.sty overrides
 	./munger -mc overrides < $< > $@
 
-chpt3hilbert.tex: chpt3hilbert.htex munger holtexbasic.sty overrides
+chpt3hilbert.tex: chpt3hilbert.htex munger holtexbasic.sty proof.sty overrides
 	./munger -mc overrides < $< > $@
 
-chpt4deduction.tex: chpt4deduction.htex munger holtexbasic.sty overrides
+chpt4deduction.tex: chpt4deduction.htex munger holtexbasic.sty proof.sty overrides
 	./munger -mc overrides < $< > $@
 
-chpt5rmsemantics.tex: chpt5rmsemantics.htex munger holtexbasic.sty overrides
+chpt5rmsemantics.tex: chpt5rmsemantics.htex munger holtexbasic.sty proof.sty overrides
 	./munger -mc overrides < $< > $@
 
-chpt6coversemantics.tex: chpt6coversemantics.htex munger holtexbasic.sty overrides
+chpt6coversemantics.tex: chpt6coversemantics.htex munger holtexbasic.sty proof.sty overrides
 	./munger -mc overrides < $< > $@
 
-chpt7conclusion.tex: chpt7conclusion.htex munger holtexbasic.sty overrides
+chpt7conclusion.tex: chpt7conclusion.htex munger holtexbasic.sty proof.sty overrides
 	./munger -mc overrides < $< > $@
 
 munger: $(dprot $(MASTER_THEORY)).uo $(dprot $(HOLDIR)/bin/mkmunge.exe)
 	$(protect $(HOLDIR)/bin/mkmunge.exe) -o $@ $(MASTER_THEORY)
 
 holtexbasic.sty: $(HOLDIR)/src/TeX/holtexbasic.sty
+	$(CP) $< $@
+
+proof.sty: $(HOLDIR)/Manual/LaTeX/proof.sty
 	$(CP) $< $@

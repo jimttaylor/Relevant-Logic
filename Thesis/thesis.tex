@@ -36,6 +36,7 @@
 \usepackage{multirow}
 
 \usepackage{holtexbasic}
+\usepackage{proof}
 
 \renewcommand{\HOLConst}[1]{{\textsf{\upshape\small #1}}}
 \renewcommand{\HOLTyOp}[1]{\mbox{\fontencoding{T1}\fontfamily{bch}\fontseries{m}\fontshape{it}\fontsize{9.5}{10}\selectfont #1}}
@@ -45,16 +46,17 @@
 
 \newenvironment{holmath}{\begin{displaymath}\begin{array}{l}}{\end{array}\end{displaymath}\ignorespacesafterend}
 
+\usepackage{bm}
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{mathtools}
 
-\newtheorem{defn}{Definition}
-\newtheorem{prop}{Proposition}
-\newtheorem{cor}{Corollary}
-\newtheorem{thm}{Theorem}
-\newtheorem{lem}{Lemma}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
 
 \renewcommand*{\backref}[1]{}
 \renewcommand*{\backrefalt}[4]{

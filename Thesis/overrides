@@ -1,34 +1,32 @@
-goldblatt_provable 2 \ensuremath{\vdash_\textbf{R}}
+slaney_provable 2 \ensuremath{\vdash_\textbf{S}}
 gs 4 \ensuremath{\theta_{G\rightarrow S}}
-s_VAR  4\ensuremath{\texttt{VAR}_s}
+s_VAR  4 \ensuremath{\texttt{VAR}_s}
 -->ₛ 2 \ensuremath{\rightarrow_s}
 <->ₛ 2 \ensuremath{\leftrightarrow_s} 
 &ₛ 2 \ensuremath{\&_s}
 ~ₛ 2 \ensuremath{{\sim_s}}
-Vₛ 2 \ensuremath{\text{V}_s}
+Vₛ 2 \ensuremath{\bm{\lor}_s}
 ioₛ 2 \ensuremath{\circ_s}
 τₛ 2 \ensuremath{\tau_s}
 
-slaney_provable 2 \ensuremath{\vdash_\textbf{S}}
+goldblatt_provable 2 \ensuremath{\vdash_\textbf{R}}
 sg 4 \ensuremath{\theta_{S\rightarrow G}}
 g_VAR 4 \ensuremath{\texttt{VAR}_g}
 -->ₐ 2 \ensuremath{\rightarrow_g}
 <->ₐ 2 \ensuremath{\leftrightarrow_g} 
 &ₐ 2 \ensuremath{\&_g}
 ~ₐ 2 \ensuremath{{\sim_g}}
-Vₐ 2 \ensuremath{\text{V}_g}
+Vₐ 2 \ensuremath{\bm{\lor}_g}
 ioₐ 2 \ensuremath{\circ_g}
 τₐ 2 \ensuremath{\tau_g}
 
-⇔ 2 \ensuremath{\Leftrightarrow}
 
+-> 1 \ensuremath{\rightarrow}
+
+⇔ 2 \ensuremath{\Leftrightarrow}
+⇒ 2 \ensuremath{\Rightarrow}
 
 phi 1 \ensuremath{\phi}
 psi 1 \ensuremath{\psi}
 
 $Turnstile$ 5 \HOLTokenTurnstile{}
-
-
-
-
-
