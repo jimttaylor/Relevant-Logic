@@ -1,6 +1,7 @@
 open HolKernel boolLib Parse bossLib
+open NaturalDeductionTheory
 
-val _ = new_theory "prettyPrinting"
+val _ = new_theory "prettyPrintingND"
 
 val _ = remove_termtok{ tok = "==>", term_name = "⇒"}
 val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),

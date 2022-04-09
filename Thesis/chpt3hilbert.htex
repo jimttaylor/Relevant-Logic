@@ -323,3 +323,4 @@ And now we have all that we need for our proof of equivalence.
 \section{A Natural Deduction System}
 \label{sec:nd-system}
 
+\input{chpt3ND}
