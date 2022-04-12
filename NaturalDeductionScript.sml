@@ -28,7 +28,6 @@ Datatype: Bunch = PROP g_prop
           | SEMICOLON Bunch Bunch
 End
 
-        
 val _ = set_fixity "，" (Infixr 490);
 Overload "，" = “λp q. COMMA (PROP p) (PROP q)”
 Overload "，" = “λp q. COMMA p (PROP q)”
@@ -42,8 +41,6 @@ Overload "；" = “λp q. SEMICOLON p (PROP q)”
 Overload "；" = “λp q. SEMICOLON (PROP p) q”
 Overload "；" = “SEMICOLON”
 
-
-         
 Datatype: B_Context = HOLE
           | LCOMMA B_Context Bunch
           | RCOMMA Bunch B_Context
@@ -58,7 +55,13 @@ Definition REPLACE_def:
   (REPLACE (LSEMI Γ b) X  = SEMICOLON (REPLACE Γ X) b) ∧ 
   (REPLACE (RSEMI b Γ) X  = SEMICOLON b (REPLACE Γ X)) 
 End
-     
+        
+val _ = overload_on ("，", “RCOMMA”);
+val _ = overload_on ("，", “LCOMMA”);
+
+val _ = overload_on ("；", “RSEMI”);
+val _ = overload_on ("；", “LSEMI”);
+        
 Inductive R_sequent:
 (* Classical Rules *)
 [Assumption:] (∀A. R_sequent (PROP A) A) ∧
@@ -89,21 +92,22 @@ Inductive R_sequent:
 [SEMICOLON_associative_lr:] (∀Γ X Y Z A. R_sequent (REPLACE Γ ((X ； Y) ； Z)) A ⇒ R_sequent (REPLACE Γ (X ； (Y ； Z))) A) ∧
 [SEMICOLON_idempotent_lr:] (∀Γ X A. R_sequent (REPLACE Γ (X ； X)) A ⇒ R_sequent (REPLACE Γ X) A)
 End
-
-
-
         
 val _ = overload_on ("|-", “goldblatt_provable”);
 
 val _ = set_fixity "||-" (Infixr 460);
 val _ = overload_on ("||-", “R_sequent”);
-
-
-    
+ 
 Theorem SEMICOLON_associative_rl:
   ∀Γ X Y Z A. R_sequent (REPLACE Γ (X； (Y； Z))) A ⇒ R_sequent (REPLACE Γ ((X； Y)； Z)) A
 Proof
   metis_tac [SEMICOLON_associative_lr, SEMICOLON_commutative]
+QED
+        
+Theorem R_Contrapositive:
+  ∀ A B. (PROP (A-->B)) ||- (~B --> ~A)
+Proof
+  metis_tac[RAA, IMP_Elimination, IMP_Introduction, Assumption]
 QED
 
 Theorem NOT_NOT_replacement:
@@ -116,26 +120,20 @@ Proof
       metis_tac[IMP_Elimination, identity_lr, REPLACE_def])
 QED
 
-Theorem R_Contrapositive:
-  ∀ A B. (PROP (A-->B) ； PROP ~B) ||- ~A
-Proof
-  metis_tac[RAA, IMP_Elimination, Assumption]
-QED
-
 Theorem OR_Introduction_gen:
   ∀X A B. (X ||- A ⇒ X ||- (A V B)) ∧
           (X ||- A ⇒ X ||- (B V A))
 Proof
   rw[] 
   >- (‘PROP τ ||- A --> (A V B)’ by
-        metis_tac [OR_Introduction_l, Assumption, IMP_Introduction, identity_rl, REPLACE_def] >> 
-      metis_tac [IMP_Elimination, REPLACE_def, identity_lr, SEMICOLON_commutative])
+        metis_tac [OR_Introduction_l, IMP_Introduction, identity_rl, REPLACE_def] >> 
+      metis_tac [IMP_Elimination, REPLACE_def, identity_lr])
   >- (‘PROP τ ||- A --> (B V A)’ by
-        metis_tac [OR_Introduction_r, Assumption, IMP_Introduction, identity_rl, REPLACE_def] >> 
-      metis_tac [IMP_Elimination, REPLACE_def, identity_lr, SEMICOLON_commutative])
+        metis_tac [OR_Introduction_r, IMP_Introduction, identity_rl, REPLACE_def] >> 
+      metis_tac [IMP_Elimination, REPLACE_def, identity_lr])
 QED
      
-Theorem R_sequent_completeness:
+Theorem hilbert_to_natural_deduction:
   ∀A. |- A ⇒ (PROP  τ) ||- A
 Proof
   Induct_on ‘|-’ >> rpt strip_tac
@@ -226,64 +224,9 @@ End
 
 val _ = overload_on ("bg", “bg_translation”);
 
+Theorem g_id[simp] = g_identity;
 
-
-                               
-    
-(*
-Theorem OR_fold:
-  ∀Γ A B C. |- ((bg (REPLACE Γ (PROP A)) V bg (REPLACE Γ (PROP B))) --> bg (REPLACE Γ (PROP (A V B))))
-Proof
-  rpt strip_tac >> Induct_on ‘Γ’ >> rpt strip_tac >> gs[REPLACE_def]
-  >- metis_tac[goldblatt_provable_rules]
-  >- (‘|- (((bg (REPLACE Γ (PROP  A)) & bg B0) V bg (REPLACE Γ (PROP  B)) & bg B0) -->
-           (bg B0 & (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)))))’ by
-         (‘|- ((bg (REPLACE Γ (PROP  A)) & bg B0) --> bg B0)’
-            by metis_tac[goldblatt_provable_rules] >> 
-          ‘|- ((bg (REPLACE Γ (PROP  B)) & bg B0) --> bg B0)’
-            by metis_tac[goldblatt_provable_rules] >>
-          ‘|- ((bg (REPLACE Γ (PROP  A)) & bg B0) --> (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B))))’
-            by metis_tac[goldblatt_provable_rules] >> 
-          ‘|- ((bg (REPLACE Γ (PROP  B)) & bg B0) --> (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B))))’
-            by metis_tac[goldblatt_provable_rules] >>
-          ‘|- ((bg (REPLACE Γ (PROP  A)) & bg B0) --> (bg B0 & (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)))))’
-            by metis_tac[goldblatt_provable_rules] >>
-          ‘|- ((bg (REPLACE Γ (PROP  B)) & bg B0) --> (bg B0 & (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)))))’
-            by metis_tac[goldblatt_provable_rules] >>
-           metis_tac[goldblatt_provable_rules]                                                                    
-         ) >> 
-       ‘|- (( bg B0 & bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B))) -->
-           bg (REPLACE Γ (PROP  (A V B))) & bg B0)’ suffices_by metis_tac[g_suffixing, g_modus_ponens] >> 
-       metis_tac[goldblatt_provable_rules]
-      )
-  >- (‘|- (((bg B0 & bg (REPLACE Γ (PROP  A))) V bg B0 & bg (REPLACE Γ (PROP  B))) -->
-           (bg B0 & (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)))))’ by
-         (‘|- ((bg B0 & bg (REPLACE Γ (PROP  A))) --> bg B0)’
-            by metis_tac[goldblatt_provable_rules] >> 
-          ‘|- ((bg B0 & bg (REPLACE Γ (PROP  B))) --> bg B0)’
-            by metis_tac[goldblatt_provable_rules] >>
-          ‘|- ((bg B0 & bg (REPLACE Γ (PROP  A))) --> (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B))))’
-            by metis_tac[goldblatt_provable_rules] >> 
-          ‘|- ((bg B0 & bg (REPLACE Γ (PROP  B))) --> (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B))))’
-            by metis_tac[goldblatt_provable_rules] >>
-          ‘|- ((bg B0 & bg (REPLACE Γ (PROP  A))) --> (bg B0 & (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)))))’
-            by metis_tac[goldblatt_provable_rules] >>
-          ‘|- ((bg B0 & bg (REPLACE Γ (PROP  B))) --> (bg B0 & (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)))))’
-            by metis_tac[goldblatt_provable_rules] >>
-           metis_tac[goldblatt_provable_rules]                                                                    
-         ) >> 
-       ‘|- (( bg B0 & bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B))) -->
-            bg B0 & bg (REPLACE Γ (PROP  (A V B))))’
-        suffices_by metis_tac[g_suffixing, g_modus_ponens] >> 
-       metis_tac[goldblatt_provable_rules]
-     )
-  >- 
-QED
-*)
-
-Theorem foo[simp] = g_identity;
-
-Theorem foo1:
+Theorem g_suffixing_rule:
   |- (A --> B) ∧ |- (B --> C) ⇒ |- (A --> C)
 Proof
   metis_tac[goldblatt_provable_rules]
@@ -298,7 +241,7 @@ Proof
        qabbrev_tac ‘AORB = bg (REPLACE Γ (PROP (A V B)))’ >>
        qabbrev_tac ‘CC = bg B0’ >> 
        ‘|- (AORB & CC --> (AA V BB) & CC)’ by metis_tac[goldblatt_provable_rules] >> 
-       irule foo1 >> first_assum $ irule_at Any >>
+       irule g_suffixing_rule >> first_assum $ irule_at Any >>
        ‘|- (CC & (AA V BB) --> AA & CC V BB & CC)’ suffices_by
          metis_tac[g_AND_commutative, g_equiv_replacement] >> 
        ‘|- (CC & AA  --> AA & CC V BB & CC)’ by
@@ -314,7 +257,7 @@ Proof
        qabbrev_tac ‘AORB = bg (REPLACE Γ (PROP (A V B)))’ >>
        qabbrev_tac ‘CC = bg B0’ >> 
        ‘|- (CC & AORB --> CC & (AA V BB))’ by metis_tac[goldblatt_provable_rules] >> 
-       irule foo1 >> first_assum $ irule_at Any >>
+       irule g_suffixing_rule >> first_assum $ irule_at Any >>
        metis_tac[g_distribution, g_suffixing, g_modus_ponens]
      )
   >- ( qabbrev_tac ‘AA = bg (REPLACE Γ (PROP A))’ >>
@@ -322,7 +265,7 @@ Proof
        qabbrev_tac ‘AORB = bg (REPLACE Γ (PROP (A V B)))’ >>
        qabbrev_tac ‘CC = bg B0’ >> 
        ‘|- (AORB ∘ᵣ CC --> (AA V BB) ∘ᵣ CC)’ by metis_tac[goldblatt_provable_rules, yeet] >> 
-       irule foo1 >> first_assum $ irule_at Any >>
+       irule g_suffixing_rule >> first_assum $ irule_at Any >>
        ‘|- (CC ∘ᵣ (AA V BB) --> AA ∘ᵣ CC V BB ∘ᵣ CC)’ suffices_by
          metis_tac[g_io_commutative, g_equiv_replacement] >> 
        ‘|- (CC ∘ᵣ AA  --> AA ∘ᵣ CC V BB ∘ᵣ CC)’ by
@@ -338,7 +281,7 @@ Proof
        qabbrev_tac ‘AORB = bg (REPLACE Γ (PROP (A V B)))’ >>
        qabbrev_tac ‘CC = bg B0’ >> 
        ‘|- (CC ∘ᵣ AORB --> CC ∘ᵣ (AA V BB))’ by metis_tac[goldblatt_provable_rules, yeet] >> 
-       irule foo1 >> first_assum $ irule_at Any >>
+       irule g_suffixing_rule >> first_assum $ irule_at Any >>
        metis_tac[g_io_distribution_lr, g_suffixing, g_modus_ponens]
      )
 QED
@@ -355,7 +298,7 @@ Proof
       metis_tac[goldblatt_provable_rules, g_contrapositive_alt, g_DIMP_def])
 QED
 
-Theorem R_sequent_soundness:
+Theorem natural_deduction_to_hilbert:
   ∀X A. X ||- A ⇒ |- ((bg X) --> A)
 Proof
   Induct_on ‘X ||- A’ >> rpt strip_tac >> 
@@ -426,5 +369,48 @@ Proof
      )
 QED
 
+Theorem X_derive_bg_X:
+  ∀X. X ||- bg(X)
+Proof
+  Induct >> gs[]
+  >- metis_tac[R_sequent_rules]
+  >- metis_tac[R_sequent_rules]
+  >- (rename[‘X ； Y ||- _’] >>
+      simp[g_ICONJ_def] >> assume_tac RAA >>
+      pop_assum $ qspecl_then [‘X’, ‘Y’, ‘bg X --> ~bg Y’] strip_assume_tac >>
+      last_x_assum irule >> qexists_tac ‘~(bg Y)’ >> rw[]
+      >- metis_tac[NOT_NOT_replacement]
+      >- metis_tac[IMP_Elimination, SEMICOLON_commutative, Assumption, REPLACE_def]
+     )
+QED
         
+Theorem bg_trans_reconstuction:
+  ∀X A. |- (bg(X) --> A) ⇒ X ||- A
+Proof
+  Induct >> gs[] >> rw[] >>
+  drule_then strip_assume_tac hilbert_to_natural_deduction
+  >- (assume_tac identity_lr >> last_x_assum $ qspec_then ‘HOLE’ strip_assume_tac >>
+      gs[REPLACE_def] >> last_x_assum irule >>
+      irule IMP_Elimination >> metis_tac[Assumption])
+  >- (rename[‘X ， Y ||- A’] >>
+      ‘X ， Y ||- bg X & bg Y’ by
+        (assume_tac X_derive_bg_X >>
+         pop_assum $ qspec_then ‘X ， Y’ strip_assume_tac >>
+         gs[]) >>
+      metis_tac[IMP_Elimination, identity_lr, REPLACE_def])
+  >- (rename[‘X ； Y ||- A’] >>
+      ‘X ； Y ||- (bg X ∘ᵣ bg Y)’ by
+      (assume_tac X_derive_bg_X >>
+       pop_assum $ qspec_then ‘X ； Y’ strip_assume_tac >>
+       gs[]) >>
+      metis_tac[IMP_Elimination, identity_lr, REPLACE_def])
+QED
+
+Theorem hilbert_to_natural_deduction_alt_proof:
+  ∀A. |- A ⇒ (PROP  τ) ||- A
+Proof
+  rw[] >> drule_then strip_assume_tac g_tt_rl >>
+  irule bg_trans_reconstuction >> simp[]
+QED
+
 val _ = export_theory();
