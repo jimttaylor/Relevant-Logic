@@ -1,16 +1,26 @@
-goldblatt_provable 2 \ensuremath{\vdash_\textbf{R}}
-g_VAR 4 \ensuremath{\texttt{VAR}_g}
+|- 2 \ensuremath{\vdash_\textbf{R}}
+g_VAR 4 \ensuremath{\texttt{VAR}}
 --> 2 \ensuremath{\rightarrow}
 <-> 2 \ensuremath{\leftrightarrow} 
 & 2 \ensuremath{\&}
 ~ 2 \ensuremath{{\sim}}
 V 2 \ensuremath{\bm{\lor}}
-io 2 \ensuremath{\circ}
+∘ᵣ 2 \ensuremath{\circ}
 τ 2 \ensuremath{\tau}
+
+||- 2 \ensuremath{\Vdash_\textbf{R}}
+； 1 \ensuremath{\bm{;}}
+， 1 \ensuremath{\bm{,}}
+PROP 0 \ensuremath{}
+REPLACE 0 \ensuremath{}
 
 -> 1 \ensuremath{\rightarrow}
 
 ⇔ 2 \ensuremath{\Leftrightarrow}
 ⇒ 2 \ensuremath{\Rightarrow}
+
+Γ 1 \ensuremath{\Gamma}
+
+bg 1 \ensuremath{\beta}
 
 $Turnstile$ 5 \HOLTokenTurnstile{}

@@ -7,12 +7,15 @@ MASTER_THEORY_GSE = prettyPrintingGSETheory
 MASTER_THEORY_ND = prettyPrintingNDTheory
 
 
-EXTRA_CLEANS = holtexbasic.sty proof.sty munger munger0.o mungernd mungergse chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt4deduction.tex chpt5rmsemantics.tex chpt6coversemantics.tex chpt7conclusion.tex tmp/ PDFs/
+EXTRA_CLEANS = holtexbasic.sty proof.sty munger munger0.o mungernd mungergse chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4deduction.tex chpt5rmsemantics.tex chpt6coversemantics.tex chpt7conclusion.tex tmp/ PDFs/
 
 all: output_dir thesis chpt1 chpt2 chpt3 chpt4 chpt5 chpt6 chpt7 thesis
 	mv tmp/*.pdf PDFs
 
-thesis: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt4deduction.tex chpt5rmsemantics.tex chpt6coversemantics.tex chpt7conclusion.tex tmp_dir
+thesis: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4deduction.tex chpt5rmsemantics.tex chpt6coversemantics.tex chpt7conclusion.tex tmp_dir
+	pdflatex -output-directory=tmp thesis.tex; \
+    bibtex ./tmp/thesis.aux;                   \
+	pdflatex -output-directory=tmp thesis.tex; \
 	pdflatex -output-directory=tmp thesis.tex
 
 chpt1: chpt1intro.tex tmp_dir

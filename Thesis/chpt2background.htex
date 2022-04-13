@@ -18,7 +18,7 @@ Section~\ref{sec:relatedwork} yyyy.\\
 \section{Related work}
 \label{sec:relatedwork}
 You may reference other papers. For example: 
-Generational garbage collection~\citep{LH:83,Moon:84,Ungar:84} is perhaps the
+Generational garbage collection is perhaps the
 single most important advance in garbage collection since the first collectors
 were developed in the early 1960s. (doi: "doi" should just be the doi part, not
 the full URL, and it will be made to link to dx.doi.org and resolve.

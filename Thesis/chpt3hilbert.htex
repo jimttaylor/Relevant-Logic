@@ -1,4 +1,5 @@
 \chapter{Proof Systems}
+\fix{There are a bunch of other theorems that I proved inside the Hilbert systems... should I introduce them here? should they be stated without proof?}
 \label{cha:proof-systems}
 This chapter focuses on some basic theorems of relevance  logic, and the establishment of a sort of equivalency between two other ways of characterising relevance logic.\fix{brief explaination about what Hilbert systems are and what Natural Deduction systems are. And motivations behind each. }
 
@@ -8,7 +9,7 @@ This chapter focuses on some basic theorems of relevance  logic, and the establi
 In order to reason about relevant logic inside HOL, we need to create a new datatype representing our propositions.
 In Goldblatt's characterisation of relevance logic, propositions are built up of: atomic symbols as \HOLtm{g_VAR s} with \HOLtm{s} a \HOLty{:string} type, an implication 
 \HOLtm{phi -->ₐ psi}
-between propositions, a conjunction \HOLtm{phi &ₐ psi} of propositions, the negation \HOLtm{~ₐ phi} of a proposition, or the propositional constant \HOLtm{τₐ}. 
+between propositions, a conjunction \HOLtm{phi &ₐ psi} \fix{Figure out what is going wrong with this garbled output} of propositions, the negation \HOLtm{~ₐ phi} of a proposition, or the propositional constant \HOLtm{τₐ}. 
 Thus in HOL we introduce our propositions as inductive type called $g\_prop$:
 \begin{defn}[Goldblatt Proposition]
 \label{def:props}
@@ -18,7 +19,7 @@ Thus in HOL we introduce our propositions as inductive type called $g\_prop$:
   \end{holmath}  
 \end{defn}
 
-We can also introduce disjuction, biconditional, and intensional conjunction in the normal ways:
+We can also introduce disjuction, biconditional, and intensional conjunction\footnote{An intutive way to think about \HOltm{ioₐ} is that it behaves like classical conjunction does with classical implication, but when it holds, it doesn't guarantee that either of its conjuncts hold.} (also known as fusion) in the normal ways:
 \begin{holmath}
 \begin{matrix*}[l]
   \HOLthm[aligneddef]{GoldblattRL.g_OR_def}\\
@@ -29,7 +30,7 @@ We can also introduce disjuction, biconditional, and intensional conjunction in 
 And now we are ready to formalise the Hilbert system that we use for the majority of this thesis:
 \begin{defn}[Goldblatt provable]
 \label{def:hilbert-provable}
-  A proposition is \emph{Goldblatt provable} (written \HOLtm{goldblatt_provable} \footnote{The choice of \HOLtm{goldblatt_provable} is due to the fact that we will choose this system as a sort of `source of truth' for what it means to be a theorem of relevance logic.}) if it is of the form of the following axioms:
+  A proposition is \emph{Goldblatt provable} (written \HOLtm{goldblatt_provable} \footnote{The choice of \HOLtm{goldblatt_provable} as our symbol for \emph{Goldblatt Provable} is due to the fact that we will choose this system as a sort of `source of truth' for what it means to be a theorem of relevance logic.}) if it is of the form of the following axioms:
   \begin{holmath}
   \begin{matrix*}[l]
   \HOLthm[nostile]{GoldblattRL.g_identity} & \textsf{Identity}\\
@@ -47,7 +48,7 @@ And now we are ready to formalise the Hilbert system that we use for the majorit
   \HOLthm[nostile]{GoldblattRL.g_double_negation} & \textsf{Double Negation Elimination}
   \end{matrix*}
   \end{holmath}
-  Or it is derivable from other Goldblatt provable propositions using the following rules\fix{figure out how to get nice typesetting of rule names}:
+  Or it is derivable from other Goldblatt Provable propositions using the following rules\fix{figure out how to get nice typesetting of rule names}:
   \begin{holmath}
   \HOLthm[rule,rulename=Adjunction]{GoldblattRL.g_adjunction_rule}\\
   \HOLthm[rule,rulename=Modus Ponens]{GoldblattRL.g_modus_ponens}\\
@@ -121,7 +122,7 @@ We will also find it useful to have another understanding as to how intentional 
 \end{proof}
 \section{A Second Hilbert System}
 \label{subsec:newhilbert}
-In this section we briefly introduce an alternative Hilbert system and demonstrate a kind of equivalence between these systems. 
+In this section we briefly introduce an alternative Hilbert system and demonstrate a kind of equivalence between these systems. \fix{probably needs some justification as to why one would want to do this...}
 \subsection{The Alternative System}
 Just like in the previous section, we first will need to define a new propositional type, but there are a few things that we will need to take into consideration. 
 In the Goldblatt presentation we defined the disjunction and intensional conjunction connectives from the other connectives; for this new system, however, we will instead be baking them into the underlying language.
@@ -272,7 +273,7 @@ That is we are attempting to show the following theorem:
 We will first establish the translation fuctions $\HOLtm{gs}:\HOLty[of]{gs}$ and $\HOLtm{sg}:\HOLty[of]{sg}$ that we will be using for the above theorem:
 
 \begin{defn}
-  \HOLtm{gs} is a function of type \HOLty[of]{gs} as defined below
+  \HOLtm{gs} is a function of type \HOLty[of]{gs} as defined below:
   \begin{holmath}
     \begin{matrix*}[l]
       \HOLthm[aligneddef]{GoldblattSlaneyEquiv.gs_translation_def}
@@ -281,7 +282,7 @@ We will first establish the translation fuctions $\HOLtm{gs}:\HOLty[of]{gs}$ and
 \end{defn}
 
 \begin{defn}
-\HOLtm{sg} is a function of type \HOLty[of]{sg} as defined below
+\HOLtm{sg} is a function of type \HOLty[of]{sg} as defined below:
   \begin{holmath}
     \begin{matrix*}[l]
       \HOLthm[aligneddef]{GoldblattSlaneyEquiv.sg_translation_def}
@@ -320,7 +321,5 @@ And now we have all that we need for our proof of equivalence.
     \item Follows from lemma~\ref{prop:trans-equiv-def} and replacement. 
   \end{enumerate}
 \end{proof}
-\section{A Natural Deduction System}
-\label{sec:nd-system}
 
 \input{chpt3ND}

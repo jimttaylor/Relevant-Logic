@@ -154,7 +154,7 @@ Proof
       gs[REPLACE_def]
      )
   >- (‘((PROP  A) ； (PROP (A-->B))) ||- B’ suffices_by
-        metis_tac [Assumption, identity_rl, IMP_Introduction, REPLACE_def] >>
+        metis_tac [identity_rl, IMP_Introduction, REPLACE_def] >>
       assume_tac Assumption >>
       last_assum $ qspec_then ‘A --> B’ strip_assume_tac >>
       last_x_assum $ qspec_then ‘A’ strip_assume_tac >>
@@ -163,7 +163,7 @@ Proof
       metis_tac [REPLACE_def, IMP_Elimination]
      )
   >- (‘(PROP (A-->A-->B) ； PROP A) ||- B ’ suffices_by
-        metis_tac [Assumption, identity_rl, IMP_Introduction, REPLACE_def] >> 
+        metis_tac [identity_rl, IMP_Introduction, REPLACE_def] >> 
       ‘((PROP (A-->A-->B) ； PROP A) ； PROP A)  ||- B ’ by
         metis_tac [Assumption, IMP_Elimination] >>
       metis_tac [REPLACE_def, SEMICOLON_associative_lr, SEMICOLON_idempotent_lr]
@@ -171,7 +171,7 @@ Proof
   >- metis_tac[AND_Elimination_l, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
   >- metis_tac[AND_Elimination_r, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
   >- (‘(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- (B & C)’ suffices_by
-        metis_tac [Assumption, identity_rl, IMP_Introduction, REPLACE_def] >>
+        metis_tac [identity_rl, IMP_Introduction, REPLACE_def] >>
       ‘(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- B’ by
         metis_tac[IMP_Elimination, Assumption, AND_Elimination_l] >> 
       ‘(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- C’ by
@@ -181,7 +181,7 @@ Proof
   >- metis_tac[OR_Introduction_l, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
   >- metis_tac[OR_Introduction_r, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
   >- (‘(PROP  ((A --> C) & (B --> C)) ； PROP (A V B)) ||- C’ suffices_by
-        metis_tac [Assumption, identity_rl, IMP_Introduction, REPLACE_def] >> 
+        metis_tac [identity_rl, IMP_Introduction, REPLACE_def] >> 
       ‘(PROP  ((A --> C) & (B --> C)) ； PROP A) ||- C’ by 
         metis_tac[IMP_Elimination, Assumption, AND_Elimination_l] >> 
       ‘(PROP  ((A --> C) & (B --> C)) ； PROP B) ||- C’ by 
@@ -192,7 +192,7 @@ Proof
       metis_tac [Assumption, REPLACE_def]
      )
   >- (‘(PROP  (A & (B V C))) ||- ((A & B) V (A & C))’ suffices_by
-        metis_tac [Assumption, identity_rl, IMP_Introduction, REPLACE_def] >>
+        metis_tac [identity_rl, IMP_Introduction, REPLACE_def] >>
       ‘(PROP  (A & (B V C))) ||- A’ by metis_tac[Assumption, AND_Elimination_l] >>
       ‘(PROP  (A & (B V C))) ||- (B V C)’ by metis_tac[Assumption, AND_Elimination_r] >>
       ‘(PROP  (A & (B V C)) ， PROP B ) ||- ((A & B) V (A & C))’ by 
@@ -202,7 +202,7 @@ Proof
       assume_tac OR_Elimination >>
       last_x_assum $ qspecl_then [‘RCOMMA (PROP (A & (B V C))) HOLE’,
                                   ‘PROP (A & (B V C))’, ‘B’, ‘C’,
-                                  ‘((A & B) V (A & C))’] strip_assume_tac >>      
+                                  ‘((A & B) V (A & C))’] strip_assume_tac >>
       metis_tac [COMMA_idempotent_lr, REPLACE_def]
      )
   >- (‘((PROP (A --> ~B)) ； PROP (B)) ||- (~A)’ suffices_by 
@@ -286,7 +286,7 @@ Proof
      )
 QED
 
-Theorem replacement:
+Theorem CONTEXT_IMP:
   ∀X Y. |- (bg(X) --> bg(Y)) ⇒ ∀Γ. |- (bg(REPLACE Γ X) --> bg(REPLACE Γ (Y)))
 Proof
   rpt strip_tac >> Induct_on ‘Γ’ >> rw[REPLACE_def] 
@@ -319,53 +319,53 @@ Proof
         metis_tac[goldblatt_provable_rules] >>
       ‘|- (bg (REPLACE Γ X) --> bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)))’
         suffices_by metis_tac[goldblatt_provable_rules] >> 
-      assume_tac replacement >> last_x_assum $ qspecl_then [‘X’, ‘PROP  (A V B)’] strip_assume_tac >>
+      assume_tac CONTEXT_IMP >> last_x_assum $ qspecl_then [‘X’, ‘PROP  (A V B)’] strip_assume_tac >>
       gs[] >> last_x_assum $ qspec_then ‘Γ’ strip_assume_tac >>
       metis_tac [OR_Bunch_rule, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg (Y ， X) --> bg(X ， Y))’ by
         (simp[] >> metis_tac[goldblatt_provable_rules, g_DIMP_def, g_AND_commutative]) >> 
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg ((X ， Y ， Z)) --> bg((X ， Y) ， Z))’ by 
         (simp[] >> metis_tac[goldblatt_provable_rules, g_AND_associative_lr]) >>
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg (((X ， Y) ， Z)) --> bg(X ， (Y ， Z)))’ by 
         (simp[] >> metis_tac[goldblatt_provable_rules, g_AND_associative_rl]) >>
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg (X) --> bg (X ， X))’ by 
         (simp[] >> metis_tac[goldblatt_provable_rules]) >>
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg (X ， X) --> bg (X))’ by 
         (simp[] >> metis_tac[goldblatt_provable_rules]) >>
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg (X ， Y) --> bg (X))’ by 
         (simp[] >> metis_tac[goldblatt_provable_rules]) >>
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg (X) --> bg (PROP τ ； X))’ by 
         (simp[] >> metis_tac[goldblatt_provable_rules, g_DIMP_def, g_io_true]) >>
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg (PROP τ ； X) --> bg (X))’ by 
         (simp[] >> metis_tac[goldblatt_provable_rules, g_DIMP_def, g_io_true]) >>
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg (Y ； X) --> bg (X ； Y))’ by 
         (simp[] >> metis_tac[goldblatt_provable_rules, g_io_commutative_lr]) >>
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg (X ； (Y ； Z)) --> bg ((X ； Y) ； Z))’ by 
         (simp[] >> metis_tac[goldblatt_provable_rules, g_io_associative_rl]) >>
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
   >- (‘|- (bg (X) --> bg(X ； X))’ by
         (simp[] >> metis_tac[goldblatt_provable_rules, g_io_imp]) >>
-      metis_tac[replacement, g_suffixing, g_modus_ponens]
+      metis_tac[CONTEXT_IMP, g_suffixing, g_modus_ponens]
      )
 QED
 
