@@ -1,4 +1,4 @@
-\chapter{Natural Deduction}
+\chapter{Routley-Meyer System}
 \label{cha:deduction}
 
 \section{Software platform}
@@ -8,5 +8,4 @@
 
 \section{Hardware platform}
 \label{sec:hardplat}
-
 
