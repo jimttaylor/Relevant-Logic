@@ -12,7 +12,8 @@ V 2 \ensuremath{\bm{\lor}}
 ； 1 \ensuremath{\bm{;}}
 ， 1 \ensuremath{\bm{,}}
 PROP 0 \ensuremath{}
-REPLACE 0 \ensuremath{}
+(REPLACE1) 1 \ensuremath{(}
+(REPLACE2) 1 \ensuremath{)}
 
 -> 1 \ensuremath{\rightarrow}
 

@@ -44,6 +44,9 @@
 \newcommand{\holthmenv}[1]{\begin{array}[t]{l}#1\end{array}}
 \renewcommand{\HOLKeyword}[1]{\texttt{#1}}
 
+\renewcommand{\mathit}[1]{\mathnormal{#1}} 
+%OMG this is so discusting but it works
+
 \newenvironment{holmath}{\begin{displaymath}\begin{array}{l}}{\end{array}\end{displaymath}\ignorespacesafterend}
 
 \usepackage{bm}
@@ -132,10 +135,11 @@
 %% Chapters
 \input{chpt2background}
 \input{chpt3hilbert}
+\input{chpt3ND}
 \input{chpt4rmsemantics}
-%\input{chpt5coversemantics}
-%\input{chpt6decidability}
-%\input{chpt7conclusion}
+\input{chpt5coversemantics}
+\input{chpt6decidability}
+\input{chpt7conclusion}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Here begins the end matter

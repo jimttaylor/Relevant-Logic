@@ -28,14 +28,14 @@ val _ = overload_on ("<->", “g_DIMP”);
 val _ = set_fixity "∘ᵣ" (Infixl 600);
 val _ = overload_on ("∘ᵣ", “g_ICONJ”);
 
-
+val _ = overload_on ("|-", “goldblatt_provable”);
     
-Datatype: R_FRAME = <| W: α set; Z: α; R:α -> α -> α -> bool; STAR: α -> α |>
+Datatype: FRAME = <| W: α set; Z: α; R:α -> α -> α -> bool; STAR: α -> α |>
 End
                        
     
-Definition Reduced_R_Frame_def:
-  Reduced_R_Frame RF  ⇔
+Definition R_Frame_def:
+  R_Frame RF  ⇔
     (RF.Z ∈ RF.W) ∧
 
     (∀x. x ∈ RF.W ⇒ (RF.STAR x) ∈ RF.W) ∧ 
@@ -58,50 +58,30 @@ Definition Reduced_R_Frame_def:
        x ∈ RF.W ∧ y ∈ RF.W ∧  z ∈ RF.W ∧ w ∈ RF.W ∧  a ∈ RF.W ∧
         RF.R w x a ∧ RF.R a y z ⇒
        (∃ b. RF.R x y b ∧ RF.R w b z ∧ b ∈ RF.W))
-       
 End
 
 
-Theorem R_ZERO_EXISTS[simp] = Reduced_R_Frame_def |> iffLR |> cj 1
-Theorem R_STAR_CLOSURE      = Reduced_R_Frame_def |> iffLR |> cj 2
-(* Theorem R_R_CLOSURE         = Reduced_R_Frame_def |> iffLR |> cj 3 *)
+Theorem R_ZERO_EXISTS[simp] = R_Frame_def |> iffLR |> cj 1
+Theorem R_STAR_CLOSURE      = R_Frame_def |> iffLR |> cj 2
 
-Theorem R_R_ZERO_REFLEX     = Reduced_R_Frame_def |> iffLR |> cj 3
-Theorem R_R_MONOTONE        = Reduced_R_Frame_def |> iffLR |> cj 4
-Theorem R_STAR_INVERSE      = Reduced_R_Frame_def |> iffLR |> cj 5
-Theorem R_STAR_DUAL         = Reduced_R_Frame_def |> iffLR |> cj 6
+Theorem R_R_ZERO_REFLEX     = R_Frame_def |> iffLR |> cj 3
+Theorem R_R_MONOTONE        = R_Frame_def |> iffLR |> cj 4
+Theorem R_STAR_INVERSE      = R_Frame_def |> iffLR |> cj 5
+Theorem R_STAR_DUAL         = R_Frame_def |> iffLR |> cj 6
 
-Theorem R_R_SELF_REFLEX     = Reduced_R_Frame_def |> iffLR |> cj 7
-Theorem R_R_COMM            = Reduced_R_Frame_def |> iffLR |> cj 8
-Theorem R_INTER_WORLD       = Reduced_R_Frame_def |> iffLR |> cj 9
+Theorem R_R_SELF_REFLEX     = R_Frame_def |> iffLR |> cj 7
+Theorem R_R_COMM            = R_Frame_def |> iffLR |> cj 8
+Theorem R_INTER_WORLD       = R_Frame_def |> iffLR |> cj 9
 
-
-val _ = overload_on ("|-", “goldblatt_provable”);
-
-Definition CONJl_def:
-  (CONJl [] = τ) ∧
-  (CONJl [p] = p) ∧ 
-  (CONJl (p::(q::lp)) = p & CONJl (q::lp))
-End
-        
-Definition pENTAIL_def:
-  pENTAIL Γ p ⇔
-    ∃ γ. γ ≠ [] ∧ (set γ) ⊆ Γ ∧ |- ((CONJl γ) --> p)
-End
-
-val _ = set_fixity "|-^" (Infixr 490); 
-Overload "|-^" = “pENTAIL”
-        
-Definition R_Theory_def:
-  R_Theory θ ⇔
-    (∀p. θ |-^ p ⇒ p ∈ θ)   
-End
-
-Definition Regular_def:
-  Regular θ ⇔
-    R_Theory θ ∧ (∀p. |- p ⇒ p ∈ θ)
-End                                                                          
-        
+                                                                
+Theorem R_INTER_WORLD_CONVERSE:
+∀RF. R_Frame RF ⇒
+     ∀w x y z b. RF.R x y b ∧ RF.R w b z ∧ x ∈ RF.W ∧ y ∈ RF.W ∧ z ∈ RF.W ∧ w ∈ RF.W ∧ b ∈ RF.W 
+                 ⇒ ∃a. RF.R w x a ∧ RF.R a y z ∧ a ∈ RF.W
+Proof
+  metis_tac[R_R_COMM, R_INTER_WORLD]
+QED
+                
 Definition Holds_def:
   (Holds RF VF w (g_VAR s) ⇔ w ∈ VF s ∧ w ∈ RF.W) ∧
   (Holds RF VF w (a & b) ⇔ Holds RF VF w a ∧ Holds RF VF w b) ∧
@@ -110,6 +90,12 @@ Definition Holds_def:
   (Holds RF VF w τ ⇔ RF.R RF.Z RF.Z w)
 End
 
+Theorem OR_Holds:
+  ∀ RF VF w A B. R_Frame RF ∧ w ∈ RF.W ⇒ (Holds RF VF w (A V B) ⇔ Holds RF VF w A ∨ Holds RF VF w B)
+Proof
+  strip_tac >> gs[g_OR_def, Holds_def] >> metis_tac[R_STAR_INVERSE]
+QED
+        
 Definition Hereditary_def:
   Hereditary RF VF ⇔
     ∀x y s. RF.R RF.Z x y ∧ x ∈ VF s ⇒ y ∈ VF s
@@ -117,7 +103,7 @@ End
      
 Theorem Hereditary_Lemma:
   ∀ RF VF x y p.
-    x ∈ RF.W ∧ y ∈ RF.W ∧ Reduced_R_Frame RF ∧ Hereditary RF VF ∧ Holds RF VF x p ∧ RF.R RF.Z x y ⇒
+    x ∈ RF.W ∧ y ∈ RF.W ∧ R_Frame RF ∧ Hereditary RF VF ∧ Holds RF VF x p ∧ RF.R RF.Z x y ⇒
     Holds RF VF y p
 Proof
   gen_tac >> gen_tac >>
@@ -141,29 +127,15 @@ Proof
       simp[R_R_ZERO_REFLEX, R_R_SELF_REFLEX]
       )
 QED
-
-Theorem OR_Holds:
-  ∀ RF VF w A B. Reduced_R_Frame RF ∧ w ∈ RF.W ⇒ (Holds RF VF w (A V B) ⇔ Holds RF VF w A ∨ Holds RF VF w B)
-Proof
-  strip_tac >> gs[g_OR_def, Holds_def] >> metis_tac[R_STAR_INVERSE]
-QED
-
-Theorem R_INTER_WORLD_CONVERSE:
-∀RF. Reduced_R_Frame RF ⇒
-     ∀w x y z b. RF.R x y b ∧ RF.R w b z ∧ x ∈ RF.W ∧ y ∈ RF.W ∧ z ∈ RF.W ∧ w ∈ RF.W ∧ b ∈ RF.W 
-                 ⇒ ∃a. RF.R w x a ∧ RF.R a y z ∧ a ∈ RF.W
-Proof
-  metis_tac[R_R_COMM, R_INTER_WORLD]
-QED
         
 Theorem Contraction_Lemma:
-  Reduced_R_Frame RF ∧ RF.R a b c ∧ a ∈ RF.W ∧ b ∈ RF.W ∧ c ∈ RF.W ⇒ ∃x. x ∈ RF.W ∧ RF.R a b x ∧ RF.R x b c 
+  R_Frame RF ∧ RF.R a b c ∧ a ∈ RF.W ∧ b ∈ RF.W ∧ c ∈ RF.W ⇒ ∃x. x ∈ RF.W ∧ RF.R a b x ∧ RF.R x b c 
 Proof
   metis_tac[R_R_SELF_REFLEX, R_INTER_WORLD_CONVERSE]
 QED
-        
+
 Theorem Soundness:
-  |- p ∧ Reduced_R_Frame RF ∧ Hereditary RF VF ⇒ Holds RF VF RF.Z p 
+  |- p ∧ R_Frame RF ∧ Hereditary RF VF ⇒ Holds RF VF RF.Z p 
 Proof
   Induct_on ‘goldblatt_provable’ >> simp[Holds_def] >> rpt strip_tac
   >- metis_tac[Hereditary_Lemma, R_R_ZERO_REFLEX]
@@ -222,6 +194,30 @@ Proof
      )
 QED
 
+Definition CONJl_def:
+  (CONJl [] = τ) ∧
+  (CONJl [p] = p) ∧ 
+  (CONJl (p::(q::lp)) = p & CONJl (q::lp))
+End
+        
+Definition pENTAIL_def:
+  pENTAIL Γ p ⇔
+    ∃ γ. γ ≠ [] ∧ (set γ) ⊆ Γ ∧ |- ((CONJl γ) --> p)
+End
+
+val _ = set_fixity "|-^" (Infixr 490); 
+Overload "|-^" = “pENTAIL”
+        
+Definition R_Theory_def:
+  R_Theory θ ⇔
+    (∀p. θ |-^ p ⇒ p ∈ θ)   
+End
+
+Definition Regular_def:
+  Regular θ ⇔
+    R_Theory θ ∧ (∀p. |- p ⇒ p ∈ θ)
+End                                                                          
+        
 Definition Prime_def:
   Prime θ ⇔
     R_Theory θ ∧ (∀A B. (A V B) ∈ θ ⇒ (A ∈ θ ∨ B ∈ θ))
@@ -1386,9 +1382,9 @@ Proof
 QED
                                      
 Theorem Canonical_Frame_is_R_Frame:
-  ∀A. ¬|-A ⇒ Reduced_R_Frame (Canonical_Frame A)
+  ∀A. ¬|-A ⇒ R_Frame (Canonical_Frame A)
 Proof
-  simp[Reduced_R_Frame_def] >> rpt strip_tac >>
+  simp[R_Frame_def] >> rpt strip_tac >>
   gs[Canonical_Frame_def] >>
   ‘Ordinary (Theta A)’ by simp[Theta_Ordinary] (* 9 *)
   >- gs[Ordinary_def, Theta_Theta_theory]
@@ -1854,11 +1850,9 @@ Proof
   irule Y_WORLD_i_grows >> qexists_tac ‘n’ >> gs[] >> 
   metis_tac[SUBSET_DEF]
 QED
-
-        
         
 Theorem Completeness:
-  (∀ (RF : (g_prop set) R_FRAME) VF. Holds RF VF RF.Z p) ⇒ |- p
+  (∀ (RF : (g_prop set) FRAME) VF. Holds RF VF RF.Z p ∧ Hereditary RF VF) ⇒ |- p
 Proof
   rw[] >> CCONTR_TAC >> 
   last_x_assum $ qspecl_then [‘(Canonical_Frame p)’,
@@ -2391,7 +2385,7 @@ Proof
             )
         )
      >- (‘(Canonical_Frame p).STAR w ∈ (Canonical_Frame p).W’ by
-           (‘Reduced_R_Frame (Canonical_Frame p)’ by 
+           (‘R_Frame (Canonical_Frame p)’ by 
               (assume_tac Canonical_Frame_is_R_Frame >>
                pop_assum $ qspec_then ‘p’ strip_assume_tac >> gs[]
               ) >> gs[R_STAR_CLOSURE]
@@ -2406,7 +2400,7 @@ Proof
              metis_tac[goldblatt_provable_rules]
             )
          >- (‘(Canonical_Frame p).R w (Canonical_Frame p).Z w’ by
-               (‘Reduced_R_Frame (Canonical_Frame p)’ by 
+               (‘R_Frame (Canonical_Frame p)’ by 
                   (assume_tac Canonical_Frame_is_R_Frame >>
                    pop_assum $ qspec_then ‘p’ strip_assume_tac >> gs[]
                   ) >>

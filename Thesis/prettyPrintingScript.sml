@@ -1,5 +1,5 @@
 open HolKernel boolLib Parse bossLib
-
+open RMSemanticsTheory
 val _ = new_theory "prettyPrinting"
 
 val _ = remove_termtok{ tok = "==>", term_name = "⇒"}

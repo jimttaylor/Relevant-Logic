@@ -1,8 +1,3 @@
-
-
-
-
-
 open HolKernel Parse boolLib bossLib stringTheory;
 
 open SlaneyRLTheory GoldblattRLTheory;
@@ -77,8 +72,11 @@ QED
 Theorem goldblatt_implies_slaney:
   ∀A. goldblatt_provable A ⇒ slaney_provable $ gs A
 Proof
-  Induct_on ‘goldblatt_provable’ >> rpt strip_tac >> gs[gs_translation_def, g_OR_def] >>
-  metis_tac[slaney_provable_rules, s_assertion, s_OR_definable, s_equiv_replacement, s_disjunction_OR_def]
+  Induct_on ‘goldblatt_provable’ >> rpt strip_tac >> gs[gs_translation_def, g_OR_def, slaney_provable_rules, s_assertion, s_disjunction_OR_def]
+  >- metis_tac[slaney_provable_rules]
+  >- metis_tac[slaney_provable_rules, s_assertion, s_OR_definable, s_equiv_replacement, s_disjunction_OR_def]
+  >- metis_tac[s_equiv_replacement, s_OR_definable, s_disjunction_elim]
+  >- metis_tac[slaney_provable_rules]
 QED
         
 Theorem slaney_implies_goldblatt:

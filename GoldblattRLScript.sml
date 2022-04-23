@@ -12,7 +12,7 @@ End
 val _ = set_fixity "-->ₐ" (Infixr 490);
 val _ = overload_on ("-->ₐ", “g_IMP”);
 
-val _ = set_fixity "&ₐ" (Infixr 490); 
+val _ = set_fixity "&ₐ" (Infixl 600); 
 val _ = overload_on ("&ₐ", “g_AND”);
 
 val _ = overload_on ("~ₐ", “g_NOT”);
@@ -32,13 +32,13 @@ Definition g_ICONJ_def:
 End
         
 
-val _ = set_fixity "Vₐ" (Infixr 490);
+val _ = set_fixity "Vₐ" (Infixl 500);
 val _ = overload_on ("Vₐ", “g_OR”);
     
-val _ = set_fixity "<->ₐ" (Infixr 490);
+val _ = set_fixity "<->ₐ" (Infixr 491);
 val _ = overload_on ("<->ₐ", “g_DIMP”);
  
-val _ = set_fixity "ioₐ" (Infixr 490);
+val _ = set_fixity "ioₐ" (Infixl 600);
 val _ = overload_on ("ioₐ", “g_ICONJ”);
 
         
@@ -86,20 +86,41 @@ Proof
   metis_tac [g_permutation, goldblatt_provable_rules, g_DIMP_def, g_double_negative_equiv]
 QED
 
+Theorem g_conj_intro_rule:
+  ∀A B C. goldblatt_provable (A -->ₐ B) ∧
+          goldblatt_provable (A -->ₐ C) ⇒
+          goldblatt_provable (A -->ₐ (B &ₐ C))
+Proof
+  metis_tac[goldblatt_provable_rules]
+QED
+        
 Theorem g_equiv_replacement:
   ∀A B C. goldblatt_provable (A <->ₐ B) ⇒
-          (goldblatt_provable (A -->ₐ C) ⇔ goldblatt_provable (B -->ₐ C)) ∧
-          (goldblatt_provable (C -->ₐ A) ⇔ goldblatt_provable (C -->ₐ B)) ∧
-          (goldblatt_provable (A &ₐ C) ⇔ goldblatt_provable (B &ₐ C)) ∧
-          (goldblatt_provable (C &ₐ A) ⇔ goldblatt_provable (C &ₐ B)) ∧
+          (goldblatt_provable ((A -->ₐ C) <->ₐ (B -->ₐ C))) ∧ 
+          (goldblatt_provable ((C -->ₐ A) <->ₐ (C -->ₐ B))) ∧
+          (goldblatt_provable ((A &ₐ C) <->ₐ (B &ₐ C))) ∧
+          (goldblatt_provable ((C &ₐ A) <->ₐ (C &ₐ B))) ∧
           (goldblatt_provable ((~ₐ A) <->ₐ ~ₐ B)) ∧
-          (goldblatt_provable (A <->ₐ C) ⇔ goldblatt_provable (B <->ₐ C)) ∧
-          (goldblatt_provable (C <->ₐ A) ⇔ goldblatt_provable (C <->ₐ B)) ∧
+          (goldblatt_provable ((A <->ₐ C) <->ₐ (B <->ₐ C))) ∧
+          (goldblatt_provable ((C <->ₐ A) <->ₐ (C <->ₐ B))) ∧
           (goldblatt_provable A ⇔ goldblatt_provable B)
 Proof
-  metis_tac[goldblatt_provable_rules, EQ_IMP_THM, g_DIMP_def]
+  rw[]
+  >- metis_tac[goldblatt_provable_rules, g_permutation, g_DIMP_def]
+  >- metis_tac[goldblatt_provable_rules, g_permutation, g_DIMP_def]
+  >- metis_tac[goldblatt_provable_rules, g_permutation, g_DIMP_def]
+  >- metis_tac[goldblatt_provable_rules, g_permutation, g_DIMP_def]
+  >- metis_tac[goldblatt_provable_rules, g_permutation, g_DIMP_def]
+  >- (gs[g_DIMP_def] >> irule g_adjunction_rule >> rw[] >> 
+      irule g_conj_intro_rule >>
+      metis_tac[goldblatt_provable_rules, g_permutation])
+  >- (gs[g_DIMP_def] >> irule g_adjunction_rule >> rw[] >> 
+      irule g_conj_intro_rule >>
+      metis_tac[goldblatt_provable_rules, g_permutation])
+ >- metis_tac[goldblatt_provable_rules, g_permutation, g_DIMP_def]
 QED
-                       
+
+        
 Theorem g_contrapositive_alt:
  ∀ A B. goldblatt_provable ((A -->ₐ B) <->ₐ (~ₐ B -->ₐ ~ₐ A))
 Proof
