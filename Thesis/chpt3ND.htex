@@ -241,7 +241,7 @@ We will need the following lemma to prove this:
 \end{proof}
 
 \subsection{Summary}
-This chapter introduced, formalised, and showed the equivalence of two different Hilbert systems and a Natural Deduction system. 
+This chapter introduced, formalised, and showed the equivalence of two different Hilbert systems and a Natural Deduction system for relevance logic. 
 Inside the HOL4 development: the introduction of the Goldblatt System (in \texttt{GoldblattRLScript.sml}) consists of 147 lines of HOL4 the introduction of the Slaney system (in \texttt{SlaneyRLScript.sml}) consists of 244 lines of HOL4, showing equivalence between the Goldblatt and Slaney systems required a further 104 lines of HOL4 in \texttt{GoldblattSlaneyEquivScript.sml}, and the introduction and equivalence results of the Natural Deduction system consisted of 416 lines of HOL4 in \texttt{NaturalDeductionScript.sml}.
 
 Now that we have thoroughly explored our syntactic systems, it follows that we should now consider our first \emph{semantic} one. 

@@ -1,11 +1,132 @@
 \chapter{Routley-Meyer System}
-\label{cha:deduction}
+\label{cha:rmsemantics}
+\fix{needs some form of content introduction... probably talk about the difference between semanitic models in contrast with syntactic ones. There should also be brief explaination of Possible Worlds}
+This chapter introduces the Routley-Meyer Semantics and establishes soundness and completeness results between the Goldblatt axioms and this system.
+\section{The Routley-Meyer System}
+As with the formalisations given in chapter~\ref{cha:proof-systems} we will first begin with the types of structures that are begin dealt with in the Routley-Meyer semantics, so without much ado:  
+\begin{defn}[]\label{def:frame-models}
+	An \HOLty{:α FRAME} is a record type with fields \HOLtm{W}, \HOLtm{Z}, \HOLtm{R}, and \HOLtm{STAR}. 
+	\HOLtm{W} is a set of worlds of type \HOLty{:α}. \HOLtm{Z} is of type \HOLty{:α}, \HOLtm{R} is a ternary relation over \HOLty{:α}, \HOLtm{STAR} is an operator over \HOLty{:α}.
+	\begin{holmath}
+		\HOLthm[width=100]{RMSemantics.datatype_FRAME}
+	\end{holmath}
+	Accompanying the \HOLty{:α FRAME} datatype we shall also consider a valuation function which takes our propositional letters and assigns them sets of worlds. 
+	An \HOLty{:α MODEL} is a record type with fields \HOLtm{RF} being a \HOLty{:α FRAME}, and \HOLtm{VF} begin a map of type:  \HOLty{:(string -> (α set))}:
+	\begin{holmath}
+		\HOLthm[width=100]{RMSemantics.datatype_MODEL}
+	\end{holmath}
 
-\section{Software platform}
-\label{sec:softplat}
+\end{defn}
+A \emph{world} in the sense of Definition~\ref{def:frame-models} is a place where propositions taken to be true or false. 
+In the Routley-Meyer semantics each world isn't required to \emph{consistant}, that is: if \HOLtm{p} is a propsition and \HOLtm{w} a \emph{world}, then both \HOLtm{p} and \HOLtm{~p} can be true at \HOLtm{w} at the same time or neither true. \fix {maybe put in the introduction of chpr} 
+Now that we have these dataypes we now introduce a set of conditions on members of the datatypes to get \emph{frames} and \emph{models} of the logic: 
+\begin{defn}[\HOLtm{R_Frame}]\label{def:r-frame}
+	If \HOLtm{RF} is of type \HOLty{:α FRAME} and then it is an \HOLtm{R_Frame} if it has the following closure properties:
+	\begin{enumerate}
+		\item \HOLtm{RF.Z ∈ RF.W}
+		\item If \HOLtm{x ∈ RF.W} then so is \HOLtm{RF.STAR x}
+	\end{enumerate}	
+	We also have the following rules which make \HOLtm{RF} a member of the class of substructural logics:\fix{I breifly talk about substructural logics in the Background} that contain Relevance Logic.  
+	\begin{enumerate}
+		\setcounter{enumi}{2}
+		\item When we have \HOLtm{x ∈ RF.W} we alsohave \HOLtm{RF.R RF.Z x x}
+		\item When we have $\HOLtm{x},\,\HOLtm{x'},\,\HOLtm{y},\,\HOLtm{y'},\,\HOLtm{z},\,\HOLtm{z'}\in\HOLtm{RF.W}$ such that \HOLtm{RF.R RF.Z x' x}, \HOLtm{RF.R RF.Z y' y}\fix{hm, difficult to read}, and \HOLtm{RF.R RF.Z z z'} then \HOLtm{(RF.R x y z) ⇒ (RF.R x' y' z')}
+		\item When \HOLtm{x ∈ RF.W} we have \HOLtm{RF.STAR (RF.STAR x) = x}
+		\item When we have $\HOLtm{w},\,\HOLtm{x},\,\HOLtm{y}\in\HOLtm{RF.W}$ then we have \HOLtm{(RF.R w x y) ⇒ (RF.R w (RF.STAR y) (RF.STAR x))}
+	\end{enumerate}
+	We also require that \HOLtm{RF} satisfy the following three propositions  
+	\begin{enumerate}
+		\setcounter{enumi}{6}
+		\item When we have \HOLtm{x ∈ RF.W} we also have \HOLtm{RF.R x x x}
+		\item When we have $\HOLtm{x},\,\HOLtm{y},\,\HOLtm{z}\in\HOLtm{RF.W}$ then we have \HOLtm{(RF.R x y z) ⇒ (RF.R y x z)}
+		\item If we have $\HOLtm{w},\,\HOLtm{x},\,\HOLtm{y},\,\HOLtm{z},\,\HOLtm{a}\in\HOLtm{RF.W}$ where we have both \HOLtm{RF.R w x a} and \HOLtm{RF.R a y z} then there exists a world \HOLtm{b ∈ RF.W} such that both \HOLtm{RF.R x y b} and \HOLtm{RF.R w b z}
+	\end{enumerate}
+	In other words:
+	\begin{holmath}
+		\HOLthm[]{RMSemantics.R_Frame_def}
+	\end{holmath}
+\end{defn} 
+Of course we could just take any function \HOLtm{VF} to be our valuation like in modal logic, but in \textbf{R} this is a slight problem as we want the property that if a propositional variable \HOLtm{s} holds at some world \HOLtm{x} and \HOLtm{x} is related to \HOLtm{y} by our \emph{logical} world \HOLtm{RF.Z} then that propositional variable ought to hold at \HOLtm{y} as well. \fix{explain this further}
+The intuition behind why this is a desirable property is: any given world should be `stable' under logic, if something holds then it ought to hold after applying logic. We call this the \emph{hereditary property}.
+\begin{defn}[Hereditary property]\label{def:hereditary}
+	An \HOLty{:α MODEL}, \HOLtm{RM} has the \emph{hereditary property} if and only if whenever we both have \HOLtm{RM.RF.R RM.RF.Z x y} and \HOLtm{x ∈ RM.VF s} then we also have \HOLtm{y ∈ RM.VF s}:
+	\begin{holmath}
+		\HOLthm[]{RMSemantics.Hereditary_def}
+	\end{holmath}
+	If an \HOLty{:α MODEL} \HOLtm{RM} has the hereditary property, then we say that \HOLtm{RM} is \emph{hereditary}.
+\end{defn}
+Definitions~\ref{def:r-frame} and \ref{def:hereditary} leads us to the definition of an \HOLtm{R_Model}:
+\begin{defn}[\HOLtm{R_Model}]\label{def:r-model}
+	If \HOLtm{RM} is of type \HOLty{:α MODEL} then it is an \HOLtm{R_Model} if \HOLtm{RM.RF} is an \HOLtm{R_Frame} and \HOLtm{RM} is hereditary.
+	\begin{holmath}
+		\HOLthm{RMSemantics.R_Model_def}
+	\end{holmath}
+\end{defn}
+As we consider each of the worlds in \HOLtm{RM.RF.W} to be a place where  propositions can be true, we . 
+\begin{defn}[Holds]\label{def:holds}
+	\fix{there has to be a nicer way to write STAR}
+	Given a \HOLtm{R_Model} \HOLtm{RM} and a world \HOLtm{w ∈ RM.RF.W} then when a \HOLty{:g_prop} \HOLtm{p} holds at \HOLtm{w} in the model \HOLtm{RM} then we write \HOLtm{Holds RM w p}. 
+	When \HOLtm{p = g_VAR s} for some \HOLty{:string} \HOLtm{s} then \HOLtm{p} holds at \HOLtm{w} if and only if \HOLtm{w ∈ RM.VF s}. 
+	When \HOLtm{p = A & B} then \HOLtm{p} holds at \HOLtm{w} if and only if \HOLtm{Holds RM w A} and \HOLtm{Holds RM w B}. 
+	When \HOLtm{p = ~A} then \HOLtm{p} holds at \HOLtm{w} if and only if $\lnot\HOLtm{Holds RM (RM.RF.STAR w) A}$. 
+	When \HOLtm{p = A --> B} \HOLtm{p} holds at \HOLtm{w} holds if and only if whenever \HOLtm{RM.RF.R w x y} for $\HOLtm{x}, \HOLtm{y} \in \HOLtm{RM.RF.W}$ and \HOLtm{Holds RM x A} then we have that \HOLtm{Holds RM y B}.
+	When \HOLtm{p = τ} then \HOLtm{p} holds at \HOLtm{w} if and only if \HOLtm{RM.RF.R RM.RF.Z RM.RF.Z w}.
+	\begin{holmath}
+	\begin{matrix*}[l]
+		\HOLthm[aligneddef,width=100,A//a,B//b]{RMSemantics.Holds_def}
+	\end{matrix*}
+	\end{holmath}
+	We also say that a proposition \HOLtm{p} holds at a model if and only if it holds at the \HOLtm{RM.RF.Z} and we write \HOLtm{Holds RM RM.RF.Z p}.
+\end{defn}
+It follows from immediatley from this definition that:
+\begin{cor}[\HOLtm{$V} Holds]
+	\begin{holmath}
+	\HOLthm[nostile,width=100]{RMSemantics.OR_Holds}
+	\end{holmath}
+\end{cor}
+The hereditary property also extends to all formulae:
+\begin{lem}[Hereditary Lemma]\label{lem:hereditary-lem}
+	\begin{holmath}
+		\HOLthm[]{RMSemantics.Hereditary_Lemma}
+	\end{holmath}
+\end{lem}
+\begin{proof}
+	Inducting on the structure of \HOLtm{p}, the \HOLtm{g_VAR} and \HOLtm{$&} cases are immediate using Definitions~\ref{def:hereditary}, \ref{def:r-model}, and \ref{def:holds}. 
+	\begin{itemize}
+		\item[$\HOLtm{$-->}$:] We suppose that \HOLtm{Holds RM x (A --> B)} and \HOLtm{RM.RF.R y a b} with $\HOLtm{a},\, \HOLtm{b} \in \HOLtm{RM.RF.W}$ where \HOLtm{Holds RM a A}. 
+		It suffices to show that \HOLtm{RM.RF.R x a b} by definition~\ref{def:holds}. 
+		From definition~\ref{def:r-frame}.4 all that is require is to show that \HOLtm{RM.RF.R RM.RF.Z a a} and \HOLtm{RM.RF.R RM.RF.Z b b}, both of which follow from definition~\ref{def:r-frame}.3.
+		\item[$\HOLtm{$~}$:] We suppose that \HOLtm{Holds RM x (~A)} which means that \HOLtm{¬Holds RM (RM.RF.STAR x) A} and we are required to show that \HOLtm{¬Holds RM (RM.RF.STAR y) A}. 
+		But we know that \HOLtm{RM.RF.R RM.RF.Z (RM.RF.STAR y) (RM.RF.STAR x)} by definition~\ref{def:r-frame}.6. 
+		Then, due to the inductive hypothesis, this case follows from definition~\ref{def:r-frame}.2.
+		\item[$(\HOLtm{τ})$:] We suppose that \HOLtm{Holds RM x τ} which just means that \HOLtm{RM.RF.R RM.RF.Z RM.RF.Z x} and we need to show that \HOLtm{RM.RF.R RM.RF.Z RM.RF.Z y}. 
+		By definition~\ref{def:r-frame}.4 we get that all we need to show is \HOLtm{RM.RF.R RM.RF.Z RM.RF.Z RM.RF.Z} and \HOLtm{RM.RF.R RM.RF.Z y y}, these follow from definitions~\ref{def:r-frame}.7 and \ref{def:r-frame}.3 respectively. 
+	\end{itemize}
+\end{proof}
 
+\section{Soundness}
+In sections~\ref{sec:newhilbert} and~\ref{sec:nd-system} we showed that the new proof systems that we were introducing proved exactly the same theorems that the Goldblatt Axiomatisation could prove. 
+Semantic systems, on the other hand, create a series of rules that define a class of models where some models may prove some propositions while others don't. 
 
+The connection between semantic theories, and syntactic ones are two metatheorems called \emph{soundness} and \emph{completeness} results. 
+A \emph{soundness} result between a syntactic theory and a semantic theory states that if a proposition \HOLtm{p} is a theorem of the syntactic theory, then \HOLtm{p} holds in every model in the semantic theory. 
+Conversly a \emph{completeness} result states that if a propostion holds in every model of the semantic theory, then it is a theorem of the syntactic theory. 
 
-\section{Hardware platform}
-\label{sec:hardplat}
+As hinted by its title, this section will establish the soundness result between the Goldblatt axiomatisation and the Routley-Meyer semantics.
 
+We will first state a useful lemma before showing the soundness result:
+\begin{lem}\label{lem:contraction-lem}
+\begin{holmath}
+		\HOLthm{RMSemantics.Contraction_Lemma}
+\end{holmath}
+\end{lem}
+\begin{thm}[Soundness]\label{thm:RM-soundness}
+	\begin{holmath}
+		\HOLthm[]{RMSemantics.Soundness}
+	\end{holmath}
+\end{thm}
+\begin{proof}[Sketch]
+	Induct on \HOLtm{goldblatt_provable}.
+\end{proof}
+
+\section{Completeness}

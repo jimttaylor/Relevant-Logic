@@ -31,9 +31,11 @@ val _ = overload_on ("∘ᵣ", “g_ICONJ”);
 val _ = overload_on ("|-", “goldblatt_provable”);
     
 Datatype: FRAME = <| W: α set; Z: α; R:α -> α -> α -> bool; STAR: α -> α |>
+End                
+
+Datatype: MODEL = <| RF: α FRAME; VF: string -> α set|>
 End
-                       
-    
+                   
 Definition R_Frame_def:
   R_Frame RF  ⇔
     (RF.Z ∈ RF.W) ∧
@@ -60,7 +62,6 @@ Definition R_Frame_def:
        (∃ b. RF.R x y b ∧ RF.R w b z ∧ b ∈ RF.W))
 End
 
-
 Theorem R_ZERO_EXISTS[simp] = R_Frame_def |> iffLR |> cj 1
 Theorem R_STAR_CLOSURE      = R_Frame_def |> iffLR |> cj 2
 
@@ -73,7 +74,54 @@ Theorem R_R_SELF_REFLEX     = R_Frame_def |> iffLR |> cj 7
 Theorem R_R_COMM            = R_Frame_def |> iffLR |> cj 8
 Theorem R_INTER_WORLD       = R_Frame_def |> iffLR |> cj 9
 
-                                                                
+Definition Hereditary_def:
+  Hereditary RM ⇔
+    ∀x y s. RM.RF.R RM.RF.Z x y ∧ x ∈ RM.VF s ⇒ y ∈ RM.VF s
+End
+
+Definition R_Model_def:
+  R_Model RM ⇔ R_Frame RM.RF ∧ Hereditary RM
+End
+        
+Definition Holds_def:
+  (Holds RM w (g_VAR s) ⇔ w ∈ RM.RF.W ∧ w ∈ RM.VF s) ∧
+  (Holds RM w (a & b) ⇔  w ∈ RM.RF.W ∧ Holds RM w a ∧ Holds RM w b) ∧
+  (Holds RM w (~a) ⇔  w ∈ RM.RF.W ∧ ¬ Holds RM (RM.RF.STAR w) a) ∧
+  (Holds RM w (a --> b) ⇔  w ∈ RM.RF.W ∧ ∀x y. x ∈ RM.RF.W ∧ y ∈ RM.RF.W ∧ RM.RF.R w x y ∧ Holds RM x a ⇒ Holds RM y b) ∧
+  (Holds RM w τ ⇔  w ∈ RM.RF.W ∧ RM.RF.R RM.RF.Z RM.RF.Z w)
+End
+
+Theorem OR_Holds:
+  ∀ RM w A B. R_Model RM ∧ w ∈ RM.RF.W ⇒ (Holds RM w (A V B) ⇔ Holds RM w A ∨ Holds RM w B)
+Proof
+  rw[R_Model_def, g_OR_def, Holds_def, EQ_IMP_THM] >> metis_tac[R_STAR_INVERSE, R_STAR_CLOSURE]
+QED
+        
+Theorem Hereditary_Lemma:
+  ∀ RM x y p.
+    R_Model RM ∧ x ∈ RM.RF.W ∧ y ∈ RM.RF.W ∧ Holds RM x p ∧ RM.RF.R RM.RF.Z x y ⇒
+    Holds RM y p
+Proof
+  gen_tac >> 
+  simp[R_Model_def, Hereditary_def] >> Induct_on ‘p’ >> 
+  simp[Holds_def] 
+  >- metis_tac[]
+  >- (rpt strip_tac >> gs[] >>
+      rename [‘RM.RF.R y a b’, ‘Holds _ a A’, ‘Holds _ b B’] >> 
+      ‘RM.RF.R x a b’ suffices_by metis_tac[] >>
+      drule_then irule R_R_MONOTONE >> simp[] >> 
+      qexistsl_tac [‘y’, ‘a’, ‘b’] >> simp[] >> 
+      metis_tac[R_R_ZERO_REFLEX]) 
+  >- metis_tac[]
+  >- (rw[] >> rename[‘RM.RF.R RM.RF.Z x y’, ‘¬Holds RM (RM.RF.STAR y) A’] >>
+      ‘RM.RF.R RM.RF.Z (RM.RF.STAR y) (RM.RF.STAR x)’ by (irule R_STAR_DUAL >> simp[]) >> 
+      metis_tac[R_STAR_CLOSURE])
+  >- (rw[] >>  
+      irule R_R_MONOTONE >> simp[] >>
+      qexistsl_tac [‘RM.RF.Z’, ‘x’, ‘y’] >> simp[] >>
+      simp[R_R_ZERO_REFLEX, R_R_SELF_REFLEX])
+QED
+                                                              
 Theorem R_INTER_WORLD_CONVERSE:
 ∀RF. R_Frame RF ⇒
      ∀w x y z b. RF.R x y b ∧ RF.R w b z ∧ x ∈ RF.W ∧ y ∈ RF.W ∧ z ∈ RF.W ∧ w ∈ RF.W ∧ b ∈ RF.W 
@@ -81,119 +129,68 @@ Theorem R_INTER_WORLD_CONVERSE:
 Proof
   metis_tac[R_R_COMM, R_INTER_WORLD]
 QED
-                
-Definition Holds_def:
-  (Holds RF VF w (g_VAR s) ⇔ w ∈ VF s ∧ w ∈ RF.W) ∧
-  (Holds RF VF w (a & b) ⇔ Holds RF VF w a ∧ Holds RF VF w b) ∧
-  (Holds RF VF w (~a) ⇔ ¬ Holds RF VF (RF.STAR w) a) ∧
-  (Holds RF VF w (a --> b) ⇔ ∀x y. x ∈ RF.W ∧ y ∈ RF.W ∧ RF.R w x y ∧ Holds RF VF x a ⇒ Holds RF VF y b) ∧
-  (Holds RF VF w τ ⇔ RF.R RF.Z RF.Z w)
-End
 
-Theorem OR_Holds:
-  ∀ RF VF w A B. R_Frame RF ∧ w ∈ RF.W ⇒ (Holds RF VF w (A V B) ⇔ Holds RF VF w A ∨ Holds RF VF w B)
-Proof
-  strip_tac >> gs[g_OR_def, Holds_def] >> metis_tac[R_STAR_INVERSE]
-QED
-        
-Definition Hereditary_def:
-  Hereditary RF VF ⇔
-    ∀x y s. RF.R RF.Z x y ∧ x ∈ VF s ⇒ y ∈ VF s
-End
-     
-Theorem Hereditary_Lemma:
-  ∀ RF VF x y p.
-    x ∈ RF.W ∧ y ∈ RF.W ∧ R_Frame RF ∧ Hereditary RF VF ∧ Holds RF VF x p ∧ RF.R RF.Z x y ⇒
-    Holds RF VF y p
-Proof
-  gen_tac >> gen_tac >>
-  simp[Hereditary_def] >> Induct_on ‘p’ >> 
-  simp[Holds_def] 
-  >- metis_tac[]
-  >- (rpt strip_tac >> gs[] >>
-      rename [‘RF.R y a b’, ‘Holds _ _ a p’] >> 
-      ‘RF.R x a b’ suffices_by metis_tac[] >>
-      drule_then irule R_R_MONOTONE >> simp[] >> 
-      qexistsl_tac [‘y’, ‘a’, ‘b’] >> 
-      metis_tac[R_R_ZERO_REFLEX]
-     ) 
-  >- metis_tac[]
-  >- (rw[] >>
-      ‘RF.R RF.Z (RF.STAR y) (RF.STAR x)’ by (irule R_STAR_DUAL >> simp[]) >> 
-      metis_tac[R_STAR_CLOSURE])
-  >- (rw[] >>
-      irule R_R_MONOTONE >> simp[] >>
-      qexistsl_tac [‘RF.Z’, ‘x’, ‘y’] >> simp[] >>
-      simp[R_R_ZERO_REFLEX, R_R_SELF_REFLEX]
-      )
-QED
-        
 Theorem Contraction_Lemma:
-  R_Frame RF ∧ RF.R a b c ∧ a ∈ RF.W ∧ b ∈ RF.W ∧ c ∈ RF.W ⇒ ∃x. x ∈ RF.W ∧ RF.R a b x ∧ RF.R x b c 
+  R_Frame RF ∧ RF.R w x y ∧ w ∈ RF.W ∧ x ∈ RF.W ∧ y ∈ RF.W ⇒ ∃x'. x' ∈ RF.W ∧ RF.R w x x' ∧ RF.R x' x y 
 Proof
   metis_tac[R_R_SELF_REFLEX, R_INTER_WORLD_CONVERSE]
 QED
 
 Theorem Soundness:
-  |- p ∧ R_Frame RF ∧ Hereditary RF VF ⇒ Holds RF VF RF.Z p 
+  ∀p RM. |- p ∧ R_Model RM ⇒ Holds RM RM.RF.Z p 
 Proof
-  Induct_on ‘goldblatt_provable’ >> simp[Holds_def] >> rpt strip_tac
-  >- metis_tac[Hereditary_Lemma, R_R_ZERO_REFLEX]
-  >- (rename [‘RF.R RF.Z ab bc_ac’, ‘RF.R bc_ac bc ac’, ‘RF.R ac a c’] >> 
-      ‘RF.R bc ab ac’ by
+  rpt gen_tac >> 
+  Induct_on ‘goldblatt_provable’ >> simp[Holds_def, R_Model_def] >>
+  rpt strip_tac >> gs[R_STAR_CLOSURE]
+  >- metis_tac[Hereditary_Lemma, R_R_ZERO_REFLEX, R_Model_def]
+  >- (rename [‘RM.RF.R RM.RF.Z ab bc_ac’, ‘RM.RF.R bc_ac bc ac’, ‘RM.RF.R ac a c’] >> 
+      ‘RM.RF.R bc ab ac’ by
         (irule R_R_MONOTONE >> 
          metis_tac[R_R_ZERO_REFLEX, R_R_COMM]) >>
-      metis_tac[R_INTER_WORLD]
-     )
-  >- (rename[‘RF.R RF.Z a ab_b’, ‘RF.R ab_b ab b’] >> 
-      ‘RF.R a ab b’ by
+      metis_tac[R_INTER_WORLD])
+  >- (rename[‘RM.RF.R RM.RF.Z a ab_b’, ‘RM.RF.R ab_b ab b’] >> 
+      ‘RM.RF.R a ab b’ by
         (irule R_R_MONOTONE >> 
          metis_tac[R_R_ZERO_REFLEX]) >> 
-      metis_tac[R_R_COMM]
-     )
-  >- (rename [‘RF.R RF.Z abb ab’, ‘RF.R ab a b’] >> 
+      metis_tac[R_R_COMM])
+  >- (rename [‘RM.RF.R RM.RF.Z abb ab’, ‘RM.RF.R ab a b’] >> 
       last_x_assum irule>> simp[] >> qexistsl_tac [‘a’, ‘a’] >> simp[] >>
       irule Contraction_Lemma >> simp[] >>
       irule R_R_MONOTONE >> 
-      metis_tac[R_R_ZERO_REFLEX, R_R_COMM]
-     )
-  >- metis_tac[Hereditary_Lemma]
-  >- metis_tac[Hereditary_Lemma]
-  >- (rename [‘RF.R RF.Z x y’, ‘RF.R y a b’] >> 
+      metis_tac[R_R_ZERO_REFLEX, R_R_COMM])
+  >- metis_tac[Hereditary_Lemma, R_Model_def]
+  >- metis_tac[Hereditary_Lemma, R_Model_def]
+  >- (rename [‘RM.RF.R RM.RF.Z x y’, ‘RM.RF.R y a b’] >> 
       last_x_assum irule >> simp[] >> qexists_tac ‘a’ >> gs[] >> 
-      irule R_R_MONOTONE >> metis_tac[R_R_ZERO_REFLEX]
-     )
-  >- (rename [‘RF.R RF.Z x y’, ‘RF.R y a c’] >> 
+      irule R_R_MONOTONE >> metis_tac[R_R_ZERO_REFLEX])
+  >- (rename [‘RM.RF.R RM.RF.Z x y’, ‘RM.RF.R y a c’] >> 
       last_x_assum irule >> simp[] >> qexists_tac ‘a’ >> gs[] >> 
-      irule R_R_MONOTONE >> metis_tac[R_R_ZERO_REFLEX]
-     )
-  >- metis_tac[OR_Holds, Hereditary_Lemma]
-  >- metis_tac[OR_Holds, Hereditary_Lemma]
-  >- (rename [‘RF.R RF.Z x y’, ‘RF.R y avb c’] >>
-      ‘RF.R x avb c’ by
+      irule R_R_MONOTONE >> metis_tac[R_R_ZERO_REFLEX])
+  >- metis_tac[OR_Holds, Hereditary_Lemma, R_Model_def]
+  >- metis_tac[OR_Holds, Hereditary_Lemma, R_Model_def]
+  >- (rename [‘RM.RF.R RM.RF.Z x y’, ‘RM.RF.R y avb c’] >>
+      ‘RM.RF.R x avb c’ by
         (irule R_R_MONOTONE >> metis_tac[R_R_ZERO_REFLEX]) >>
-      metis_tac[OR_Holds]
-     )
-  >- metis_tac[OR_Holds, Holds_def, Hereditary_Lemma]
-  >- (rename [‘RF.R RF.Z x y’, ‘RF.R y b a’] >>
-      ‘RF.R x (RF.STAR a) (RF.STAR b)’ by
+      metis_tac[OR_Holds, R_Model_def])
+  >- metis_tac[OR_Holds, Holds_def, Hereditary_Lemma, R_Model_def]
+  >- (rename [‘RM.RF.R RM.RF.Z x y’, ‘RM.RF.R y b a’] >>
+      ‘RM.RF.R x (RM.RF.STAR a) (RM.RF.STAR b)’ by
         (irule R_R_MONOTONE >>  metis_tac[R_R_ZERO_REFLEX, R_STAR_DUAL, R_STAR_CLOSURE]) >>
-      last_x_assum $ qspecl_then [‘RF.STAR a’, ‘RF.STAR b’] strip_assume_tac >> gs[] >>
-      metis_tac [R_STAR_INVERSE, R_STAR_CLOSURE]
-      )
-  >- metis_tac[R_STAR_INVERSE, Hereditary_Lemma]
-  >- (last_x_assum irule >> metis_tac[R_R_SELF_REFLEX, R_ZERO_EXISTS]
-     )
-  >- (irule Hereditary_Lemma >> simp[] >>
-      qexists_tac ‘RF.Z’ >> gs[] >>
+      last_x_assum $ qspecl_then [‘RM.RF.STAR a’, ‘RM.RF.STAR b’] strip_assume_tac >> gs[] >>
+      metis_tac [R_STAR_INVERSE, R_STAR_CLOSURE])
+  >- metis_tac[R_STAR_INVERSE, Hereditary_Lemma, R_Model_def]
+  >- (last_x_assum irule >> metis_tac[R_R_SELF_REFLEX, R_ZERO_EXISTS])
+  >- (irule Hereditary_Lemma >> rw[] 
+      >- gs[R_Model_def] >> 
+      qexists_tac ‘RM.RF.Z’ >> gs[] >>
       irule R_R_MONOTONE >> simp[] >>
-      qexistsl_tac [‘RF.Z’, ‘x’, ‘y’] >> simp[] >> strip_tac >> 
-      assume_tac R_R_ZERO_REFLEX >> pop_assum $ qspec_then ‘RF’ irule >> simp[]
-     )
-  >- (last_x_assum irule >> metis_tac[R_R_SELF_REFLEX, R_ZERO_EXISTS]
-     )
+      qexistsl_tac [‘RM.RF.Z’, ‘x’, ‘y’] >> simp[] >> strip_tac >> 
+      assume_tac R_R_ZERO_REFLEX >> pop_assum $ qspec_then ‘RM.RF’ irule >> simp[])
+  >- (last_x_assum irule >> metis_tac[R_R_SELF_REFLEX, R_ZERO_EXISTS])
 QED
+(* Changed to model *)
 
+   (*
 Definition CONJl_def:
   (CONJl [] = τ) ∧
   (CONJl [p] = p) ∧ 
@@ -2433,6 +2430,6 @@ Proof
   CCONTR_TAC >> qpat_x_assum ‘¬(Theta p |-^ p)’ mp_tac >> simp[pENTAIL_def] >>
   gs[] >> qexists_tac ‘[p]’ >> gs[CONJl_def, g_identity]
 QED
-        
+        *)
 val _ = export_theory();
 

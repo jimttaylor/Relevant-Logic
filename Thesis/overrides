@@ -19,3 +19,25 @@ $Turnstile$ 5 \HOLTokenTurnstile{}
 
 <| 1 \ensuremath{\langle}
 |> 1 \ensuremath{\rangle}
+
+RM 1 \ensuremath{\mathfrak{M}}
+RF 1 \ensuremath{\mathfrak{F}}
+VF 1 \ensuremath{V}
+Z 1 \ensuremath{0}
+
+(Mw) 1 \ensuremath{\sp{W}}
+(Mz) 1 \ensuremath{\sp{0}}
+(Mr) 1 \ensuremath{\sp{R}}
+(Ms) 4 \ensuremath{\sp{STAR}}
+(Mv) 1 \ensuremath{\sp{V}}
+(Mf) 1 \ensuremath{\sp{\mathfrak{F}}}
+
+(Fw) 1 \ensuremath{\sp{W}}
+(Fz) 1 \ensuremath{\sp{0}}
+(Fr) 1 \ensuremath{\sp{R}}
+(Fs) 4 \ensuremath{\sp{STAR}}
+
+(HOLDS1) 2 \ensuremath{,\,} 
+(HOLDS2) 1 \ensuremath{\models}
+
+(MHOLDS1) 1 \ensuremath{\models}
