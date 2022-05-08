@@ -62,6 +62,10 @@
 \newtheorem{cor}[thm]{Corollary}
 \newtheorem{lem}[thm]{Lemma}
 
+\newtheorem{innercustomthm}{Theorem}
+\newenvironment{restatethm}[2]
+  {\renewcommand\theinnercustomthm{#1}\innercustomthm[#2]}
+  {\endinnercustomthm}
 
 \renewcommand*{\backref}[1]{}
 \renewcommand*{\backrefalt}[4]{
@@ -74,6 +78,7 @@
   \fi
 }
 
+\usepackage{graphicx}
 
 
 

@@ -35,7 +35,7 @@ End
 val _ = set_fixity "Vₐ" (Infixl 500);
 val _ = overload_on ("Vₐ", “g_OR”);
     
-val _ = set_fixity "<->ₐ" (Infixr 491);
+val _ = set_fixity "<->ₐ" (Infix (NONASSOC, 491));
 val _ = overload_on ("<->ₐ", “g_DIMP”);
  
 val _ = set_fixity "ioₐ" (Infixl 600);

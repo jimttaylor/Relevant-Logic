@@ -1,5 +1,4 @@
-|- 2 \ensuremath{\vdash_\textbf{R}}
-g_VAR 4 \ensuremath{\texttt{VAR}_g}
+|- 2 \ensuremath{\vdash\sb{\bm{R}}}
 --> 2 \ensuremath{\rightarrow}
 <-> 2 \ensuremath{\leftrightarrow} 
 & 2 \ensuremath{\&}
@@ -7,6 +6,8 @@ g_VAR 4 \ensuremath{\texttt{VAR}_g}
 V 2 \ensuremath{\bm{\lor}}
 ∘ᵣ 2 \ensuremath{\circ}
 τ 2 \ensuremath{\tau}
+
+|-^ 2 \ensuremath{\vdash^{\&}\sb{\bm{R}}}
 
 -> 1 \ensuremath{\rightarrow}
 
@@ -20,24 +21,78 @@ $Turnstile$ 5 \HOLTokenTurnstile{}
 <| 1 \ensuremath{\langle}
 |> 1 \ensuremath{\rangle}
 
-RM 1 \ensuremath{\mathfrak{M}}
-RF 1 \ensuremath{\mathfrak{F}}
+RM 1 \ensuremath{\mathcal{M}}
+RF 1 \ensuremath{\mathcal{F}}
 VF 1 \ensuremath{V}
 Z 1 \ensuremath{0}
+STAR 1 \ensuremath{\ast}
 
 (Mw) 1 \ensuremath{\sp{W}}
-(Mz) 1 \ensuremath{\sp{0}}
-(Mr) 1 \ensuremath{\sp{R}}
-(Ms) 4 \ensuremath{\sp{STAR}}
+Mz 2 \ensuremath{0\sb{\mathcal{M}}}
+(Mr) 1 \ensuremath{R\sb}
+(Ms) 1 \ensuremath{\sp{\ast}}
+(Mss) 2 \ensuremath{\sp{\ast\ast}}
+(Msss) 3 \ensuremath{\sp{\ast\ast\ast}}
 (Mv) 1 \ensuremath{\sp{V}}
-(Mf) 1 \ensuremath{\sp{\mathfrak{F}}}
+(Mf) 1 \ensuremath{\sp{\mathcal{F}}}
 
 (Fw) 1 \ensuremath{\sp{W}}
-(Fz) 1 \ensuremath{\sp{0}}
-(Fr) 1 \ensuremath{\sp{R}}
-(Fs) 4 \ensuremath{\sp{STAR}}
+Fz 2 \ensuremath{0\sb{\mathcal{F}}}
+(Fr) 1 \ensuremath{R\sb}
+(Fs) 1 \ensuremath{\sp{\ast}}
+(Fss) 2 \ensuremath{\sp{\ast\ast}}
+(Fsss) 3 \ensuremath{\sp{\ast\ast\ast}}
 
 (HOLDS1) 2 \ensuremath{,\,} 
 (HOLDS2) 1 \ensuremath{\models}
 
 (MHOLDS1) 1 \ensuremath{\models}
+
+(Ti1) 1 \ensuremath{\theta\sb{
+(Ti2) 1 }(
+(Ti3) 1 )}
+
+(T1) 1 \ensuremath{\Theta (
+(T2) 1 )}
+(SUC) 1 {+ 1}
+
+(sENT1) 2 \ensuremath{\vdash^{\&}\sb{
+(sENT2) 1 }}
+
+R_set 1 \ensuremath{\bm{R}}
+
+(Ap1) 1 (
+(Ap2) 1 )
+
+CONJl 1 \ensuremath{\raisebox{-1pt}{\scalebox{1.2}{\usefont{OT1}{cmr}{m}{it} \textbf{\&}}}}
+(CONJl1) 1 \ensuremath{\raisebox{-1pt}{\scalebox{1.2}{\usefont{OT1}{cmr}{m}{it} \textbf{\&}}}}
+
+(op_imp_l1) 2 \ensuremath{\left(
+(op_imp_l2) 3 {}
+(op_imp_l3) 0 \right)\rightarrow
+(op_imp_l4) 0 }
+
+(op_imp_r1) 2 \ensuremath{
+(op_imp_r2) 3 \rightarrow\left(
+(op_imp_r3) 0 {}
+(op_imp_r4) 0 \right)}
+
+(CF1) 2 \ensuremath{\mathfrak{F}(
+(CF2) 1 )}
+
+(CM1) 2 \ensuremath{\mathfrak{M}(
+(CM2) 1 )}
+
+(LEQ1) 1 \ensuremath{\leq\sb{
+(LEQ2) 0 }}
+
+(Enum1) 1 \ensuremath{A\sb{
+(Enum2) 0 }} 
+
+delta 1 \ensuremath{\delta}
+Delta 1 \ensuremath{\Delta}
+gamma 1 \ensuremath{\gamma}
+Gamma 1 \ensuremath{\Gamma}
+cup 1 \ensuremath{\cup}
+(ss1) 1 \{ 
+(ss2) 1 \}

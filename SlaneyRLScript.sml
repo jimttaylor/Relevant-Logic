@@ -31,7 +31,7 @@ Definition s_DIMP_def:
 End
 
     
-val _ = set_fixity "<->ₛ" (Infixr 491);
+val _ = set_fixity "<->ₛ" (Infix (NONASSOC, 491)); (* Infix (NONASSOC, 491)*)
 val _ = overload_on ("<->ₛ", “s_DIMP”);
  
 val _ = set_fixity "ioₛ" (Infixl 600);

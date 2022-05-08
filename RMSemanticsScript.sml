@@ -8,7 +8,44 @@ open numpairTheory string_numTheory;
      
 val _ = new_theory "RMSemantics";
 
+Theorem NOT_MEM_FILTER_LEMMA:
+  ∀ a γ. ¬ MEM a (FILTER (λx. x ≠ a) γ) 
+Proof
+  strip_tac >> Induct >> gs[] >> rw[]
+QED
+        
+Theorem MEM_FILTER_LEMMA:
+  ∀ a x γ. MEM x (FILTER (λx. x ≠ a) γ) ⇒ MEM x γ 
+Proof
+  Induct_on ‘γ’ >> gs[] >> rw[]
+  >> metis_tac[] 
+QED
 
+Theorem EMPTY_FILTER_LEMMA:
+  ∀a γ. FILTER (λx. x ≠ a) γ = [] ⇔ set γ ⊆ {a}  
+Proof
+  rw[EQ_IMP_THM, SUBSET_DEF] >> 
+  Induct_on ‘γ’ >> rw[] >> gs[]
+QED
+
+Theorem FILTER_NON_MEM_EQUAL:
+  ∀ γ A. ¬MEM A γ ⇒ FILTER (λx. x ≠ A) γ = γ
+Proof
+  Induct_on ‘γ’ >> rw[] >> gs[] >>
+  Cases_on ‘γ = []’ >> gs[] >>
+  Cases_on ‘FILTER (λx. x ≠ A) γ = []’ >> gs[] >>
+  ‘∃B. MEM B γ’ by (Cases_on ‘γ’ >> gs[]) >>
+  Induct_on ‘γ’ >> gs[]
+QED
+               
+Theorem FINITE_EXISTS_LIST:
+  ∀x. FINITE x ⇒ ∃l. set l = x 
+Proof
+  Induct_on ‘FINITE’ >>
+  rw[] >> qexists_tac ‘e :: l’ >>
+  gs[]
+QED
+    
 val _ = set_fixity "-->" (Infixr 490);
 val _ = overload_on ("-->", “g_IMP”);
 
@@ -153,8 +190,8 @@ Proof
         (irule R_R_MONOTONE >> 
          metis_tac[R_R_ZERO_REFLEX]) >> 
       metis_tac[R_R_COMM])
-  >- (rename [‘RM.RF.R RM.RF.Z abb ab’, ‘RM.RF.R ab a b’] >> 
-      last_x_assum irule>> simp[] >> qexistsl_tac [‘a’, ‘a’] >> simp[] >>
+  >- (rename [‘RM.RF.R RM.RF.Z aab ab’, ‘RM.RF.R ab a b’] (* contraction *) >>
+      last_x_assum irule >> simp[] >> qexistsl_tac [‘a’, ‘a’] >> simp[] >>
       irule Contraction_Lemma >> simp[] >>
       irule R_R_MONOTONE >> 
       metis_tac[R_R_ZERO_REFLEX, R_R_COMM])
@@ -173,24 +210,21 @@ Proof
         (irule R_R_MONOTONE >> metis_tac[R_R_ZERO_REFLEX]) >>
       metis_tac[OR_Holds, R_Model_def])
   >- metis_tac[OR_Holds, Holds_def, Hereditary_Lemma, R_Model_def]
-  >- (rename [‘RM.RF.R RM.RF.Z x y’, ‘RM.RF.R y b a’] >>
+  >- (rename [‘RM.RF.R RM.RF.Z x y’, ‘RM.RF.R y b a’] (*Contradiction*) >> 
       ‘RM.RF.R x (RM.RF.STAR a) (RM.RF.STAR b)’ by
         (irule R_R_MONOTONE >>  metis_tac[R_R_ZERO_REFLEX, R_STAR_DUAL, R_STAR_CLOSURE]) >>
-      last_x_assum $ qspecl_then [‘RM.RF.STAR a’, ‘RM.RF.STAR b’] strip_assume_tac >> gs[] >>
-      metis_tac [R_STAR_INVERSE, R_STAR_CLOSURE])
-  >- metis_tac[R_STAR_INVERSE, Hereditary_Lemma, R_Model_def]
+      last_x_assum $ qspecl_then [‘RM.RF.STAR a’, ‘RM.RF.STAR b’] strip_assume_tac >> gs[R_STAR_CLOSURE] >>
+      metis_tac [R_STAR_INVERSE])
+  >- metis_tac[R_STAR_INVERSE, Hereditary_Lemma, R_Model_def] 
   >- (last_x_assum irule >> metis_tac[R_R_SELF_REFLEX, R_ZERO_EXISTS])
-  >- (irule Hereditary_Lemma >> rw[] 
-      >- gs[R_Model_def] >> 
-      qexists_tac ‘RM.RF.Z’ >> gs[] >>
-      irule R_R_MONOTONE >> simp[] >>
-      qexistsl_tac [‘RM.RF.Z’, ‘x’, ‘y’] >> simp[] >> strip_tac >> 
-      assume_tac R_R_ZERO_REFLEX >> pop_assum $ qspec_then ‘RM.RF’ irule >> simp[])
+  >- (‘Holds RM x p’ by
+        (irule Hereditary_Lemma >> simp[R_Model_def] >> 
+         qexists_tac ‘RM.RF.Z’ >> simp[]) >> 
+      irule Hereditary_Lemma >> simp[R_Model_def] >> 
+      qexists_tac ‘x’ >> simp[])
   >- (last_x_assum irule >> metis_tac[R_R_SELF_REFLEX, R_ZERO_EXISTS])
 QED
-(* Changed to model *)
 
-   (*
 Definition CONJl_def:
   (CONJl [] = τ) ∧
   (CONJl [p] = p) ∧ 
@@ -220,25 +254,280 @@ Definition Prime_def:
     R_Theory θ ∧ (∀A B. (A V B) ∈ θ ⇒ (A ∈ θ ∨ B ∈ θ))
 End
 
-Definition Consistent_def:
-  Consistent θ ⇔
-    R_Theory θ ∧ ¬∃A. A ∈ θ ∧ (~A) ∈ θ
-End
-
 Definition Ordinary_def:
   Ordinary θ ⇔ Prime θ ∧ Regular θ
 End
-        
-Definition Normal_def:
-  Normal θ ⇔ Ordinary θ ∧ Consistent θ
-End
 
+
+Theorem LIST_SUBSET_ADJUNCTION:
+  ∀γ. set γ ⊆ {p | |- p} ⇒ |- (CONJl γ)
+Proof
+  rpt strip_tac >> gs[SUBSET_DEF] >>
+  Induct_on ‘γ’
+  >- metis_tac[goldblatt_provable_rules, CONJl_def]
+  >> Cases_on ‘γ’ >> gs[CONJl_def] >> 
+  rpt strip_tac >> rename[‘|- (k & CONJl (h::t))’] >> 
+  metis_tac[goldblatt_provable_rules]
+QED                
+
+Theorem g_A_CONJl_A:
+  ∀A γ. set γ ⊆ {A} ∧ γ ≠ []  ⇒
+        |- (A --> CONJl γ)
+Proof
+  rw[] >> Induct_on ‘γ’ >> rw[] >>
+  Cases_on ‘γ = []’ >> gs[CONJl_def, g_identity] >>
+  ‘CONJl (A::γ) = A & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
+  metis_tac [goldblatt_provable_rules]                                                            
+QED
+        
+Theorem CONJl_weaken_r:
+  γ ≠ [] ⇒ |- (CONJl (δ ++ γ) --> CONJl γ)
+Proof
+  Induct_on ‘δ’
+  >- simp[g_identity]
+  >- (Cases_on ‘δ’
+      >- (Cases_on ‘γ’ >> gs[] >> 
+          simp[CONJl_def, g_conjunction_r]
+         )
+      >- (gs[CONJl_def] >> rpt strip_tac
+          >> metis_tac[goldblatt_provable_rules]
+         )
+     )
+QED
+        
+Theorem CONJl_weaken_l:
+  ∀δ. δ ≠ [] ⇒ |- (CONJl (δ ++ γ) --> CONJl δ)
+Proof
+  Induct_on ‘δ’
+  >- simp[]
+  >- (Cases_on ‘δ’
+      >- (Cases_on ‘γ’ >> gs[] >> 
+          simp[CONJl_def, g_identity, g_conjunction_l]
+         )
+      >- (gs[CONJl_def] >> rpt strip_tac
+          >> metis_tac[goldblatt_provable_rules]
+         )
+     )
+QED
+
+Theorem CONJl_split:
+  ∀ α β. α ≠ [] ∧ β ≠ [] ⇒
+         |- (CONJl α & CONJl β --> CONJl (α ++ β)) ∧
+         |- (CONJl (α ++ β) --> CONJl α & CONJl β)
+Proof
+  rw[]
+  >- (Induct_on ‘α’ >> rw[] >>
+      Cases_on ‘α = []’ >> rw[CONJl_def] 
+      >- (‘CONJl (h::β) = h & CONJl β’ by (Cases_on ‘β’ >> metis_tac[CONJl_def]) >>
+          gs[g_identity]
+         )
+      >- (‘CONJl (h::α) = h & CONJl α’ by (Cases_on ‘α’ >> metis_tac[CONJl_def]) >>
+          ‘CONJl (h::(α ⧺ β)) = h & CONJl (α ++ β)’ by (Cases_on ‘α ++ β’ >> gs[] >> metis_tac[CONJl_def]) >> 
+          gs[] >>
+          ‘|- (h & CONJl α & CONJl β --> CONJl α & CONJl β)’ by
+            metis_tac[g_suffixing, g_modus_ponens, g_conj_introduction, g_conjunction_l, g_conjunction_r, g_adjunction_rule] >>
+          ‘|- (h & CONJl α & CONJl β --> h)’ by  
+            metis_tac[g_suffixing, g_modus_ponens, g_conjunction_l] >>
+          metis_tac[g_adjunction_rule, g_conj_introduction, g_modus_ponens, g_suffixing]
+         )
+     )
+  >- (irule g_conj_intro_rule >> rw[CONJl_weaken_l, CONJl_weaken_r])
+QED
+        
+Theorem CONJl_MEM_IMP:
+  MEM p γ ⇒ |- (CONJl γ --> p)
+Proof
+  Induct_on ‘γ’ >> rw[]
+  >- (Cases_on ‘γ = []’ >> gs[CONJl_def, g_identity] >>
+      ‘CONJl (h::γ) = h & CONJl γ’ by
+        (Cases_on ‘γ’ >> gs[CONJl_def]) >> simp[g_conjunction_l]
+     )
+  >- (gs[] >>
+      ‘CONJl (h::γ) = h & CONJl γ’ by
+        (Cases_on ‘γ’ >> gs[CONJl_def]) >> simp[] >> metis_tac[goldblatt_provable_rules]
+     )
+QED
+
+Theorem IMP_MEM_IMP_CONJl:
+  ∀q γ. (γ ≠ [] ∧ ∀p. (MEM p γ ⇒ |- (q --> p))) ⇒ |-(q --> CONJl γ) 
+Proof
+  rpt strip_tac >> 
+  Induct_on ‘γ’ >> rw[] >> Cases_on ‘γ = []’
+  >- gs[CONJl_def]
+  >- (gs[] >>
+      ‘CONJl (h::γ) = h & CONJl γ’ by
+        (Cases_on ‘γ’ >> gs[CONJl_def]) >> simp[] >>
+      irule g_conj_intro_rule >> gs[]
+     )
+QED
+
+Theorem FILTER_AND_FILTERED_IMP_CONJl :
+  ∀A γ.γ ≠ [] ∧ MEM A γ ∧ FILTER (λx. x ≠ A) γ ≠ [] ⇒ 
+          |- ((CONJl (FILTER (λx. x ≠ A) γ) & A) --> CONJl γ)
+Proof
+  rw[] >>
+  Induct_on ‘γ’ >> rw[] (* 3 *)
+  >- (Cases_on ‘FILTER (λx. x ≠ A) γ = []’ >> gs[CONJl_def] (* 2 *)
+      >- (‘set γ ⊆ {A}’ by metis_tac[EMPTY_FILTER_LEMMA] >>
+          Cases_on ‘γ = []’
+          >- metis_tac[goldblatt_provable_rules, CONJl_def]
+          >- (‘CONJl (h::γ) = h & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
+              gs[] >> metis_tac[goldblatt_provable_rules, g_A_CONJl_A]
+             )
+         )
+      >- (Cases_on ‘γ = []’ >> rw[CONJl_def] (* 2 *)
+          >- metis_tac[goldblatt_provable_rules]
+          >- (‘CONJl (h::FILTER (λx. x ≠ A) γ) = h & CONJl (FILTER (λx. x ≠ A) γ)’ by
+                (Cases_on ‘FILTER (λx. x ≠ A) γ’ >> gs[CONJl_def]
+                ) >>
+              ‘CONJl (h::γ) = h & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
+              gs[] >>
+              ‘|- (h & CONJl (FILTER (λx. x ≠ A) γ) & A --> h & (CONJl (FILTER (λx. x ≠ A) γ) & A))’ by 
+                gs[g_AND_associative_rl] >>
+              ‘|- (h & (CONJl (FILTER (λx. x ≠ A) γ) & A) --> h & CONJl γ)’ by
+                metis_tac[goldblatt_provable_rules] >>
+              metis_tac[g_suffixing, g_modus_ponens]
+             )
+         )
+     )
+  >- (Cases_on ‘γ = []’ >>
+      Cases_on ‘MEM A γ’ >> gs[] 
+      >- (‘CONJl (A::γ) = A & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
+          gs[] >> metis_tac[goldblatt_provable_rules]
+         )
+      >- (‘FILTER (λx. x ≠ A) γ = γ’ by
+            (Induct_on ‘γ’ >> rw[] >> gs[] >>
+             Cases_on ‘γ = []’ >> gs[] >>
+             Cases_on ‘FILTER (λx. x ≠ A) γ = []’ >> gs[] >>
+             ‘∃B. MEM B γ’ by (Cases_on ‘γ’ >> gs[]) >>
+             Induct_on ‘γ’ >> gs[]
+            ) >>
+          ‘CONJl (A::γ) = A & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >> 
+          gs[] >> metis_tac[goldblatt_provable_rules]
+         )
+     )
+  >- (Cases_on ‘γ = []’ >> gs[] >>
+      ‘CONJl (A::γ) = A & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >> 
+      gs[] >> metis_tac[goldblatt_provable_rules]
+     )
+QED
+                 
+Theorem Trans_pENTAILS:
+  ∀ A p q. A |-^ p ∧ (A ∪ {p}) |-^ q  ⇒ A |-^ q  
+Proof
+  rpt strip_tac >>
+  Cases_on ‘p ∈ A’ (* 2 *)
+  >- (‘(A ∪ {p}) = A’ by (simp[EXTENSION] >> metis_tac[]) >> 
+      metis_tac[]
+     )
+  >- (gs[pENTAIL_def] >> rename [‘|- (CONJl δ --> q)’] >>
+      reverse $ Cases_on ‘MEM p δ’ (* 2 *)
+      >- (qexists_tac ‘δ’ >> gs[SUBSET_DEF] >> rpt strip_tac >> 
+          ‘x ≠ p’ by metis_tac[] >>
+          qpat_x_assum ‘∀x. MEM x δ ⇒ x ∈ A ∨ x = p’ (qspec_then ‘x’ strip_assume_tac) >> 
+          metis_tac[]
+         )
+      >- (qexists_tac ‘(FILTER (λ x. x ≠ p) δ) ++ γ’ >> strip_tac (* 2 *)
+          >- (gs[SUBSET_DEF, MEM_FILTER, DISJ_IMP_THM] >> metis_tac[]
+             )
+          >- (‘|- (CONJl (FILTER (λx. x ≠ p) δ ⧺ γ) --> CONJl δ)’ suffices_by
+                (rpt strip_tac
+                 >- (gs[SUBSET_DEF] >> rw[] >> gs[] >> 
+                     Cases_on ‘x = p’ >> gs[NOT_MEM_FILTER_LEMMA] >>
+                     metis_tac[MEM_FILTER_LEMMA]
+                    )
+                 >- (metis_tac[g_suffixing, g_modus_ponens]
+                    )
+                ) >> Cases_on ‘γ = []’ >> gvs[CONJl_def] >> 
+              qpat_x_assum ‘MEM p δ’ mp_tac >>
+              qpat_x_assum ‘set δ ⊆ A ∪ {p}’ mp_tac >>
+              qid_spec_tac ‘δ’ >> Induct >>
+              gs[] >> rw[] >> rename[‘_ --> CONJl (h::Δ)’] >> gs[] (* 3 *)
+              >- (‘CONJl (h :: Δ) = h & CONJl Δ’ by (
+                   Cases_on ‘Δ’ >> gs[CONJl_def]
+                   ) >> simp[] >> irule g_conj_intro_rule >> 
+                  simp[CONJl_MEM_IMP] >> (* here *) 
+                  ‘CONJl (h :: (FILTER (λx. x ≠ p) Δ ⧺ γ)) = h & (CONJl (FILTER (λx. x ≠ p) Δ ⧺ γ))’ by
+                    (Cases_on ‘FILTER (λx. x ≠ p) Δ ⧺ γ’ >> gs[CONJl_def]
+                    ) >> gs[] >> 
+                  metis_tac[g_conjunction_r, g_suffixing, g_modus_ponens]
+                 )
+              >- (Cases_on ‘MEM h Δ’ >> gvs[]
+                  >- (‘CONJl (h :: Δ) = h & CONJl Δ’ by (
+                       Cases_on ‘Δ’ >> gs[CONJl_def]
+                       ) >> simp[] >> irule g_conj_intro_rule >>
+                      metis_tac[CONJl_weaken_r, g_suffixing, g_modus_ponens]
+                     )
+                  >- (‘FILTER (λx. x ≠ h) Δ = Δ’ by (
+                       Induct_on ‘Δ’ >> rw[]
+                       ) >> simp[] >> Cases_on ‘Δ = []’ >> gs[CONJl_def] >> 
+                      ‘CONJl (h :: Δ) = h & CONJl Δ’ by (
+                        Cases_on ‘Δ’ >> gs[CONJl_def]
+                        ) >> simp[] >> irule g_conj_intro_rule >> strip_tac
+                      >- metis_tac[CONJl_weaken_r, g_suffixing, g_modus_ponens]
+                      >- simp[CONJl_weaken_l]
+                     )
+                 )
+              >- (‘CONJl (h :: Δ) = h & CONJl Δ’ by (
+                   Cases_on ‘Δ’ >> gs[CONJl_def]
+                   ) >> simp[] >> irule g_conj_intro_rule >> 
+                  metis_tac[CONJl_weaken_r, g_suffixing, g_modus_ponens]
+                 )
+             )   
+         )
+     )
+QED
+
+Theorem CONJl_IN_R_Theory_IMP:
+  ∀ A γ. R_Theory A ∧ γ ≠ []  ⇒ (CONJl γ ∈ A ⇔ set γ ⊆ A) 
+Proof
+  gs[R_Theory_def, EQ_IMP_THM, SUBSET_DEF] >> rpt strip_tac >> last_x_assum $ irule >> gs[pENTAIL_def] (* 2 *)
+  >- (qexists_tac ‘[CONJl γ]’ >> gs[CONJl_def, CONJl_MEM_IMP])
+  >- (qexists_tac ‘γ’ >> gs[g_identity, SUBSET_DEF])
+QED
+
+Theorem IMP_CONJl_R_THEORY:
+  ∀ A γ θ. γ ≠ [] ∧ R_Theory θ ∧ (∀ B. B ∈ set γ ⇒ A --> B ∈ θ) ⇒
+           A --> CONJl γ ∈ θ 
+Proof
+  rw[] >> Induct_on ‘γ’ >> rw[] >>
+  Cases_on ‘γ = []’
+  >- gs[CONJl_def]
+  >- (‘CONJl (h::γ) = h & CONJl γ’ by
+        (Cases_on ‘γ’ >> gs[CONJl_def]) >>
+      gs[R_Theory_def, pENTAIL_def] >> last_x_assum irule >>
+      qexists_tac ‘[A --> h; A --> CONJl γ]’ >>
+      gs[CONJl_def, g_conj_introduction]
+     )
+QED
+
+Theorem CONJl_NOTIN_PRIME:
+  ∀A γ. Prime A ∧ ~CONJl γ ∈ A ∧ γ ≠ [] ⇒
+        ∃x. MEM x γ ∧ ~x ∈ A
+Proof
+  strip_tac >> Induct >> rw[] >> 
+  Cases_on ‘γ = []’
+  >- (qexists_tac ‘h’ >> gs[CONJl_def])
+  >- (‘CONJl (h::γ) = h & CONJl (γ)’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
+      gs[] >>
+      ‘(~h V ~CONJl γ) ∈ A’ by (
+        gs[Prime_def, R_Theory_def] >> last_x_assum irule >>
+        simp[pENTAIL_def] >> qexists_tac ‘[~(h & CONJl γ)]’ >> gs[CONJl_def, g_OR_def] >>
+        ‘|- ((~(~~h & ~~CONJl γ)) <-> (~(h & CONJl γ)))’ by (
+          ‘|- (h <-> ~~h)’ by simp[g_double_negative_equiv] >> 
+          ‘|- (CONJl γ <-> ~~CONJl γ)’ by simp[g_double_negative_equiv] >> 
+          metis_tac[g_equiv_AND, g_equiv_replacement, g_equiv_commutative]
+          ) >> metis_tac[g_DIMP_def, g_modus_ponens, g_conjunction_r, g_conjunction_l]
+        ) >> 
+        gs[Prime_def] >> last_x_assum $ qspecl_then [‘~h’, ‘~ CONJl γ’] strip_assume_tac >>
+        gs[] >>  metis_tac[]                    
+     )
+QED
+(* up to here *)
 Definition Maximal_Excluding_def:
   Maximal_Excluding θ p ⇔
     ¬(θ |-^ p) ∧ ∀q. q ∉ θ ⇒ (θ ∪ {q}) |-^ p  
 End
-
-
         
 Definition R_gn:
   R_gn (g_VAR s) = 4*(s2n s + 1) ∧
@@ -261,7 +550,7 @@ Theorem countable_g_props:
 Proof
   simp[countable_def, INJ_DEF] >> metis_tac[R_gn_INJ]
 QED
-
+ (*       
 Definition Theta_i_def:
   Theta_i 0 A = {p | |- p} ∧ 
   Theta_i (SUC n) A =
@@ -270,6 +559,18 @@ Definition Theta_i_def:
   in if θ ∪ {p} |-^ A
      then θ
      else θ ∪ {p}
+End
+
+Definition Theta_def:
+  Theta A = BIGUNION {Theta_i n A | n ∈ UNIV}
+End
+*)
+Definition Theta_i_def:
+  Theta_i 0 A = {p | |- p} ∧ 
+  Theta_i (SUC n) A =
+  if Theta_i n A ∪ {LINV R_gn UNIV n} |-^ A
+     then Theta_i n A
+     else Theta_i n A ∪ {LINV R_gn UNIV n}
 End
 
 Definition Theta_def:
@@ -323,19 +624,7 @@ Proof
      )
   >- metis_tac[]
 QED
-
         
-Theorem LIST_SUBSET_ADJUNCTION:
-  ∀γ. set γ ⊆ {p | |- p} ⇒ |- (CONJl γ)
-Proof
-  rpt strip_tac >> gs[SUBSET_DEF] >>
-  Induct_on ‘γ’
-  >- metis_tac[goldblatt_provable_rules, CONJl_def]
-  >> Cases_on ‘γ’ >> gs[CONJl_def] >> 
-  rpt strip_tac >> rename[‘|- (k & CONJl (h::t))’] >> 
-  metis_tac[goldblatt_provable_rules]
-QED
-
 Theorem Theta_not_pENTAIL:
   ¬( |- A) ⇒ ¬ (Theta A |-^ A)
 Proof
@@ -378,128 +667,7 @@ Proof
       metis_tac[]                                                                          
      )
 QED
-
-Theorem g_imp_conj_rule:
-  |- (A --> B) ∧ |- (A --> C) ⇒ |- (A --> (B & C))
-Proof
-  metis_tac[goldblatt_provable_rules]
-QED
-
-Theorem CONJl_weaken_r:
-  γ ≠ [] ⇒ |- (CONJl (δ ++ γ) --> CONJl γ)
-Proof
-  Induct_on ‘δ’
-  >- simp[g_identity]
-  >- (Cases_on ‘δ’
-      >- (Cases_on ‘γ’ >> gs[] >> 
-          simp[CONJl_def, g_conjunction_r]
-         )
-      >- (gs[CONJl_def] >> rpt strip_tac
-          >> metis_tac[goldblatt_provable_rules]
-         )
-     )
-QED
         
-Theorem CONJl_weaken_l:
-  ∀δ. δ ≠ [] ⇒ |- (CONJl (δ ++ γ) --> CONJl δ)
-Proof
-  Induct_on ‘δ’
-  >- simp[g_identity]
-  >- (Cases_on ‘δ’
-      >- (Cases_on ‘γ’ >> gs[] >> 
-          simp[CONJl_def, g_identity, g_conjunction_l]
-         )
-      >- (gs[CONJl_def] >> rpt strip_tac
-          >> metis_tac[goldblatt_provable_rules]
-         )
-     )
-QED
-
-Theorem CONJl_CONS_imp:
-  |- (CONJl (h :: γ) --> h)
-Proof
-  Cases_on ‘γ’ >> simp[CONJl_def, g_identity, g_conjunction_l]
-QED
-
-Theorem NOT_MEM_FILTER_LEMMA:
-  ∀ a γ. ¬ MEM a (FILTER (λx. x ≠ a) γ) 
-Proof
-  strip_tac >> Induct >> gs[] >> rw[]
-QED
-        
-Theorem MEM_FILTER_LEMMA:
-  ∀ a x γ. MEM x (FILTER (λx. x ≠ a) γ) ⇒ MEM x γ 
-Proof
-  Induct_on ‘γ’ >> gs[] >> rw[]
-  >> metis_tac[] 
-QED
-
-Theorem Trans_pENTAILS:
-  ∀ A p q. A |-^ p ∧ (A ∪ {p}) |-^ q ∧ {p | |- p } ⊆ A ⇒ A |-^ q  
-Proof
-  rpt strip_tac >>
-  Cases_on ‘p ∈ A’ (* 2 *)
-  >- (‘(A ∪ {p}) = A’ by (simp[EXTENSION] >> metis_tac[]) >> 
-      metis_tac[]
-     )
-  >- (gs[pENTAIL_def] >> rename [‘|- (CONJl δ --> q)’] >>
-      reverse $ Cases_on ‘MEM p δ’ (* 2 *)
-      >- (qexists_tac ‘δ’ >> gs[SUBSET_DEF] >> rpt strip_tac >> 
-          ‘x ≠ p’ by metis_tac[] >>
-          qpat_x_assum ‘∀x. MEM x δ ⇒ x ∈ A ∨ x = p’ (qspec_then ‘x’ strip_assume_tac) >> 
-          metis_tac[]
-         )
-      >- (qexists_tac ‘(FILTER (λ x. x ≠ p) δ) ++ γ’ >> strip_tac (* 2 *)
-          >- (gs[SUBSET_DEF, MEM_FILTER, DISJ_IMP_THM] >> metis_tac[]
-             )
-          >- (‘|- (CONJl (FILTER (λx. x ≠ p) δ ⧺ γ) --> CONJl δ)’ suffices_by
-                (rpt strip_tac
-                 >- (gs[SUBSET_DEF] >> rw[] >> gs[] >> 
-                     Cases_on ‘x = p’ >> gs[NOT_MEM_FILTER_LEMMA] >>
-                     metis_tac[MEM_FILTER_LEMMA]
-                    )
-                 >- (metis_tac[g_suffixing, g_modus_ponens]
-                    )
-                ) >> Cases_on ‘γ = []’ >> gvs[CONJl_def] >> 
-              qpat_x_assum ‘MEM p δ’ mp_tac >>
-              qpat_x_assum ‘set δ ⊆ A ∪ {p}’ mp_tac >>
-              qid_spec_tac ‘δ’ >> Induct >>
-              gs[] >> rw[] >> rename[‘_ --> CONJl (h::Δ)’] >> gs[] (* 3 *)
-              >- (‘CONJl (h :: Δ) = h & CONJl Δ’ by (
-                   Cases_on ‘Δ’ >> gs[CONJl_def]
-                   ) >> simp[] >> irule g_imp_conj_rule >> 
-                  simp [CONJl_CONS_imp] >> 
-                  ‘CONJl (h :: (FILTER (λx. x ≠ p) Δ ⧺ γ)) = h & (CONJl (FILTER (λx. x ≠ p) Δ ⧺ γ))’ by
-                    (Cases_on ‘FILTER (λx. x ≠ p) Δ ⧺ γ’ >> gs[CONJl_def]
-                    ) >> gs[] >> 
-                  metis_tac[g_conjunction_r, g_suffixing, g_modus_ponens]
-                 )
-              >- (Cases_on ‘MEM h Δ’ >> gvs[]
-                  >- (‘CONJl (h :: Δ) = h & CONJl Δ’ by (
-                       Cases_on ‘Δ’ >> gs[CONJl_def]
-                       ) >> simp[] >> irule g_imp_conj_rule >>
-                      metis_tac[CONJl_weaken_r, g_suffixing, g_modus_ponens]
-                     )
-                  >- (‘FILTER (λx. x ≠ h) Δ = Δ’ by (
-                       Induct_on ‘Δ’ >> rw[]
-                       ) >> simp[] >> Cases_on ‘Δ = []’ >> gs[CONJl_def] >> 
-                      ‘CONJl (h :: Δ) = h & CONJl Δ’ by (
-                        Cases_on ‘Δ’ >> gs[CONJl_def]
-                        ) >> simp[] >> irule g_imp_conj_rule >> strip_tac
-                      >- metis_tac[CONJl_weaken_r, g_suffixing, g_modus_ponens]
-                      >- simp[CONJl_weaken_l]
-                     )
-                 )
-              >- (‘CONJl (h :: Δ) = h & CONJl Δ’ by (
-                   Cases_on ‘Δ’ >> gs[CONJl_def]
-                   ) >> simp[] >> irule g_imp_conj_rule >> 
-                  metis_tac[CONJl_weaken_r, g_suffixing, g_modus_ponens]
-                 )
-             )   
-         )
-     )
-QED
-
 Theorem R_SUBSET_THETA:
  {p | |- p} ⊆ Theta A
 Proof
@@ -518,41 +686,6 @@ Proof
   CCONTR_TAC >> ‘Maximal_Excluding (Theta A) A’ by metis_tac[Theta_Maximal_Rejection] >>
   gs[Maximal_Excluding_def] >> last_x_assum $ qspec_then ‘p’ strip_assume_tac >> gs[] >>
   metis_tac[R_SUBSET_THETA, Trans_pENTAILS]             
-QED
-
-Theorem CONJl_MEM_IMP:
-  MEM p γ ⇒ |- (CONJl γ --> p)
-Proof
-  Induct_on ‘γ’ >> rw[]
-  >- (Cases_on ‘γ = []’ >> gs[CONJl_def, g_identity] >>
-      ‘CONJl (h::γ) = h & CONJl γ’ by
-        (Cases_on ‘γ’ >> gs[CONJl_def]) >> simp[g_conjunction_l]
-     )
-  >- (gs[] >>
-      ‘CONJl (h::γ) = h & CONJl γ’ by
-        (Cases_on ‘γ’ >> gs[CONJl_def]) >> simp[] >> metis_tac[goldblatt_provable_rules]
-     )
-QED
-
-Theorem IMP_MEM_IMP_CONJl:
-  ∀q γ. (γ ≠ [] ∧ ∀p. (MEM p γ ⇒ |- (q --> p))) ⇒ |-(q --> CONJl γ) 
-Proof
-  rpt strip_tac >> 
-  Induct_on ‘γ’ >> rw[] >> Cases_on ‘γ = []’
-  >- gs[CONJl_def]
-  >- (gs[] >>
-      ‘CONJl (h::γ) = h & CONJl γ’ by
-        (Cases_on ‘γ’ >> gs[CONJl_def]) >> simp[] >>
-      irule g_imp_conj_rule >> gs[]
-     )
-QED
-
-Theorem CONJl_IN_R_Theory_IMP:
-  ∀ A γ. R_Theory A ∧ γ ≠ []  ⇒ (CONJl γ ∈ A ⇔ set γ ⊆ A) 
-Proof
-  gs[R_Theory_def, EQ_IMP_THM, SUBSET_DEF] >> rpt strip_tac >> last_x_assum $ irule >> gs[pENTAIL_def] (* 2 *)
-  >- (qexists_tac ‘[CONJl γ]’ >> gs[CONJl_def, CONJl_MEM_IMP])
-  >- (qexists_tac ‘γ’ >> gs[g_identity, SUBSET_DEF])
 QED
 
 Theorem Exists_Theta_prop:
@@ -577,21 +710,21 @@ Proof
               >- metis_tac[goldblatt_provable_rules]
               >- (‘CONJl (a::γ) = a & CONJl γ’ by
                     (Cases_on ‘γ’ >> gs[CONJl_def]) >> simp[] >>
-                  irule g_imp_conj_rule >> simp[g_conjunction_r] >> 
+                  irule g_conj_intro_rule >> simp[g_conjunction_r] >> 
                   last_x_assum irule >> strip_tac >>
                   ‘MEM a γ’ by
                     (Induct_on ‘γ’ >> rw[]) >> simp[] >>
                   ‘|- (CONJl γ --> CONJl (a::γ))’ suffices_by
                     metis_tac[goldblatt_provable_rules] >>
-                  simp[] >> irule g_imp_conj_rule >> simp[g_identity, CONJl_MEM_IMP] 
+                  simp[] >> irule g_conj_intro_rule >> simp[g_identity, CONJl_MEM_IMP] 
                  )
               >- (‘CONJl (a::γ) = a & CONJl γ’ by
                     (Cases_on ‘γ’ >> gs[CONJl_def]) >> simp[] >>
-                  irule g_imp_conj_rule >> simp[g_conjunction_r] >> 
+                  irule g_conj_intro_rule >> simp[g_conjunction_r] >> 
                   last_x_assum irule >>
                   ‘|- (CONJl γ --> CONJl (a::γ))’ suffices_by
                     metis_tac[goldblatt_provable_rules] >>
-                  simp[] >> irule g_imp_conj_rule >> simp[g_identity, CONJl_MEM_IMP]
+                  simp[] >> irule g_conj_intro_rule >> simp[g_identity, CONJl_MEM_IMP]
                  )
              )
           >- (irule IMP_MEM_IMP_CONJl >> reverse $ strip_tac >> gs[] >>              
@@ -619,7 +752,6 @@ Proof
       Cases_on ‘x = a’ >> metis_tac[NOT_MEM_FILTER_LEMMA, MEM_FILTER_LEMMA]
      )
 QED
-
         
 Theorem Theta_Ordinary:
   ∀A. ¬ |- A ⇒ Ordinary (Theta A)  
@@ -703,29 +835,6 @@ Proof
   simp[pENTAIL_def] (* 2 *)
   >- (qexists_tac ‘[~~a]’ >> simp[SUBSET_DEF, g_double_negation, CONJl_def])
   >- (qexists_tac ‘[a]’ >> simp[SUBSET_DEF, g_double_neg, CONJl_def])
-QED
-
-Theorem CONJl_NOTIN_PRIME:
-  ∀A γ. Prime A ∧ ~CONJl γ ∈ A ∧ γ ≠ [] ⇒
-        ∃x. MEM x γ ∧ ~x ∈ A
-Proof
-  strip_tac >> Induct >> rw[] >> 
-  Cases_on ‘γ = []’
-  >- (qexists_tac ‘h’ >> gs[CONJl_def])
-  >- (‘CONJl (h::γ) = h & CONJl (γ)’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
-      gs[] >>
-      ‘(~h V ~CONJl γ) ∈ A’ by (
-        gs[Prime_def, R_Theory_def] >> last_x_assum irule >>
-        simp[pENTAIL_def] >> qexists_tac ‘[~(h & CONJl γ)]’ >> gs[CONJl_def, g_OR_def] >>
-        ‘|- ((~(~~h & ~~CONJl γ)) <-> (~(h & CONJl γ)))’ by (
-          ‘|- (h <-> ~~h)’ by simp[g_double_negative_equiv] >> 
-          ‘|- (CONJl γ <-> ~~CONJl γ)’ by simp[g_double_negative_equiv] >> 
-          metis_tac[g_equiv_AND, g_equiv_replacement, g_equiv_commutative]
-          ) >> metis_tac[g_DIMP_def, g_modus_ponens, g_conjunction_r, g_conjunction_l]
-        ) >> 
-        gs[Prime_def] >> last_x_assum $ qspecl_then [‘~h’, ‘~ CONJl γ’] strip_assume_tac >>
-        gs[] >>  metis_tac[]                    
-     )
 QED
 
 Theorem Prime_STAR_R_Theory:
@@ -818,7 +927,6 @@ Proof
      )
 QED
 
-
 Definition B_WORLD_i_def:
   B_WORLD_i 0 Θ S R= S ∧
   B_WORLD_i (SUC n) Θ S R=
@@ -860,44 +968,6 @@ Proof
   irule B_WORLD_i_grows >> qexists_tac ‘n’ >> gs[] >> 
   metis_tac[SUBSET_DEF]
 QED
- 
-Theorem CONJl_split:
-  ∀ α β. α ≠ [] ∧ β ≠ [] ⇒
-         |- (CONJl α & CONJl β --> CONJl (α ++ β)) ∧
-         |- (CONJl (α ++ β) --> CONJl α & CONJl β)
-Proof
-  rw[]
-  >- (Induct_on ‘α’ >> rw[] >>
-      Cases_on ‘α = []’ >> rw[CONJl_def] 
-      >- (‘CONJl (h::β) = h & CONJl β’ by (Cases_on ‘β’ >> metis_tac[CONJl_def]) >>
-          gs[g_identity]
-         )
-      >- (‘CONJl (h::α) = h & CONJl α’ by (Cases_on ‘α’ >> metis_tac[CONJl_def]) >>
-          ‘CONJl (h::(α ⧺ β)) = h & CONJl (α ++ β)’ by (Cases_on ‘α ++ β’ >> gs[] >> metis_tac[CONJl_def]) >> 
-          gs[] >>
-          ‘|- (h & CONJl α & CONJl β --> CONJl α & CONJl β)’ by
-            metis_tac[g_suffixing, g_modus_ponens, g_conj_introduction, g_conjunction_l, g_conjunction_r, g_adjunction_rule] >>
-          ‘|- (h & CONJl α & CONJl β --> h)’ by  
-            metis_tac[g_suffixing, g_modus_ponens, g_conjunction_l] >>
-          metis_tac[g_adjunction_rule, g_conj_introduction, g_modus_ponens, g_suffixing]
-         )
-     )
-  >- (Induct_on ‘α’ >> rw[] >>
-      Cases_on ‘α = []’
-      >- (‘CONJl (h::β) = h & CONJl β’ by (Cases_on ‘β’ >> metis_tac[CONJl_def]) >>
-          gs[g_identity, CONJl_def])
-      >- (‘CONJl (h::α) = h & CONJl α’ by (Cases_on ‘α’ >> metis_tac[CONJl_def]) >>
-          ‘CONJl (h::(α ⧺ β)) = h & CONJl (α ++ β)’ by (Cases_on ‘α ++ β’ >> gs[] >> metis_tac[CONJl_def]) >> 
-          gs[] >>
-          ‘|- (h & (CONJl α & CONJl β) --> h & CONJl α & CONJl β)’ by
-            metis_tac[g_suffixing, g_modus_ponens, g_conj_introduction, g_conjunction_l, g_conjunction_r, g_adjunction_rule] >>
-          ‘|- (h & CONJl (α ⧺ β) --> (CONJl α & CONJl β))’ by  
-            metis_tac[g_conjunction_r, g_modus_ponens, g_suffixing] >>
-          metis_tac[g_conjunction_l, g_conj_introduction, g_modus_ponens, g_adjunction_rule, g_suffixing]
-         )
-     )
-QED
-
         
 Theorem S_Theory_imp_R_Theory:
   ∀ θ x. S_Theory θ x ⇒ R_Theory x
@@ -908,14 +978,6 @@ Proof
   qexists_tac ‘γ’ >> 
   gs[Ordinary_def, Regular_def]
 QED
-
-Theorem CONJl_split_equiv:
-  ∀ α β. α ≠ [] ∧ β ≠ [] ⇒
-         |- (CONJl α & CONJl β <-> CONJl (α ++ β))
-Proof
-  metis_tac[g_DIMP_def, goldblatt_provable_rules, CONJl_split]
-QED
-
 
 Theorem CONJl_IN_APPLIED:
   ∀ θ w x γ. S_Theory θ w ∧  
@@ -947,113 +1009,6 @@ Proof
       ‘|- (CONJl (α ++ β) --> CONJl α & CONJl β)’ by simp[CONJl_split] >> 
       metis_tac[g_suffixing, g_modus_ponens, g_permutation]
      )
-QED
-
-
-Theorem g_imp_conj_introduction:
-  ∀ A B C D. |-  (A --> B --> C) ∧ |-  (A --> B --> D) ⇒
-             |- (A --> B --> (C & D))
-Proof
-  rpt strip_tac >>
-  ‘|- ((A ∘ᵣ B) --> C)’ by metis_tac[g_io_rule] >> 
-  ‘|- ((A ∘ᵣ B) --> D)’  by metis_tac[g_io_rule] >>
-  ‘|- ((A ∘ᵣ B) --> C & D)’  suffices_by metis_tac[g_io_rule] >>
-  metis_tac[goldblatt_provable_rules] 
-QED
-
-
-Theorem IMP_CONJl_R_THEORY:
-  ∀ A γ θ. γ ≠ [] ∧ R_Theory θ ∧ (∀ B. B ∈ set γ ⇒ A --> B ∈ θ) ⇒
-           A --> CONJl γ ∈ θ 
-Proof
-  rw[] >> Induct_on ‘γ’ >> rw[] >>
-  Cases_on ‘γ = []’
-  >- gs[CONJl_def]
-  >- (‘CONJl (h::γ) = h & CONJl γ’ by
-        (Cases_on ‘γ’ >> gs[CONJl_def]) >>
-      gs[R_Theory_def, pENTAIL_def] >> last_x_assum irule >>
-      qexists_tac ‘[A --> h; A --> CONJl γ]’ >>
-      gs[CONJl_def, g_conj_introduction]
-     )
-QED
-
-Theorem g_A_CONJl_A:
-  ∀A γ. set γ ⊆ {A} ∧ γ ≠ []  ⇒
-        |- (A --> CONJl γ)
-Proof
-  rw[] >> Induct_on ‘γ’ >> rw[] >>
-  Cases_on ‘γ = []’ >> gs[CONJl_def, g_identity] >>
-  ‘CONJl (A::γ) = A & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
-  metis_tac [goldblatt_provable_rules]                                                            
-QED
-
-Theorem EMPTY_FILTER_LEMMA:
-  ∀a γ. FILTER (λx. x ≠ a) γ = [] ⇔ set γ ⊆ {a}  
-Proof
-  rw[EQ_IMP_THM, SUBSET_DEF] >> 
-  Induct_on ‘γ’ >> rw[] >> gs[]
-QED
-
-
-Theorem FILTER_AND_FILTERED_IMP_CONJl:
-  ∀A γ. γ ≠ [] ∧ MEM A γ ∧ FILTER (λx. x ≠ A) γ ≠ [] ⇒ 
-          |- ((CONJl (FILTER (λx. x ≠ A) γ) & A) --> CONJl γ)
-Proof
-  rw[] >>
-  Induct_on ‘γ’ >> rw[] (* 3 *)
-  >- (Cases_on ‘FILTER (λx. x ≠ A) γ = []’ >> gs[CONJl_def] (* 2*)
-      >- (‘set γ ⊆ {A}’ by metis_tac[EMPTY_FILTER_LEMMA] >>
-          Cases_on ‘γ = []’
-          >- metis_tac[goldblatt_provable_rules, CONJl_def]
-          >- (‘CONJl (h::γ) = h & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
-              gs[] >> metis_tac[goldblatt_provable_rules, g_A_CONJl_A]
-             )
-         )
-      >- (Cases_on ‘γ = []’ >> rw[CONJl_def] (* 2 *)
-          >- metis_tac[goldblatt_provable_rules]
-          >- (‘CONJl (h::FILTER (λx. x ≠ A) γ) = h & CONJl (FILTER (λx. x ≠ A) γ)’ by
-                (Cases_on ‘FILTER (λx. x ≠ A) γ’ >> gs[CONJl_def]
-                ) >>
-              ‘CONJl (h::γ) = h & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
-              gs[] >>
-              ‘|- (h & CONJl (FILTER (λx. x ≠ A) γ) & A --> h & (CONJl (FILTER (λx. x ≠ A) γ) & A))’ by 
-                gs[g_AND_associative_rl] >>
-              ‘|- (h & (CONJl (FILTER (λx. x ≠ A) γ) & A) --> h & CONJl γ)’ by
-                metis_tac[goldblatt_provable_rules] >>
-              metis_tac[g_suffixing, g_modus_ponens]
-             )
-         )
-     )
-  >- (Cases_on ‘γ = []’ >>
-      Cases_on ‘MEM A γ’ >> gs[] 
-      >- (‘CONJl (A::γ) = A & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
-          gs[] >> metis_tac[goldblatt_provable_rules]
-         )
-      >- (‘FILTER (λx. x ≠ A) γ = γ’ by
-            (Induct_on ‘γ’ >> rw[] >> gs[] >>
-             Cases_on ‘γ = []’ >> gs[] >>
-             Cases_on ‘FILTER (λx. x ≠ A) γ = []’ >> gs[] >>
-             ‘∃B. MEM B γ’ by (Cases_on ‘γ’ >> gs[]) >>
-             Induct_on ‘γ’ >> gs[]
-            ) >>
-          ‘CONJl (A::γ) = A & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >> 
-          gs[] >> metis_tac[goldblatt_provable_rules]
-         )
-     )
-  >- (Cases_on ‘γ = []’ >> gs[] >>
-      ‘CONJl (A::γ) = A & CONJl γ’ by (Cases_on ‘γ’ >> gs[CONJl_def]) >>
-      gs[] >> metis_tac[goldblatt_provable_rules]
-     )
-QED
-
-Theorem FILTER_NON_MEM_EQUAL:
-  ∀ γ A. ¬MEM A γ ⇒ FILTER (λx. x ≠ A) γ = γ
-Proof
-  Induct_on ‘γ’ >> rw[] >> gs[] >>
-  Cases_on ‘γ = []’ >> gs[] >>
-  Cases_on ‘FILTER (λx. x ≠ A) γ = []’ >> gs[] >>
-  ‘∃B. MEM B γ’ by (Cases_on ‘γ’ >> gs[]) >>
-  Induct_on ‘γ’ >> gs[]
 QED
 
         
@@ -1186,7 +1141,6 @@ Proof
       qexists_tac ‘[c & d; C V D]’ >> gs[CONJl_def]
      )        
 QED                                  
-
 
 Theorem Maximal_S_Theory_prop_exists:
   ∀ θ x B a. a ∉ x ∧ S_Theory θ x ∧ x ≠ ∅ ∧ ¬sENTAILS θ x B ∧
@@ -1645,6 +1599,20 @@ Proof
      )
 QED
 
+Definition Canonical_Model_def:
+  Canonical_Model A =
+    <|RF := Canonical_Frame A;
+      VF := λx. {w | g_VAR x ∈ w}|>
+End
+
+Theorem Canonical_Model_is_R_Model:
+  ∀A. ¬|-A ⇒ R_Model (Canonical_Model A)
+Proof
+  rw[R_Model_def, Canonical_Frame_is_R_Frame, Canonical_Model_def, Hereditary_def] >>
+  gs[Canonical_Frame_def, SUBSET_DEF] >> last_x_assum irule >> simp[APPLYING_def] >>
+  qexists_tac ‘[g_VAR s]’ >> simp[CONJl_def] >> 
+  gs[S_Theory_def, Ordinary_def, Regular_def, g_identity]
+QED
 
         
 Definition X_WORLD_i_def:
@@ -1674,7 +1642,6 @@ End
 Definition Y_WORLD_def:
   Y_WORLD Θ S R = BIGUNION {Y_WORLD_i n Θ S R | n ∈ UNIV}
 End
-
 
 Theorem X_WORLD_i_grows:
   ∀ e n m Θ A R w. e ∈ X_WORLD_i n Θ A R w ∧ n ≤ m ⇒
@@ -1778,14 +1745,6 @@ Proof
       qexists_tac ‘γ''’ >> rw[] >> qexists_tac ‘n’ >> simp[]
      )   
 QED
-       
-Theorem FINITE_EXISTS_LIST:
-  ∀x. FINITE x ⇒ ∃l. set l = x 
-Proof
-  Induct_on ‘FINITE’ >>
-  rw[] >> qexists_tac ‘e :: l’ >>
-  gs[]
-QED
 
 Theorem FINITE_X_WORLD_i:
   ∀n θ a b w. FINITE (X_WORLD_i n θ {a} {b} w)
@@ -1847,589 +1806,593 @@ Proof
   irule Y_WORLD_i_grows >> qexists_tac ‘n’ >> gs[] >> 
   metis_tac[SUBSET_DEF]
 QED
-        
-Theorem Completeness:
-  (∀ (RF : (g_prop set) FRAME) VF. Holds RF VF RF.Z p ∧ Hereditary RF VF) ⇒ |- p
+
+Theorem Truth_Lemma:
+  ∀p. ¬ |- p ⇒  (∀A w. w ∈ (Canonical_Model p).RF.W ⇒ 
+      (Holds (Canonical_Model p) w A ⇔ A ∈ w))
 Proof
-  rw[] >> CCONTR_TAC >> 
-  last_x_assum $ qspecl_then [‘(Canonical_Frame p)’,
-                           ‘λ x. {w | g_VAR x ∈ w}’] strip_assume_tac >>
-  ‘∀A w. w ∈ (Canonical_Frame p).W ⇒ 
-      (Holds (Canonical_Frame p) (λx. {w | g_VAR x ∈ w}) w A ⇔ A ∈ w)’ by (* turn into different theorem *)
-    (Induct_on ‘A’ >> gs[Holds_def] >> rw[](* 4 *)
-     >- (reverse $ rw[EQ_IMP_THM] >> rename [‘A --> B ∈ w’]
-         >- (qpat_x_assum ‘(Canonical_Frame p).R w x y’ mp_tac >>
-             rw[Canonical_Frame_def, APPLYING_def, SUBSET_DEF, sENTAILS_def] >>
-             last_x_assum irule >> qexists_tac ‘[A]’ >>
-             gs[CONJl_def]
-             )
-         >- (CCONTR_TAC >>
-             qpat_x_assum
-             ‘∀x y.
-                x ∈ (Canonical_Frame p).W ∧ y ∈ (Canonical_Frame p).W ∧
-                (Canonical_Frame p).R w x y ∧
-                Holds (Canonical_Frame p) (λx. {w | g_VAR x ∈ w}) x A ⇒
-                B ∈ y’ mp_tac >> gs[] >>
-             qexistsl_tac [‘X_WORLD (Theta p) {A} {B} w’,
-                           ‘Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B}’] >>
-             ‘X_WORLD (Theta p) {A} {B} w ∈ (Canonical_Frame p).W’ by
-               (simp[Canonical_Frame_def] >>
-                ‘S_Theory (Theta p) (X_WORLD (Theta p) {A} {B} w)’ by
-                  (rw[S_Theory_def, sENTAILS_def, Theta_Ordinary] >>
-                   rename[‘CONJl γ --> D ∈ Theta p’] >>
-                   simp[X_WORLD_def, PULL_EXISTS] >>
-                   qexists_tac ‘SUC (R_gn D)’ >>
-                   simp[X_WORLD_i_def] >>
-                   ‘D = LINV R_gn 𝕌(:g_prop) (R_gn D)’ by (
-                     ‘D ∈ 𝕌(:g_prop)’ by simp[] >>
-                     ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
-                     metis_tac [LINV_DEF]
-                     ) >> simp[] >> 
-                   ‘¬sENTAILS (Theta p)
-                    (APPLYING w
-                     (X_WORLD_i (R_gn D) (Theta p) {A} {B} w ∪
-                      {D})) B’ suffices_by
-                        (‘APPLYING w
-                          (X_WORLD_i (R_gn D) (Theta p) {A} {B} w ∪
-                           {LINV R_gn 𝕌(:g_prop) (R_gn D)}) =
-                          APPLYING w
-                                   (X_WORLD_i (R_gn D) (Theta p) {A} {B} w ∪
-                                    {D})’ by
-                           (rw[EXTENSION, EQ_IMP_THM] >> metis_tac[]
-                           ) >>
-                         gs[]
-                        ) >> 
-                   CCONTR_TAC >> gs[sENTAILS_def] >>
-                   rename [‘CONJl δ --> B ∈ Theta p’] >>
-                   ‘CONJl δ ∈ APPLYING w
+  strip_tac >> strip_tac >>
+  Induct_on ‘A’ >> gs[Holds_def, Canonical_Model_def] >> rw[](* 4 *)
+  >- (reverse $ rw[EQ_IMP_THM] >> rename [‘A --> B ∈ w’]
+      >- (qpat_x_assum ‘(Canonical_Frame p).R w x y’ mp_tac >>
+          rw[Canonical_Frame_def, APPLYING_def, SUBSET_DEF, sENTAILS_def] >>
+          last_x_assum irule >> qexists_tac ‘[A]’ >>
+          gs[CONJl_def]
+         )
+      >- (CCONTR_TAC >>
+          qpat_x_assum
+          ‘∀x y.
+             x ∈ (Canonical_Frame p).W ∧ y ∈ (Canonical_Frame p).W ∧
+             (Canonical_Frame p).R w x y ∧
+             Holds <|RF := Canonical_Frame p; VF := (λx. {w | g_VAR x ∈ w})|> x A ⇒
+             B ∈ y’ mp_tac >> gs[] >>
+          qexistsl_tac [‘X_WORLD (Theta p) {A} {B} w’,
+                        ‘Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B}’] >>
+          ‘X_WORLD (Theta p) {A} {B} w ∈ (Canonical_Frame p).W’ by
+            (simp[Canonical_Frame_def] >>
+             ‘S_Theory (Theta p) (X_WORLD (Theta p) {A} {B} w)’ by
+               (rw[S_Theory_def, sENTAILS_def, Theta_Ordinary] >>
+                rename[‘CONJl γ --> D ∈ Theta p’] >>
+                simp[X_WORLD_def, PULL_EXISTS] >>
+                qexists_tac ‘SUC (R_gn D)’ >>
+                simp[X_WORLD_i_def] >>
+                ‘D = LINV R_gn 𝕌(:g_prop) (R_gn D)’ by (
+                  ‘D ∈ 𝕌(:g_prop)’ by simp[] >>
+                  ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
+                  metis_tac [LINV_DEF]
+                  ) >> simp[] >> 
+                ‘¬sENTAILS (Theta p)
+                 (APPLYING w
+                  (X_WORLD_i (R_gn D) (Theta p) {A} {B} w ∪
+                   {D})) B’ suffices_by
+                  (‘APPLYING w
                     (X_WORLD_i (R_gn D) (Theta p) {A} {B} w ∪
-                     {D})’ by
-                     (gs[Canonical_Frame_def] >> irule CONJl_IN_APPLIED >> metis_tac[]
+                     {LINV R_gn 𝕌(:g_prop) (R_gn D)}) =
+                    APPLYING w
+                             (X_WORLD_i (R_gn D) (Theta p) {A} {B} w ∪
+                              {D})’ by
+                     (rw[EXTENSION, EQ_IMP_THM] >> metis_tac[]
                      ) >>
-                   ‘∃l. set l = X_WORLD_i (R_gn D) (Theta p) {A} {B} w’ by
-                     (irule FINITE_EXISTS_LIST >> simp[FINITE_X_WORLD_i]
-                     ) >>
-                   ‘l ++ γ ≠ [] ∧ set (l ++ γ) ⊆ X_WORLD (Theta p) {A} {B} w ∧ CONJl (l ++ γ) --> D ∈ Theta p’ by
-                     (rw[] (* 2 *)
-                      >- (rw[X_WORLD_def, BIGUNION, SUBSET_DEF, PULL_EXISTS] >> metis_tac[])
-                      >- (‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >>
-                          gs[Ordinary_def, Prime_def, R_Theory_def, pENTAIL_def] >>
-                          last_x_assum irule >> qexists_tac ‘[CONJl γ --> D]’ >>
-                          gs[CONJl_def] >>
-                          irule g_modus_ponens >>
-                          qexists_tac ‘(CONJl l & CONJl γ) --> CONJl γ’ >>
-                          gs[g_conjunction_r] >>
-                          irule g_modus_ponens >>
-                          qexists_tac ‘CONJl (l ++ γ) --> (CONJl l & CONJl γ)’ >> rw[]
-                          >- (‘l ≠ []’ by
-                                (CCONTR_TAC >> 
-                                 gs[NOT_EMPTY_X_WORLD_i]
-                                ) >>
-                              assume_tac CONJl_split_equiv >>
-                              pop_assum $ qspecl_then [‘l’, ‘γ’] strip_assume_tac >> 
-                              metis_tac [goldblatt_provable_rules, g_DIMP_def]
-                             )
-                          >- metis_tac[g_suffixing, g_permutation, g_modus_ponens]
-                         )
-                     ) >>
-                    ‘(CONJl (l ⧺ γ) & D --> CONJl δ) ∈ w’ by
-                     (‘CONJl l & D --> CONJl δ ∈ w’ by (
-                       ‘CONJl (l ++ [D]) --> CONJl δ ∈ w’ suffices_by (
-                         rw[] >> 
-                         ‘R_Theory w’ by (gs[Canonical_Frame_def] >> metis_tac[S_Theory_imp_R_Theory]) >>
-                         gs[R_Theory_def, pENTAIL_def] >> last_x_assum irule >>
-                         qexists_tac ‘[CONJl (l ⧺ [D]) --> CONJl δ]’ >> gs[CONJl_def] >>
-                         irule g_modus_ponens >> qexists_tac ‘CONJl l & CONJl [D] --> CONJl (l ⧺ [D])’ >> rw[]
-                         >- (‘l ≠ []’ by
-                               (CCONTR_TAC >> 
-                                gs[NOT_EMPTY_X_WORLD_i]
-                               ) >> gs[CONJl_split]
-                            )
-                         >- gs[CONJl_def, g_suffixing]
-                         ) >>
-                       irule APPLYING_TO_FINITE >> gs[PULL_EXISTS, Canonical_Frame_def] >>
-                       metis_tac[]
-                       ) >>
+                   gs[]
+                  ) >> 
+                CCONTR_TAC >> gs[sENTAILS_def] >>
+                rename [‘CONJl δ --> B ∈ Theta p’] >>
+                ‘CONJl δ ∈ APPLYING w
+                 (X_WORLD_i (R_gn D) (Theta p) {A} {B} w ∪
+                  {D})’ by
+                  (gs[Canonical_Frame_def] >> irule CONJl_IN_APPLIED >> metis_tac[]
+                  ) >>
+                ‘∃l. set l = X_WORLD_i (R_gn D) (Theta p) {A} {B} w’ by
+                  (irule FINITE_EXISTS_LIST >> simp[FINITE_X_WORLD_i]
+                  ) >>
+                ‘l ++ γ ≠ [] ∧ set (l ++ γ) ⊆ X_WORLD (Theta p) {A} {B} w ∧ CONJl (l ++ γ) --> D ∈ Theta p’ by
+                  (rw[] (* 2 *)
+                   >- (rw[X_WORLD_def, BIGUNION, SUBSET_DEF, PULL_EXISTS] >> metis_tac[])
+                   >- (‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >>
+                       gs[Ordinary_def, Prime_def, R_Theory_def, pENTAIL_def] >>
+                       last_x_assum irule >> qexists_tac ‘[CONJl γ --> D]’ >>
+                       gs[CONJl_def] >>
+                       irule g_modus_ponens >>
+                       qexists_tac ‘(CONJl l & CONJl γ) --> CONJl γ’ >>
+                       gs[g_conjunction_r] >>
+                       irule g_modus_ponens >>
+                       qexists_tac ‘CONJl (l ++ γ) --> (CONJl l & CONJl γ)’ >> rw[]
+                       >- (‘l ≠ []’ by
+                             (CCONTR_TAC >> 
+                              gs[NOT_EMPTY_X_WORLD_i]
+                             ) >>
+                           assume_tac CONJl_split >>
+                           pop_assum $ qspecl_then [‘l’, ‘γ’] strip_assume_tac >> 
+                           metis_tac [goldblatt_provable_rules]
+                          )
+                       >- metis_tac[g_suffixing, g_permutation, g_modus_ponens]
+                      )
+                  ) >>
+                ‘(CONJl (l ⧺ γ) & D --> CONJl δ) ∈ w’ by
+                  (‘CONJl l & D --> CONJl δ ∈ w’ by (
+                    ‘CONJl (l ++ [D]) --> CONJl δ ∈ w’ suffices_by (
+                      rw[] >> 
                       ‘R_Theory w’ by (gs[Canonical_Frame_def] >> metis_tac[S_Theory_imp_R_Theory]) >>
                       gs[R_Theory_def, pENTAIL_def] >> last_x_assum irule >>
-                      qexists_tac ‘[CONJl l & D --> CONJl δ]’ >> gs[CONJl_def] >>
-                      irule g_modus_ponens >> qexists_tac ‘(CONJl (l ⧺ γ) & D) --> CONJl l & D’ >>
-                      gs[g_suffixing] >>
-                      ‘l ≠ []’ by
-                        (CCONTR_TAC >> 
-                         gs[NOT_EMPTY_X_WORLD_i]
-                        ) >>
-                      ‘|- (CONJl (l ⧺ γ) --> CONJl l & CONJl γ)’ by metis_tac[CONJl_split] >>
-                      metis_tac[goldblatt_provable_rules]
-                     ) >> 
-                   ‘(CONJl (l ++ γ) & D --> CONJl δ) --> CONJl (l ++ γ) --> CONJl δ ∈ Theta p’ by
-                     (‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >>
-                      gs[Ordinary_def, Regular_def] >>
-                      ‘CONJl (l ++ γ) --> CONJl (l ++ γ) ∈ Theta p’ by simp[g_identity] >>
-                      ‘CONJl (l ++ γ) --> (CONJl (l ++ γ) & D) ∈ Theta p’ by
-                        (gs[R_Theory_def, pENTAIL_def] >> last_x_assum irule >> 
-                         qexists_tac ‘[CONJl (l ++ γ) --> CONJl (l ++ γ); CONJl (l ++ γ) --> D]’ >> 
-                         gs[CONJl_def, g_conj_introduction] 
-                        ) >> 
-                      gs[R_Theory_def, pENTAIL_def] >> last_x_assum irule >>
-                      qexists_tac ‘[CONJl (l ⧺ γ) --> CONJl (l ⧺ γ) & D]’ >>
-                      gs[CONJl_def, g_suffixing]
-                     ) >>
-                   ‘CONJl (l ⧺ γ) --> CONJl δ ∈ w’ by 
-                     (‘S_Theory (Theta p) w’ by gs[Canonical_Frame_def] >>
-                      gs[S_Theory_def, sENTAILS_def] >> last_x_assum irule >>
-                      qexists_tac ‘[CONJl (l ⧺ γ) & D --> CONJl δ]’ >>
-                      gs[CONJl_def]
-                     ) >>
-                   ‘¬sENTAILS (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) B’ by
-                     (rw[sENTAILS_def] >>
-                      rename [‘α = [] ∨ ¬(set α ⊆ APPLYING w (X_WORLD (Theta p) {A} {B} w)) ∨
-                               CONJl α --> B ∉ Theta p’] >>
-                      Cases_on ‘α = []’ >> gs[] >> 
-                      Cases_on ‘CONJl α --> B ∉ Theta p’ >> gs[] >>
-                      assume_tac FINITE_APPLIED_SUBSET >> gs[] >>
-                      Induct
-                      >- (gs[X_WORLD_i_def] >> CCONTR_TAC >>
-                          gs[] >>
-                          ‘CONJl α ∈ APPLYING w {A}’ by
-                            (gs[Canonical_Frame_def] >> irule CONJl_IN_APPLIED >>
-                             metis_tac[]
-                            ) >>
-                          pop_assum mp_tac >> simp[APPLYING_def] >> CCONTR_TAC >> gs[] >>
-                          qpat_x_assum ‘A --> B ∉ w’ mp_tac >> gs[Canonical_Frame_def, S_Theory_def] >>
-                          last_x_assum irule >> simp[sENTAILS_def] >> qexists_tac ‘[CONJl γ' --> CONJl α]’ >>
-                          simp[CONJl_def] >> gs[Ordinary_def, Prime_def, R_Theory_def, pENTAIL_def] >>
-                          last_x_assum irule >>
-                          qexists_tac ‘[CONJl α --> B]’ >> gs[CONJl_def] >>
-                          metis_tac[g_modus_ponens, g_suffixing, g_permutation, g_A_CONJl_A]
+                      qexists_tac ‘[CONJl (l ⧺ [D]) --> CONJl δ]’ >> gs[CONJl_def] >>
+                      irule g_modus_ponens >> qexists_tac ‘CONJl l & CONJl [D] --> CONJl (l ⧺ [D])’ >> rw[]
+                      >- (‘l ≠ []’ by
+                            (CCONTR_TAC >> 
+                             gs[NOT_EMPTY_X_WORLD_i]
+                            ) >> gs[CONJl_split]
                          )
-                      >- (rw[X_WORLD_i_def] >>
-                          CCONTR_TAC >>
-                          qpat_x_assum
-                          ‘¬sENTAILS (Theta p)
-                           (APPLYING w
-                            (X_WORLD_i n (Theta p) {A} {B} w ∪ {LINV R_gn 𝕌(:g_prop) n})) B’ mp_tac >> 
-                          gs[] >> simp[sENTAILS_def] >> metis_tac[]
-                         )
+                      >- gs[CONJl_def, g_suffixing]
+                      ) >>
+                    irule APPLYING_TO_FINITE >> gs[PULL_EXISTS, Canonical_Frame_def] >>
+                    metis_tac[]
                     ) >>
-                   pop_assum mp_tac >> rw[sENTAILS_def] >>
-                   qexists_tac ‘[CONJl δ]’ >> rw[CONJl_def, APPLYING_def] >>
-                   metis_tac[]
-                  ) >> rw[] >>
-                irule Maximal_S_Theory_APP_imp_prime >> rw[] (* 2 *)
-                >- (gs[X_WORLD_def, EXTENSION, PULL_EXISTS] >>
-                    qexistsl_tac [‘A’, ‘{A}’, ‘0’] >> gs[X_WORLD_i_def]
-                   )
-                >- (qexistsl_tac [‘B’, ‘w’, ‘Theta p’] >> gs[Canonical_Frame_def] >> rw[] (* 2 *)
-                    >- (rw[sENTAILS_def] >> CCONTR_TAC >> 
-                        qpat_x_assum ‘E ∉ X_WORLD (Theta p) {A} {B} w’ mp_tac >> rw[] >> 
-                        assume_tac FINITE_SUBSET_X_WORLD >> 
-                        pop_assum $ qspec_then ‘{E}’ strip_assume_tac >> gs[] >>
-                        qexists_tac ‘SUC (R_gn E)’ >> gs[X_WORLD_i_def] >> 
-                        ‘¬sENTAILS (Theta p)
-                         (APPLYING w
-                          (X_WORLD_i (R_gn E) (Theta p) {A} {B} w ∪
-                           {LINV R_gn 𝕌(:g_prop) (R_gn E)})) B’ suffices_by
-                          (rw[] >>
-                           ‘E = LINV R_gn 𝕌(:g_prop) (R_gn E)’ by (
-                             ‘E ∈ 𝕌(:g_prop)’ by simp[] >>
-                             ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
-                             metis_tac [LINV_DEF]
-                             ) >> gs[]
-                          ) >> gs[sENTAILS_def] >> rw[] >>
+                   ‘R_Theory w’ by (gs[Canonical_Frame_def] >> metis_tac[S_Theory_imp_R_Theory]) >>
+                   gs[R_Theory_def, pENTAIL_def] >> last_x_assum irule >>
+                   qexists_tac ‘[CONJl l & D --> CONJl δ]’ >> gs[CONJl_def] >>
+                   irule g_modus_ponens >> qexists_tac ‘(CONJl (l ⧺ γ) & D) --> CONJl l & D’ >>
+                   gs[g_suffixing] >>
+                   ‘l ≠ []’ by
+                     (CCONTR_TAC >> 
+                      gs[NOT_EMPTY_X_WORLD_i]
+                     ) >>
+                   ‘|- (CONJl (l ⧺ γ) --> CONJl l & CONJl γ)’ by metis_tac[CONJl_split] >>
+                   metis_tac[goldblatt_provable_rules]
+                  ) >> 
+                ‘(CONJl (l ++ γ) & D --> CONJl δ) --> CONJl (l ++ γ) --> CONJl δ ∈ Theta p’ by
+                  (‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >>
+                   gs[Ordinary_def, Regular_def] >>
+                   ‘CONJl (l ++ γ) --> CONJl (l ++ γ) ∈ Theta p’ by simp[g_identity] >>
+                   ‘CONJl (l ++ γ) --> (CONJl (l ++ γ) & D) ∈ Theta p’ by
+                     (gs[R_Theory_def, pENTAIL_def] >> last_x_assum irule >> 
+                      qexists_tac ‘[CONJl (l ++ γ) --> CONJl (l ++ γ); CONJl (l ++ γ) --> D]’ >> 
+                      gs[CONJl_def, g_conj_introduction] 
+                     ) >> 
+                   gs[R_Theory_def, pENTAIL_def] >> last_x_assum irule >>
+                   qexists_tac ‘[CONJl (l ⧺ γ) --> CONJl (l ⧺ γ) & D]’ >>
+                   gs[CONJl_def, g_suffixing]
+                  ) >>
+                ‘CONJl (l ⧺ γ) --> CONJl δ ∈ w’ by 
+                  (‘S_Theory (Theta p) w’ by gs[Canonical_Frame_def] >>
+                   gs[S_Theory_def, sENTAILS_def] >> last_x_assum irule >>
+                   qexists_tac ‘[CONJl (l ⧺ γ) & D --> CONJl δ]’ >>
+                   gs[CONJl_def]
+                  ) >>
+                ‘¬sENTAILS (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) B’ by
+                  (rw[sENTAILS_def] >>
+                   rename [‘α = [] ∨ ¬(set α ⊆ APPLYING w (X_WORLD (Theta p) {A} {B} w)) ∨
+                            CONJl α --> B ∉ Theta p’] >>
+                   Cases_on ‘α = []’ >> gs[] >> 
+                   Cases_on ‘CONJl α --> B ∉ Theta p’ >> gs[] >>
+                   assume_tac FINITE_APPLIED_SUBSET >> gs[] >>
+                   Induct
+                   >- (gs[X_WORLD_i_def] >> CCONTR_TAC >>
+                       gs[] >>
+                       ‘CONJl α ∈ APPLYING w {A}’ by
+                         (gs[Canonical_Frame_def] >> irule CONJl_IN_APPLIED >>
+                          metis_tac[]
+                         ) >>
+                       pop_assum mp_tac >> simp[APPLYING_def] >> CCONTR_TAC >> gs[] >>
+                       qpat_x_assum ‘A --> B ∉ w’ mp_tac >> gs[Canonical_Frame_def, S_Theory_def] >>
+                       last_x_assum irule >> simp[sENTAILS_def] >> qexists_tac ‘[CONJl γ' --> CONJl α]’ >>
+                       simp[CONJl_def] >> gs[Ordinary_def, Prime_def, R_Theory_def, pENTAIL_def] >>
+                       last_x_assum irule >>
+                       qexists_tac ‘[CONJl α --> B]’ >> gs[CONJl_def] >>
+                       metis_tac[g_modus_ponens, g_suffixing, g_permutation, g_A_CONJl_A]
+                      )
+                   >- (rw[X_WORLD_i_def] >>
+                       CCONTR_TAC >>
+                       qpat_x_assum
+                       ‘¬sENTAILS (Theta p)
+                        (APPLYING w
+                         (X_WORLD_i n (Theta p) {A} {B} w ∪ {LINV R_gn 𝕌(:g_prop) n})) B’ mp_tac >> 
+                       gs[] >> simp[sENTAILS_def] >> metis_tac[]
+                      )
+                  ) >>
+                pop_assum mp_tac >> rw[sENTAILS_def] >>
+                qexists_tac ‘[CONJl δ]’ >> rw[CONJl_def, APPLYING_def] >>
+                metis_tac[]
+               ) >> rw[] >>
+             irule Maximal_S_Theory_APP_imp_prime >> rw[] (* 2 *)
+             >- (gs[X_WORLD_def, EXTENSION, PULL_EXISTS] >>
+                 qexistsl_tac [‘A’, ‘{A}’, ‘0’] >> gs[X_WORLD_i_def]
+                )
+             >- (qexistsl_tac [‘B’, ‘w’, ‘Theta p’] >> gs[Canonical_Frame_def] >> rw[] (* 2 *)
+                 >- (rw[sENTAILS_def] >> CCONTR_TAC >> 
+                     qpat_x_assum ‘E ∉ X_WORLD (Theta p) {A} {B} w’ mp_tac >> rw[] >> 
+                     assume_tac FINITE_SUBSET_X_WORLD >> 
+                     pop_assum $ qspec_then ‘{E}’ strip_assume_tac >> gs[] >>
+                     qexists_tac ‘SUC (R_gn E)’ >> gs[X_WORLD_i_def] >> 
+                     ‘¬sENTAILS (Theta p)
+                      (APPLYING w
+                       (X_WORLD_i (R_gn E) (Theta p) {A} {B} w ∪
+                        {LINV R_gn 𝕌(:g_prop) (R_gn E)})) B’ suffices_by
+                       (rw[] >>
                         ‘E = LINV R_gn 𝕌(:g_prop) (R_gn E)’ by (
                           ‘E ∈ 𝕌(:g_prop)’ by simp[] >>
                           ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
                           metis_tac [LINV_DEF]
-                          ) >>
-                        Cases_on ‘γ = []’ >> simp[] >>
-                        Cases_on ‘CONJl γ --> B ∈ Theta p’ >> gs[] >> CCONTR_TAC >>
-                        first_x_assum $ qspec_then ‘γ’ mp_tac >> gs[SUBSET_DEF, APPLYING_def] >>
-                        rw[] >> first_x_assum $ qspec_then ‘x’ strip_assume_tac >> gs[] >> 
-                        qexists_tac ‘γ'’ >> rw[] >> first_x_assum $ qspec_then ‘x'’ strip_assume_tac >> 
-                        gs[] >> assume_tac FINITE_SUBSET_X_WORLD >>
-                        pop_assum $ qspec_then ‘{x'}’ strip_assume_tac >> gs[] >>
-                        ‘∃n. x' ∈ X_WORLD_i n (Theta p) {A} {B} w’ suffices_by gs[] >>
-                        metis_tac[]   
-                       )
-                    >- (rw[sENTAILS_def] >>
-                        Cases_on ‘γ = []’ >> simp[] >> 
-                        Cases_on ‘CONJl γ --> B ∈ Theta p’ >> simp[] >> 
-                        assume_tac FINITE_APPLIED_SUBSET >>
-                        pop_assum $ qspec_then ‘set γ’ strip_assume_tac >> 
-                        gs[] >> rw[] >> Induct_on ‘n’
-                        >- (CCONTR_TAC >> gs[] >>
-                            ‘(A --> CONJl γ) --> A --> B ∈ Theta p’ by
-                              (assume_tac Theta_Theta_theory >>
-                               pop_assum $ qspec_then ‘p’ strip_assume_tac >>
-                               gs[S_Theory_def, Ordinary_def, Regular_def, sENTAILS_def] >>
-                               pop_assum irule >>
-                               qexists_tac ‘[CONJl γ --> B]’ >> simp[CONJl_def] >> last_x_assum irule >>
-                               metis_tac[g_suffixing, g_modus_ponens, g_permutation]
-                              ) >> gs[X_WORLD_i_def] >> 
-                            ‘A --> CONJl γ ∈ w’ by
-                              (irule APPLYING_WORLDS >> 
-                               gs[Canonical_Frame_def, Prime_def] >>
-                               qexists_tac ‘Theta p’ >> gs[]
-                              ) >> gs[Canonical_Frame_def, S_Theory_def, sENTAILS_def] >> 
-                            qpat_x_assum ‘A --> B ∉ w’ mp_tac >> simp[] >>
-                            last_x_assum irule >> qexists_tac ‘[A --> CONJl γ]’ >> gs[CONJl_def]
-                           )
-                        >- (rw[X_WORLD_i_def] >> gs[sENTAILS_def] >> 
-                            last_x_assum $ qspec_then ‘γ’ strip_assume_tac
-                           )
-                       )
-                   )
-               ) >> 
-             ‘Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} ∈ (Canonical_Frame p).W’ by
-               (simp[Canonical_Frame_def] >> 
-                ‘S_Theory (Theta p)
-                 (Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B})’ by
-                  (rw[S_Theory_def, sENTAILS_def, Theta_Ordinary] >>
-                   rename[‘CONJl γ --> D ∈ Theta p’] >>
-                   simp[Y_WORLD_def, PULL_EXISTS] >>
-                   qexists_tac ‘SUC (R_gn D)’ >>
-                   simp[Y_WORLD_i_def] >>
-                   ‘D = LINV R_gn 𝕌(:g_prop) (R_gn D)’ by (
-                     ‘D ∈ 𝕌(:g_prop)’ by simp[] >>
-                     ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
-                     metis_tac [LINV_DEF]
-                     ) >> simp[] >>
-                   ‘¬sENTAILS (Theta p)
-                    (Y_WORLD_i (R_gn D) (Theta p)
-                     (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} ∪
-                     {D}) B’ suffices_by
-                     (‘Y_WORLD_i (R_gn D) (Theta p)
-                       (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} ∪
-                       {LINV R_gn 𝕌(:g_prop) (R_gn D)} = Y_WORLD_i (R_gn D) (Theta p)
-                                       (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} ∪
-                                       {D}’ by
-                        (rw[EXTENSION, EQ_IMP_THM] >> metis_tac[]
-                        ) >>
-                      gs[]
-                     ) >>
-                   CCONTR_TAC >> gs[sENTAILS_def] >>
-                   rename [‘CONJl δ --> B ∈ Theta p’] >>
-                 ‘¬sENTAILS (Theta p) (Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B}) B’ by
-                     (rw[sENTAILS_def] >>
-                      rename [‘α = [] ∨
-                               ¬(set α ⊆
-                                 Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B}) ∨
-                               CONJl α --> B ∉ Theta p’] >>
-                      Cases_on ‘α = []’ >> simp[] >> 
-                      Cases_on ‘CONJl α --> B ∈ Theta p’ >> simp[] >> 
-                      assume_tac FINITE_SUBSET_Y_WORLD >>
-                      pop_assum $ qspec_then ‘set α’ strip_assume_tac >> 
-                      gs[] >> rw[] >> Induct_on ‘n’ (* 2 *)
-                      >- (gs[Y_WORLD_i_def] >>
-                          assume_tac FINITE_APPLIED_SUBSET >>
-                          pop_assum $ qspec_then ‘set α’ strip_assume_tac >> gs[] >>
-                          Induct  (* 2 *)
-                          >- (CCONTR_TAC >> gs[] >>
-                              ‘(A --> CONJl α) --> A --> B ∈ Theta p’ by
-                                (assume_tac Theta_Theta_theory >>
-                                 pop_assum $ qspec_then ‘p’ strip_assume_tac >>
-                                 gs[S_Theory_def, Ordinary_def, Regular_def, sENTAILS_def] >>
-                                 pop_assum irule >>
-                                 qexists_tac ‘[CONJl α --> B]’ >> simp[CONJl_def] >> last_x_assum irule >>
-                                 metis_tac[g_suffixing, g_modus_ponens, g_permutation]
-                                ) >> gs[X_WORLD_i_def] >> 
-                              ‘A --> CONJl α ∈ w’ by
-                                (irule APPLYING_WORLDS >> 
-                                 gs[Canonical_Frame_def, Prime_def] >>
-                                 qexists_tac ‘Theta p’ >> gs[]
-                                ) >> gs[Canonical_Frame_def, S_Theory_def, sENTAILS_def] >> 
-                              qpat_x_assum ‘A --> B ∉ w’ mp_tac >> simp[] >>
-                              last_x_assum irule >> qexists_tac ‘[A --> CONJl α]’ >> gs[CONJl_def]
-                             )
-                          >- (rw[X_WORLD_i_def] >> gs[sENTAILS_def] >> 
-                              last_x_assum $ qspec_then ‘α’ strip_assume_tac
-                             )
-                         )
-                      >- (rw[Y_WORLD_i_def] >> gs[sENTAILS_def] >> 
-                          last_x_assum $ qspec_then ‘α’ strip_assume_tac
-                         )
-                     ) >> pop_assum mp_tac >> simp[sENTAILS_def] >>
-                  qexists_tac ‘γ ++ FILTER (λx. x ≠ D) δ’ >> rw[] (* 2 *)
-                   >- (gs[SUBSET_DEF] >> rw[] >>
-                       first_x_assum $ qspec_then ‘x’ strip_assume_tac >>
-                       ‘MEM x δ’ by metis_tac[MEM_FILTER_LEMMA] >>
-                       gs[] (* 2 *)
-                       >- (assume_tac FINITE_SUBSET_Y_WORLD >>
-                           pop_assum $ qspecl_then [‘{x}’, ‘Theta p’, ‘APPLYING w (X_WORLD (Theta p) {A} {B} w)’,
-                                                    ‘{B}’] strip_assume_tac >>
-                           gs[SUBSET_DEF] >> metis_tac[]
-                          )
-                       >- gs[NOT_MEM_FILTER_LEMMA]
-                      )
-                   >- (‘S_Theory (Theta p) (Theta p)’ by gs[Theta_Theta_theory] >>
-                       gs[S_Theory_def, sENTAILS_def] >> last_assum irule >>
-                       qexists_tac ‘[CONJl δ --> B]’ >> gs[CONJl_def] >>
-                       last_assum irule >> qexists_tac ‘[CONJl γ & CONJl δ --> CONJl δ]’ >>
-                       rw[CONJl_def]
-                       >- gs[g_conjunction_r, Ordinary_def, Regular_def]
-                       >- (last_assum irule >>
-                           qexists_tac ‘[CONJl (γ ++ δ) --> CONJl γ & CONJl δ]’ >> rw[CONJl_def]
-                           >- gs[CONJl_split, Ordinary_def, Regular_def]
-                           >- (last_assum irule >> qexists_tac ‘[CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) --> CONJl (γ ⧺ δ)]’ >> 
-                               reverse $ rw[CONJl_def]
-                               >- (gs[Ordinary_def, Regular_def] >> qpat_x_assum ‘∀p'. |- p' ⇒ p' ∈ Theta p’ irule >>
-                                   metis_tac[g_suffixing, g_permutation, g_modus_ponens]
-                                  )
-                               >- (last_assum irule >> qexists_tac ‘[CONJl γ & CONJl δ --> CONJl (γ ++ δ)]’ >>
-                                   rw[CONJl_def]
-                                   >- gs[CONJl_split, Ordinary_def, Regular_def] 
-                                   >-  (last_assum irule >> 
-                                        qexists_tac ‘[CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) --> CONJl γ & CONJl δ]’ >>
-                                        reverse $ rw[CONJl_def]
-                                        >- gs[g_suffixing, Ordinary_def, Regular_def]
-                                        >- (Cases_on ‘FILTER (λx. x ≠ D) δ = []’  >> gs[]
-                                            >- (last_assum irule >> 
-                                                qexists_tac ‘[CONJl γ --> CONJl γ; CONJl γ --> CONJl δ]’ >>
-                                                gs[g_conj_introduction, CONJl_def, Ordinary_def, Regular_def, g_identity, R_Theory_def] >>
-                                                qpat_x_assum ‘ ∀p'. Theta p |-^ p' ⇒ p' ∈ Theta p’ irule >> 
-                                                gs[pENTAIL_def] >> qexists_tac ‘[CONJl γ --> D]’ >> gs[CONJl_def] >>
-                                                ‘set δ ⊆ {D}’ by gs[EMPTY_FILTER_LEMMA] >> 
-                                                metis_tac[goldblatt_provable_rules, g_A_CONJl_A, g_permutation]
-                                               )
-                                            >- (‘R_Theory (Theta p)’ by gs[Theta_R_Theory] >>
-                                                gs[R_Theory_def] >> qpat_assum ‘∀p'. Theta p |-^ p' ⇒ p' ∈ Theta p’ irule >>
-                                                simp[pENTAIL_def] >> 
-                                                qexists_tac ‘[CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) -->
-                                                              (CONJl γ & CONJl (FILTER (λx. x ≠ D) δ) & D)]’ >>
-                                                reverse $ rw[CONJl_def]
-                                                >- (irule g_modus_ponens >>
-                                                    qexists_tac ‘CONJl γ & CONJl (FILTER (λx. x ≠ D) δ) & D --> CONJl γ & CONJl δ’ >>
-                                                    reverse $ rw[]
-                                                    >- metis_tac[g_suffixing, g_permutation, g_modus_ponens]
-                                                    >- (‘|- (CONJl (FILTER (λx. x ≠ D) δ) & D --> CONJl δ)’ by 
-                                                          (Cases_on ‘MEM D δ’
-                                                           >- metis_tac[FILTER_AND_FILTERED_IMP_CONJl, goldblatt_provable_rules]
-                                                           >- metis_tac[goldblatt_provable_rules, FILTER_NON_MEM_EQUAL]
-                                                          ) >> 
-                                                        ‘|- (CONJl γ & CONJl (FILTER (λx. x ≠ D) δ) & D --> CONJl δ)’ by
-                                                          (‘|- (CONJl γ & (CONJl (FILTER (λx. x ≠ D) δ) & D) --> CONJl δ)’ by
-                                                             metis_tac[goldblatt_provable_rules, g_AND_STRENGTHEN] >>
-                                                           metis_tac[g_suffixing, g_modus_ponens, g_AND_associative_rl]
-                                                          ) >>
-                                                        metis_tac[goldblatt_provable_rules]
-                                                       )
-                                                   )
-                                                >- (qpat_assum ‘∀p'. Theta p |-^ p' ⇒ p' ∈ Theta p’ irule >>
-                                                    simp[pENTAIL_def] >>
-                                                    qexists_tac ‘[CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) --> CONJl γ & CONJl (FILTER (λx. x ≠ D) δ);
-                                                                  CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) --> D]’ >>
-                                                    rw[CONJl_def] (* 3 *)
-                                                    >- (gs[Ordinary_def, Regular_def] >> gs[CONJl_split]
-                                                       )
-                                                    >- (pop_assum irule >> gs[pENTAIL_def] >>
-                                                        qexists_tac ‘[CONJl γ --> D]’ >> gs[CONJl_def] >> irule g_modus_ponens >>
-                                                        qexists_tac ‘CONJl γ & CONJl (FILTER (λx. x ≠ D) δ) --> CONJl γ’ >> gs[g_conjunction_l] >>
-                                                        irule g_modus_ponens >>
-                                                        qexists_tac ‘CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) -->
-                                                                     CONJl γ & CONJl (FILTER (λx. x ≠ D) δ)’ >> gs[CONJl_split] >> 
-                                                        metis_tac[g_suffixing, g_modus_ponens, g_permutation]
-                                                       )
-                                                    >- gs[g_conj_introduction]
-                                                   )
-                                               )
-                                           )
-                                       )
-                                  )
-                              )
-                          )
-                      )
-                  ) >> 
-                simp[] >>
-                Cases_on ‘Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} = ∅’
-                >- gs[Prime_def, R_Theory_def, pENTAIL_def]
-                >> irule Maximal_S_Theory_imp_prime >>
-                simp[] >>
-                qexistsl_tac [‘B’, ‘Theta p’] >> rw[] (* 2 *)
-                >- (rw[sENTAILS_def] >> CCONTR_TAC >> 
-                    qpat_x_assum ‘E ∉ Y_WORLD (Theta p)
-                                  (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B}’ mp_tac >> rw[] >> 
-                    assume_tac FINITE_SUBSET_Y_WORLD >>
-                    pop_assum $ qspec_then ‘{E}’ strip_assume_tac >> gs[] >>
-                    qexists_tac ‘SUC (R_gn E)’ >> gs[Y_WORLD_i_def] >> 
-                    ‘E = LINV R_gn 𝕌(:g_prop) (R_gn E)’ by (
-                      ‘E ∈ 𝕌(:g_prop)’ by simp[] >>
-                      ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
-                      metis_tac [LINV_DEF]
-                      ) >>
-                    ‘¬sENTAILS (Theta p)
-                     (Y_WORLD_i (R_gn E) (Theta p)
-                      (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} ∪
-                      {LINV R_gn 𝕌(:g_prop) (R_gn E)}) B’ suffices_by gs[] >>
-                    gs[sENTAILS_def] >> rw[] >> 
-                    Cases_on ‘γ = []’ >> simp[] >>
-                    Cases_on ‘CONJl γ --> B ∈ Theta p’ >> gs[] >> CCONTR_TAC >>
-                    first_x_assum $ qspec_then ‘γ’ mp_tac >>
-                    gs[SUBSET_DEF] >> rw[] >> first_x_assum $ qspec_then ‘x’ strip_assume_tac >>
-                    gs[] >> assume_tac FINITE_SUBSET_Y_WORLD >>
-                    pop_assum $ qspec_then ‘{x}’ strip_assume_tac >> gs[] >>
-                    metis_tac[]
-                   )
-                >- (rw[sENTAILS_def] >>
-                    Cases_on ‘γ = []’ >> simp[] >> 
-                    Cases_on ‘CONJl γ --> B ∈ Theta p’ >> simp[] >> 
-                    assume_tac FINITE_SUBSET_Y_WORLD >>
-                    pop_assum $ qspec_then ‘set γ’ strip_assume_tac >> 
-                    gs[] >> rw[] >> Induct_on ‘n’ (* 2 *)
-                    >- (gs[Y_WORLD_i_def] >>
-                        assume_tac FINITE_APPLIED_SUBSET >>
-                        pop_assum $ qspec_then ‘set γ’ strip_assume_tac >> gs[] >>
-                        Induct  (* 2 *)
-                        >- (CCONTR_TAC >> gs[] >>
-                            ‘(A --> CONJl γ) --> A --> B ∈ Theta p’ by
-                              (assume_tac Theta_Theta_theory >>
-                               pop_assum $ qspec_then ‘p’ strip_assume_tac >>
-                               gs[S_Theory_def, Ordinary_def, Regular_def, sENTAILS_def] >>
-                               pop_assum irule >>
-                               qexists_tac ‘[CONJl γ --> B]’ >> simp[CONJl_def] >> last_x_assum irule >>
-                               metis_tac[g_suffixing, g_modus_ponens, g_permutation]
-                              ) >> gs[X_WORLD_i_def] >> 
-                            ‘A --> CONJl γ ∈ w’ by
-                              (irule APPLYING_WORLDS >> 
-                               gs[Canonical_Frame_def, Prime_def] >>
-                               qexists_tac ‘Theta p’ >> gs[]
-                              ) >> gs[Canonical_Frame_def, S_Theory_def, sENTAILS_def] >> 
-                            qpat_x_assum ‘A --> B ∉ w’ mp_tac >> simp[] >>
-                            last_x_assum irule >> qexists_tac ‘[A --> CONJl γ]’ >> gs[CONJl_def]
-                           )
-                        >- (rw[X_WORLD_i_def] >> gs[sENTAILS_def] >> 
-                            last_x_assum $ qspec_then ‘γ’ strip_assume_tac
-                           )
-                       )
-                    >- (rw[Y_WORLD_i_def] >> gs[sENTAILS_def] >> 
-                        last_x_assum $ qspec_then ‘γ’ strip_assume_tac
-                       )
-                   )
-               ) >> 
-             gs[] >> rw[] (* 3 *)
-             >- (gs[Canonical_Frame_def] >>
-                 rw[Y_WORLD_def, BIGUNION, SUBSET_DEF, PULL_EXISTS] >>
-                 qexists_tac ‘0’ >> gs[Y_WORLD_i_def]
-                )
-             >- (rw[X_WORLD_def, BIGUNION, PULL_EXISTS] >>
-                 qexists_tac ‘0’ >> gs[X_WORLD_i_def]
-                )
-             >- (rw[Y_WORLD_def] >> CCONTR_TAC >> gs[] >>
-                 qpat_x_assum
-                 ‘B ∈ Y_WORLD_i n (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B}’ mp_tac >>
-                 simp[] >> Induct_on ‘n’ >> rw[Y_WORLD_i_def] (* 3 *)
-                 >- (simp[APPLYING_def] >> CCONTR_TAC >> gs[] >>
-                     pop_assum mp_tac >> assume_tac FINITE_SUBSET_X_WORLD >>
-                     pop_assum $ qspec_then ‘set γ’ strip_assume_tac >> gs[] >>
-                     Induct_on ‘n’ >> rw[X_WORLD_i_def]
+                          ) >> gs[]
+                       ) >> gs[sENTAILS_def] >> rw[] >>
+                     ‘E = LINV R_gn 𝕌(:g_prop) (R_gn E)’ by (
+                       ‘E ∈ 𝕌(:g_prop)’ by simp[] >>
+                       ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
+                       metis_tac [LINV_DEF]
+                       ) >>
+                     Cases_on ‘γ = []’ >> simp[] >>
+                     Cases_on ‘CONJl γ --> B ∈ Theta p’ >> gs[] >> CCONTR_TAC >>
+                     first_x_assum $ qspec_then ‘γ’ mp_tac >> gs[SUBSET_DEF, APPLYING_def] >>
+                     rw[] >> first_x_assum $ qspec_then ‘x’ strip_assume_tac >> gs[] >> 
+                     qexists_tac ‘γ'’ >> rw[] >> first_x_assum $ qspec_then ‘x'’ strip_assume_tac >> 
+                     gs[] >> assume_tac FINITE_SUBSET_X_WORLD >>
+                     pop_assum $ qspec_then ‘{x'}’ strip_assume_tac >> gs[] >>
+                     ‘∃n. x' ∈ X_WORLD_i n (Theta p) {A} {B} w’ suffices_by gs[] >>
+                     metis_tac[]   
+                    )
+                 >- (rw[sENTAILS_def] >>
+                     Cases_on ‘γ = []’ >> simp[] >> 
+                     Cases_on ‘CONJl γ --> B ∈ Theta p’ >> simp[] >> 
+                     assume_tac FINITE_APPLIED_SUBSET >>
+                     pop_assum $ qspec_then ‘set γ’ strip_assume_tac >> 
+                     gs[] >> rw[] >> Induct_on ‘n’
                      >- (CCONTR_TAC >> gs[] >>
+                         ‘(A --> CONJl γ) --> A --> B ∈ Theta p’ by
+                           (assume_tac Theta_Theta_theory >>
+                            pop_assum $ qspec_then ‘p’ strip_assume_tac >>
+                            gs[S_Theory_def, Ordinary_def, Regular_def, sENTAILS_def] >>
+                            pop_assum irule >>
+                            qexists_tac ‘[CONJl γ --> B]’ >> simp[CONJl_def] >> last_x_assum irule >>
+                            metis_tac[g_suffixing, g_modus_ponens, g_permutation]
+                           ) >> gs[X_WORLD_i_def] >> 
+                         ‘A --> CONJl γ ∈ w’ by
+                           (irule APPLYING_WORLDS >> 
+                            gs[Canonical_Frame_def, Prime_def] >>
+                            qexists_tac ‘Theta p’ >> gs[]
+                           ) >> gs[Canonical_Frame_def, S_Theory_def, sENTAILS_def] >> 
                          qpat_x_assum ‘A --> B ∉ w’ mp_tac >> simp[] >>
-                         qpat_x_assum ‘w ∈ (Canonical_Frame p).W’ mp_tac >>
-                         rw[Canonical_Frame_def, Prime_def, R_Theory_def] >>
-                         last_x_assum irule >> simp[pENTAIL_def] >>
-                         qexists_tac ‘[CONJl γ --> B]’ >> simp[CONJl_def] >>
-                         irule g_modus_ponens >> qexists_tac ‘A --> CONJl γ’ >>
-                         simp[g_suffixing, g_A_CONJl_A]
+                         last_x_assum irule >> qexists_tac ‘[A --> CONJl γ]’ >> gs[CONJl_def]
                         )
-                     >- (CCONTR_TAC >> gs[] >>
-                         qpat_x_assum
-                         ‘¬sENTAILS (Theta p)
-                          (APPLYING w
-                           (X_WORLD_i n (Theta p) {A} {B} w ∪ {LINV R_gn 𝕌(:g_prop) n})) B’
-                         mp_tac >> simp[sENTAILS_def] >> qexists_tac ‘[B]’ >>
-                         gs[APPLYING_def, CONJl_def] >> rw[] (* 2 *)
-                         >- (qexists_tac ‘γ’ >> gs[])
-                         >- (‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >>
-                             gs[Ordinary_def, Regular_def, g_identity]
-                            )
+                     >- (rw[X_WORLD_i_def] >> gs[sENTAILS_def] >> 
+                         last_x_assum $ qspec_then ‘γ’ strip_assume_tac
                         )
-                    )
-                 >- (CCONTR_TAC >>
-                     qpat_x_assum
-                     ‘¬sENTAILS (Theta p)
-                      (Y_WORLD_i n (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w))
-                       {B} ∪ {LINV R_gn 𝕌(:g_prop) n}) B’ mp_tac >>
-                     gs[sENTAILS_def] >> qexists_tac ‘[B]’ >> 
-                     gs[CONJl_def] >> ‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >>
-                     gs[Ordinary_def, Regular_def, g_identity]
-                  )
-                 >- (CCONTR_TAC >>
-                     qpat_x_assum
-                     ‘¬sENTAILS (Theta p)
-                      (Y_WORLD_i n (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w))
-                       {B} ∪ {LINV R_gn 𝕌(:g_prop) n}) B’ mp_tac >>
-                     gs[] >> rename[‘B = B'’] >>
-                     simp[sENTAILS_def] >> qexists_tac ‘[B']’ >>
-                     gs[CONJl_def] >> ‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >>
-                     gs[Ordinary_def, Regular_def, g_identity]
                     )
                 )
-            )
-        ) 
-     >- (rw[EQ_IMP_THM] >> rename[‘A & B ∈ w’] >> 
-         qpat_x_assum ‘w ∈ (Canonical_Frame p).W’ mp_tac >> 
-         simp[Canonical_Frame_def, S_Theory_def, sENTAILS_def] >> rw[]  (* 3 *)
-         >- (last_x_assum irule >> qexists_tac ‘[A; B]’ >>
-             gs[CONJl_def, Ordinary_def, Regular_def, g_identity]
-            )
-         >- (last_x_assum irule >> 
-             qexists_tac ‘[A & B]’ >>
-             gs[CONJl_def, Ordinary_def, Regular_def, g_conjunction_l]
-            )
-         >- (last_x_assum irule >> 
-             qexists_tac ‘[A & B]’ >>
-             gs[CONJl_def, Ordinary_def, Regular_def, g_conjunction_r]
-            )
-        )
-     >- (‘(Canonical_Frame p).STAR w ∈ (Canonical_Frame p).W’ by
-           (‘R_Frame (Canonical_Frame p)’ by 
-              (assume_tac Canonical_Frame_is_R_Frame >>
-               pop_assum $ qspec_then ‘p’ strip_assume_tac >> gs[]
-              ) >> gs[R_STAR_CLOSURE]
-           ) >> rw[EQ_IMP_THM] >> gs[Canonical_Frame_def]
-        )
-     >- (rw[EQ_IMP_THM] (* 2 *)
-         >- (pop_assum mp_tac >> simp[Canonical_Frame_def] >> rw[] >>
-             gs[SUBSET_DEF, APPLYING_def] >> last_x_assum irule >>
-             qexists_tac ‘[τ]’ >>
-             gs[CONJl_def, g_identity, S_Theory_def, Ordinary_def, Regular_def] >>
-             qpat_x_assum ‘∀p'. |- p' ⇒ p' ∈ Theta p’ irule >> 
-             metis_tac[goldblatt_provable_rules]
-            )
-         >- (‘(Canonical_Frame p).R w (Canonical_Frame p).Z w’ by
-               (‘R_Frame (Canonical_Frame p)’ by 
-                  (assume_tac Canonical_Frame_is_R_Frame >>
-                   pop_assum $ qspec_then ‘p’ strip_assume_tac >> gs[]
+            ) >> 
+          ‘Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} ∈ (Canonical_Frame p).W’ by
+            (simp[Canonical_Frame_def] >> 
+             ‘S_Theory (Theta p)
+              (Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B})’ by
+               (rw[S_Theory_def, sENTAILS_def, Theta_Ordinary] >>
+                rename[‘CONJl γ --> D ∈ Theta p’] >>
+                simp[Y_WORLD_def, PULL_EXISTS] >>
+                qexists_tac ‘SUC (R_gn D)’ >>
+                simp[Y_WORLD_i_def] >>
+                ‘D = LINV R_gn 𝕌(:g_prop) (R_gn D)’ by (
+                  ‘D ∈ 𝕌(:g_prop)’ by simp[] >>
+                  ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
+                  metis_tac [LINV_DEF]
+                  ) >> simp[] >>
+                ‘¬sENTAILS (Theta p)
+                 (Y_WORLD_i (R_gn D) (Theta p)
+                  (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} ∪
+                  {D}) B’ suffices_by
+                  (‘Y_WORLD_i (R_gn D) (Theta p)
+                    (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} ∪
+                    {LINV R_gn 𝕌(:g_prop) (R_gn D)} = Y_WORLD_i (R_gn D) (Theta p)
+                                                                (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} ∪
+                                                                {D}’ by
+                     (rw[EXTENSION, EQ_IMP_THM] >> metis_tac[]
+                     ) >>
+                   gs[]
                   ) >>
-                ‘(Canonical_Frame p).R (Canonical_Frame p).Z w w’ by
-                  gs[R_R_ZERO_REFLEX] >>
-                gs[R_R_COMM]
+                CCONTR_TAC >> gs[sENTAILS_def] >>
+                rename [‘CONJl δ --> B ∈ Theta p’] >>
+                ‘¬sENTAILS (Theta p) (Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B}) B’ by
+                  (rw[sENTAILS_def] >>
+                   rename [‘α = [] ∨
+                            ¬(set α ⊆
+                              Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B}) ∨
+                            CONJl α --> B ∉ Theta p’] >>
+                   Cases_on ‘α = []’ >> simp[] >> 
+                   Cases_on ‘CONJl α --> B ∈ Theta p’ >> simp[] >> 
+                   assume_tac FINITE_SUBSET_Y_WORLD >>
+                   pop_assum $ qspec_then ‘set α’ strip_assume_tac >> 
+                   gs[] >> rw[] >> Induct_on ‘n’ (* 2 *)
+                   >- (gs[Y_WORLD_i_def] >>
+                       assume_tac FINITE_APPLIED_SUBSET >>
+                       pop_assum $ qspec_then ‘set α’ strip_assume_tac >> gs[] >>
+                       Induct  (* 2 *)
+                       >- (CCONTR_TAC >> gs[] >>
+                           ‘(A --> CONJl α) --> A --> B ∈ Theta p’ by
+                             (assume_tac Theta_Theta_theory >>
+                              pop_assum $ qspec_then ‘p’ strip_assume_tac >>
+                              gs[S_Theory_def, Ordinary_def, Regular_def, sENTAILS_def] >>
+                              pop_assum irule >>
+                              qexists_tac ‘[CONJl α --> B]’ >> simp[CONJl_def] >> last_x_assum irule >>
+                              metis_tac[g_suffixing, g_modus_ponens, g_permutation]
+                             ) >> gs[X_WORLD_i_def] >> 
+                           ‘A --> CONJl α ∈ w’ by
+                             (irule APPLYING_WORLDS >> 
+                              gs[Canonical_Frame_def, Prime_def] >>
+                              qexists_tac ‘Theta p’ >> gs[]
+                             ) >> gs[Canonical_Frame_def, S_Theory_def, sENTAILS_def] >> 
+                           qpat_x_assum ‘A --> B ∉ w’ mp_tac >> simp[] >>
+                           last_x_assum irule >> qexists_tac ‘[A --> CONJl α]’ >> gs[CONJl_def]
+                          )
+                       >- (rw[X_WORLD_i_def] >> gs[sENTAILS_def] >> 
+                           last_x_assum $ qspec_then ‘α’ strip_assume_tac
+                          )
+                      )
+                   >- (rw[Y_WORLD_i_def] >> gs[sENTAILS_def] >> 
+                       last_x_assum $ qspec_then ‘α’ strip_assume_tac
+                      )
+                  ) >> pop_assum mp_tac >> simp[sENTAILS_def] >>
+                qexists_tac ‘γ ++ FILTER (λx. x ≠ D) δ’ >> rw[] (* 2 *)
+                >- (gs[SUBSET_DEF] >> rw[] >>
+                    first_x_assum $ qspec_then ‘x’ strip_assume_tac >>
+                    ‘MEM x δ’ by metis_tac[MEM_FILTER_LEMMA] >>
+                    gs[] (* 2 *)
+                    >- (assume_tac FINITE_SUBSET_Y_WORLD >>
+                        pop_assum $ qspecl_then [‘{x}’, ‘Theta p’, ‘APPLYING w (X_WORLD (Theta p) {A} {B} w)’,
+                                                 ‘{B}’] strip_assume_tac >>
+                        gs[SUBSET_DEF] >> metis_tac[]
+                       )
+                    >- gs[NOT_MEM_FILTER_LEMMA]
+                   )
+                >- (‘S_Theory (Theta p) (Theta p)’ by gs[Theta_Theta_theory] >>
+                    gs[S_Theory_def, sENTAILS_def] >> last_assum irule >>
+                    qexists_tac ‘[CONJl δ --> B]’ >> gs[CONJl_def] >>
+                    last_assum irule >> qexists_tac ‘[CONJl γ & CONJl δ --> CONJl δ]’ >>
+                    rw[CONJl_def]
+                    >- gs[g_conjunction_r, Ordinary_def, Regular_def]
+                    >- (last_assum irule >>
+                        qexists_tac ‘[CONJl (γ ++ δ) --> CONJl γ & CONJl δ]’ >> rw[CONJl_def]
+                        >- gs[CONJl_split, Ordinary_def, Regular_def]
+                        >- (last_assum irule >> qexists_tac ‘[CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) --> CONJl (γ ⧺ δ)]’ >> 
+                            reverse $ rw[CONJl_def]
+                            >- (gs[Ordinary_def, Regular_def] >> qpat_x_assum ‘∀p'. |- p' ⇒ p' ∈ Theta p’ irule >>
+                                metis_tac[g_suffixing, g_permutation, g_modus_ponens]
+                               )
+                            >- (last_assum irule >> qexists_tac ‘[CONJl γ & CONJl δ --> CONJl (γ ++ δ)]’ >>
+                                rw[CONJl_def]
+                                >- gs[CONJl_split, Ordinary_def, Regular_def] 
+                                >-  (last_assum irule >> 
+                                     qexists_tac ‘[CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) --> CONJl γ & CONJl δ]’ >>
+                                     reverse $ rw[CONJl_def]
+                                     >- gs[g_suffixing, Ordinary_def, Regular_def]
+                                     >- (Cases_on ‘FILTER (λx. x ≠ D) δ = []’  >> gs[]
+                                         >- (last_assum irule >> 
+                                             qexists_tac ‘[CONJl γ --> CONJl γ; CONJl γ --> CONJl δ]’ >>
+                                             gs[g_conj_introduction, CONJl_def, Ordinary_def, Regular_def, g_identity, R_Theory_def] >>
+                                             qpat_x_assum ‘ ∀p'. Theta p |-^ p' ⇒ p' ∈ Theta p’ irule >> 
+                                             gs[pENTAIL_def] >> qexists_tac ‘[CONJl γ --> D]’ >> gs[CONJl_def] >>
+                                             ‘set δ ⊆ {D}’ by gs[EMPTY_FILTER_LEMMA] >> 
+                                             metis_tac[goldblatt_provable_rules, g_A_CONJl_A, g_permutation]
+                                            )
+                                         >- (‘R_Theory (Theta p)’ by gs[Theta_R_Theory] >>
+                                             gs[R_Theory_def] >> qpat_assum ‘∀p'. Theta p |-^ p' ⇒ p' ∈ Theta p’ irule >>
+                                             simp[pENTAIL_def] >> 
+                                             qexists_tac ‘[CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) -->
+                                                           (CONJl γ & CONJl (FILTER (λx. x ≠ D) δ) & D)]’ >>
+                                             reverse $ rw[CONJl_def]
+                                             >- (irule g_modus_ponens >>
+                                                 qexists_tac ‘CONJl γ & CONJl (FILTER (λx. x ≠ D) δ) & D --> CONJl γ & CONJl δ’ >>
+                                                 reverse $ rw[]
+                                                 >- metis_tac[g_suffixing, g_permutation, g_modus_ponens]
+                                                 >- (‘|- (CONJl (FILTER (λx. x ≠ D) δ) & D --> CONJl δ)’ by 
+                                                       (Cases_on ‘MEM D δ’
+                                                        >- metis_tac[FILTER_AND_FILTERED_IMP_CONJl, goldblatt_provable_rules]
+                                                        >- metis_tac[goldblatt_provable_rules, FILTER_NON_MEM_EQUAL]
+                                                       ) >> 
+                                                     ‘|- (CONJl γ & CONJl (FILTER (λx. x ≠ D) δ) & D --> CONJl δ)’ by
+                                                       (‘|- (CONJl γ & (CONJl (FILTER (λx. x ≠ D) δ) & D) --> CONJl δ)’ by
+                                                          metis_tac[goldblatt_provable_rules, g_AND_STRENGTHEN] >>
+                                                        metis_tac[g_suffixing, g_modus_ponens, g_AND_associative_rl]
+                                                       ) >>
+                                                     metis_tac[goldblatt_provable_rules]
+                                                    )
+                                                )
+                                             >- (qpat_assum ‘∀p'. Theta p |-^ p' ⇒ p' ∈ Theta p’ irule >>
+                                                 simp[pENTAIL_def] >>
+                                                 qexists_tac ‘[CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) --> CONJl γ & CONJl (FILTER (λx. x ≠ D) δ);
+                                                               CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) --> D]’ >>
+                                                 rw[CONJl_def] (* 3 *)
+                                                 >- (gs[Ordinary_def, Regular_def] >> gs[CONJl_split]
+                                                    )
+                                                 >- (pop_assum irule >> gs[pENTAIL_def] >>
+                                                     qexists_tac ‘[CONJl γ --> D]’ >> gs[CONJl_def] >> irule g_modus_ponens >>
+                                                     qexists_tac ‘CONJl γ & CONJl (FILTER (λx. x ≠ D) δ) --> CONJl γ’ >> gs[g_conjunction_l] >>
+                                                     irule g_modus_ponens >>
+                                                     qexists_tac ‘CONJl (γ ⧺ FILTER (λx. x ≠ D) δ) -->
+                                                                  CONJl γ & CONJl (FILTER (λx. x ≠ D) δ)’ >> gs[CONJl_split] >> 
+                                                     metis_tac[g_suffixing, g_modus_ponens, g_permutation]
+                                                    )
+                                                 >- gs[g_conj_introduction]
+                                                )
+                                            )
+                                        )
+                                    )
+                               )
+                           )
+                       )
+                   )
                ) >> 
-             simp[Canonical_Frame_def] >>
-             assume_tac Theta_Ordinary >> pop_assum $ qspec_then ‘p’ strip_assume_tac >> gs[Ordinary_def] >>
-             assume_tac Theta_Theta_theory >> pop_assum $ qspec_then ‘p’ strip_assume_tac >> 
-             gs[Canonical_Frame_def] >>
-             qpat_x_assum ‘APPLYING w (Theta p) ⊆ w’ mp_tac >> rw[APPLYING_def,SUBSET_DEF] >>
-             last_x_assum irule >> qexists_tac ‘[x]’ >> rw[CONJl_def] (* 2 *)
-             >- (gs[S_Theory_def] >> last_x_assum irule >>
-                 simp[sENTAILS_def] >> qexists_tac ‘[τ]’ >> gs[CONJl_def, Regular_def] >>
-                 qpat_x_assum ‘∀p'. |- p' ⇒ p' ∈ Theta p’ irule >>
-                 metis_tac[goldblatt_provable_rules]
+             simp[] >>
+             Cases_on ‘Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} = ∅’
+             >- gs[Prime_def, R_Theory_def, pENTAIL_def]
+             >> irule Maximal_S_Theory_imp_prime >>
+             simp[] >>
+             qexistsl_tac [‘B’, ‘Theta p’] >> rw[] (* 2 *)
+             >- (rw[sENTAILS_def] >> CCONTR_TAC >> 
+                 qpat_x_assum ‘E ∉ Y_WORLD (Theta p)
+                               (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B}’ mp_tac >> rw[] >> 
+                 assume_tac FINITE_SUBSET_Y_WORLD >>
+                 pop_assum $ qspec_then ‘{E}’ strip_assume_tac >> gs[] >>
+                 qexists_tac ‘SUC (R_gn E)’ >> gs[Y_WORLD_i_def] >> 
+                 ‘E = LINV R_gn 𝕌(:g_prop) (R_gn E)’ by (
+                   ‘E ∈ 𝕌(:g_prop)’ by simp[] >>
+                   ‘INJ R_gn 𝕌(:g_prop)  𝕌(:num)’ by simp[INJ_DEF] >>
+                   metis_tac [LINV_DEF]
+                   ) >>
+                 ‘¬sENTAILS (Theta p)
+                  (Y_WORLD_i (R_gn E) (Theta p)
+                   (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B} ∪
+                   {LINV R_gn 𝕌(:g_prop) (R_gn E)}) B’ suffices_by gs[] >>
+                 gs[sENTAILS_def] >> rw[] >> 
+                 Cases_on ‘γ = []’ >> simp[] >>
+                 Cases_on ‘CONJl γ --> B ∈ Theta p’ >> gs[] >> CCONTR_TAC >>
+                 first_x_assum $ qspec_then ‘γ’ mp_tac >>
+                 gs[SUBSET_DEF] >> rw[] >> first_x_assum $ qspec_then ‘x’ strip_assume_tac >>
+                 gs[] >> assume_tac FINITE_SUBSET_Y_WORLD >>
+                 pop_assum $ qspec_then ‘{x}’ strip_assume_tac >> gs[] >>
+                 metis_tac[]
                 )
-             >- (gs[S_Theory_def] >> last_x_assum irule >> simp[sENTAILS_def] >>
-                 qexists_tac ‘γ’ >> gs[SUBSET_DEF]
+             >- (rw[sENTAILS_def] >>
+                 Cases_on ‘γ = []’ >> simp[] >> 
+                 Cases_on ‘CONJl γ --> B ∈ Theta p’ >> simp[] >> 
+                 assume_tac FINITE_SUBSET_Y_WORLD >>
+                 pop_assum $ qspec_then ‘set γ’ strip_assume_tac >> 
+                 gs[] >> rw[] >> Induct_on ‘n’ (* 2 *)
+                 >- (gs[Y_WORLD_i_def] >>
+                     assume_tac FINITE_APPLIED_SUBSET >>
+                     pop_assum $ qspec_then ‘set γ’ strip_assume_tac >> gs[] >>
+                     Induct  (* 2 *)
+                     >- (CCONTR_TAC >> gs[] >>
+                         ‘(A --> CONJl γ) --> A --> B ∈ Theta p’ by
+                           (assume_tac Theta_Theta_theory >>
+                            pop_assum $ qspec_then ‘p’ strip_assume_tac >>
+                            gs[S_Theory_def, Ordinary_def, Regular_def, sENTAILS_def] >>
+                            pop_assum irule >>
+                            qexists_tac ‘[CONJl γ --> B]’ >> simp[CONJl_def] >> last_x_assum irule >>
+                            metis_tac[g_suffixing, g_modus_ponens, g_permutation]
+                           ) >> gs[X_WORLD_i_def] >> 
+                         ‘A --> CONJl γ ∈ w’ by
+                           (irule APPLYING_WORLDS >> 
+                            gs[Canonical_Frame_def, Prime_def] >>
+                            qexists_tac ‘Theta p’ >> gs[]
+                           ) >> gs[Canonical_Frame_def, S_Theory_def, sENTAILS_def] >> 
+                         qpat_x_assum ‘A --> B ∉ w’ mp_tac >> simp[] >>
+                         last_x_assum irule >> qexists_tac ‘[A --> CONJl γ]’ >> gs[CONJl_def]
+                        )
+                     >- (rw[X_WORLD_i_def] >> gs[sENTAILS_def] >> 
+                         last_x_assum $ qspec_then ‘γ’ strip_assume_tac
+                        )
+                    )
+                 >- (rw[Y_WORLD_i_def] >> gs[sENTAILS_def] >> 
+                     last_x_assum $ qspec_then ‘γ’ strip_assume_tac
+                    )
                 )
-            )
-        )
-    ) >>
-  last_x_assum $ qspecl_then [‘p’, ‘(Canonical_Frame p).Z’] strip_assume_tac >> 
-  ‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >> 
-  gs[Canonical_Frame_def, Theta_Theta_theory, Ordinary_def] >> qpat_x_assum ‘p ∈ Theta p’ mp_tac >> 
-  assume_tac Theta_Maximal_Rejection >> gs[Maximal_Excluding_def] >>
-  pop_assum $ qspec_then ‘p’ strip_assume_tac >> gs[] >>
-  CCONTR_TAC >> qpat_x_assum ‘¬(Theta p |-^ p)’ mp_tac >> simp[pENTAIL_def] >>
-  gs[] >> qexists_tac ‘[p]’ >> gs[CONJl_def, g_identity]
+            ) >> 
+          gs[] >> rw[] (* 3 *)
+          >- (gs[Canonical_Frame_def] >>
+              rw[Y_WORLD_def, BIGUNION, SUBSET_DEF, PULL_EXISTS] >>
+              qexists_tac ‘0’ >> gs[Y_WORLD_i_def]
+             )
+          >- (rw[X_WORLD_def, BIGUNION, PULL_EXISTS] >>
+              qexists_tac ‘0’ >> gs[X_WORLD_i_def]
+             )
+          >- (rw[Y_WORLD_def] >> CCONTR_TAC >> gs[] >>
+              qpat_x_assum
+              ‘B ∈ Y_WORLD_i n (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w)) {B}’ mp_tac >>
+              simp[] >> Induct_on ‘n’ >> rw[Y_WORLD_i_def] (* 3 *)
+              >- (simp[APPLYING_def] >> CCONTR_TAC >> gs[] >>
+                  pop_assum mp_tac >> assume_tac FINITE_SUBSET_X_WORLD >>
+                  pop_assum $ qspec_then ‘set γ’ strip_assume_tac >> gs[] >>
+                  Induct_on ‘n’ >> rw[X_WORLD_i_def]
+                  >- (CCONTR_TAC >> gs[] >>
+                      qpat_x_assum ‘A --> B ∉ w’ mp_tac >> simp[] >>
+                      qpat_x_assum ‘w ∈ (Canonical_Frame p).W’ mp_tac >>
+                      rw[Canonical_Frame_def, Prime_def, R_Theory_def] >>
+                      last_x_assum irule >> simp[pENTAIL_def] >>
+                      qexists_tac ‘[CONJl γ --> B]’ >> simp[CONJl_def] >>
+                      irule g_modus_ponens >> qexists_tac ‘A --> CONJl γ’ >>
+                      simp[g_suffixing, g_A_CONJl_A]
+                     )
+                  >- (CCONTR_TAC >> gs[] >>
+                      qpat_x_assum
+                      ‘¬sENTAILS (Theta p)
+                       (APPLYING w
+                        (X_WORLD_i n (Theta p) {A} {B} w ∪ {LINV R_gn 𝕌(:g_prop) n})) B’
+                      mp_tac >> simp[sENTAILS_def] >> qexists_tac ‘[B]’ >>
+                      gs[APPLYING_def, CONJl_def] >> rw[] (* 2 *)
+                      >- (qexists_tac ‘γ’ >> gs[])
+                      >- (‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >>
+                          gs[Ordinary_def, Regular_def, g_identity]
+                         )
+                     )
+                 )
+              >- (CCONTR_TAC >>
+                  qpat_x_assum
+                  ‘¬sENTAILS (Theta p)
+                   (Y_WORLD_i n (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w))
+                    {B} ∪ {LINV R_gn 𝕌(:g_prop) n}) B’ mp_tac >>
+                  gs[sENTAILS_def] >> qexists_tac ‘[B]’ >> 
+                  gs[CONJl_def] >> ‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >>
+                  gs[Ordinary_def, Regular_def, g_identity]
+                 )
+              >- (CCONTR_TAC >>
+                  qpat_x_assum
+                  ‘¬sENTAILS (Theta p)
+                   (Y_WORLD_i n (Theta p) (APPLYING w (X_WORLD (Theta p) {A} {B} w))
+                    {B} ∪ {LINV R_gn 𝕌(:g_prop) n}) B’ mp_tac >>
+                  gs[] >> rename[‘B = B'’] >>
+                  simp[sENTAILS_def] >> qexists_tac ‘[B']’ >>
+                  gs[CONJl_def] >> ‘Ordinary (Theta p)’ by gs[Theta_Ordinary] >>
+                  gs[Ordinary_def, Regular_def, g_identity]
+                 )
+             )
+         )
+     ) 
+  >- (rw[EQ_IMP_THM] >> rename[‘A & B ∈ w’] >> 
+      qpat_x_assum ‘w ∈ (Canonical_Frame p).W’ mp_tac >> 
+      simp[Canonical_Frame_def, S_Theory_def, sENTAILS_def] >> rw[]  (* 3 *)
+      >- (last_x_assum irule >> qexists_tac ‘[A; B]’ >>
+          gs[CONJl_def, Ordinary_def, Regular_def, g_identity]
+         )
+      >- (last_x_assum irule >> 
+          qexists_tac ‘[A & B]’ >>
+          gs[CONJl_def, Ordinary_def, Regular_def, g_conjunction_l]
+         )
+      >- (last_x_assum irule >> 
+          qexists_tac ‘[A & B]’ >>
+          gs[CONJl_def, Ordinary_def, Regular_def, g_conjunction_r]
+         )
+     )
+  >- (‘(Canonical_Frame p).STAR w ∈ (Canonical_Frame p).W’ by
+        (‘R_Frame (Canonical_Frame p)’ by 
+           (assume_tac Canonical_Frame_is_R_Frame >>
+            pop_assum $ qspec_then ‘p’ strip_assume_tac >> gs[]
+           ) >> gs[R_STAR_CLOSURE]
+        ) >> rw[EQ_IMP_THM] >> gs[Canonical_Frame_def]
+     )
+  >- (rw[EQ_IMP_THM] (* 2 *)
+      >- (pop_assum mp_tac >> simp[Canonical_Frame_def] >> rw[] >>
+          gs[SUBSET_DEF, APPLYING_def] >> last_x_assum irule >>
+          qexists_tac ‘[τ]’ >>
+          gs[CONJl_def, g_identity, S_Theory_def, Ordinary_def, Regular_def] >>
+          qpat_x_assum ‘∀p'. |- p' ⇒ p' ∈ Theta p’ irule >> 
+          metis_tac[goldblatt_provable_rules]
+         )
+      >- (‘(Canonical_Frame p).R w (Canonical_Frame p).Z w’ by
+            (‘R_Frame (Canonical_Frame p)’ by 
+               (assume_tac Canonical_Frame_is_R_Frame >>
+                pop_assum $ qspec_then ‘p’ strip_assume_tac >> gs[]
+               ) >>
+             ‘(Canonical_Frame p).R (Canonical_Frame p).Z w w’ by
+               gs[R_R_ZERO_REFLEX] >>
+             gs[R_R_COMM]
+            ) >> 
+          simp[Canonical_Frame_def] >>
+          assume_tac Theta_Ordinary >> pop_assum $ qspec_then ‘p’ strip_assume_tac >> gs[Ordinary_def] >>
+          assume_tac Theta_Theta_theory >> pop_assum $ qspec_then ‘p’ strip_assume_tac >> 
+          gs[Canonical_Frame_def] >>
+          qpat_x_assum ‘APPLYING w (Theta p) ⊆ w’ mp_tac >> rw[APPLYING_def,SUBSET_DEF] >>
+          last_x_assum irule >> qexists_tac ‘[x]’ >> rw[CONJl_def] (* 2 *)
+          >- (gs[S_Theory_def] >> last_x_assum irule >>
+              simp[sENTAILS_def] >> qexists_tac ‘[τ]’ >> gs[CONJl_def, Regular_def] >>
+              qpat_x_assum ‘∀p'. |- p' ⇒ p' ∈ Theta p’ irule >>
+              metis_tac[goldblatt_provable_rules]
+             )
+          >- (gs[S_Theory_def] >> last_x_assum irule >> simp[sENTAILS_def] >>
+              qexists_tac ‘γ’ >> gs[SUBSET_DEF]
+             )
+         )
+     )
 QED
-        *)
+
+Theorem Completeness:
+  (∀ (RM : (g_prop set) MODEL) . R_Model RM ⇒ Holds RM RM.RF.Z p) ⇒ |- p
+Proof
+  rw[] >> CCONTR_TAC >> qpat_x_assum ‘∀RM. R_Model RM ⇒ Holds RM RM.RF.Z p’ mp_tac >> simp[] >>
+  qexists_tac ‘Canonical_Model p’ >> simp[Canonical_Model_is_R_Model]  >>
+  drule_then strip_assume_tac Truth_Lemma >>
+  last_x_assum $ qspecl_then [‘p’, ‘(Canonical_Frame p).Z’] strip_assume_tac >>
+  ‘p ∉ (Canonical_Frame p).Z’ suffices_by
+    gs[Canonical_Frame_is_R_Frame, Canonical_Model_def] >>
+  gs[Canonical_Frame_def] >> drule Theta_Maximal_Rejection >> 
+  rw[Maximal_Excluding_def] >> CCONTR_TAC >> gs[pENTAIL_def] >>
+  last_x_assum $ qspec_then ‘[p]’ strip_assume_tac >> 
+  gs[CONJl_def, g_identity]
+QED
+ 
 val _ = export_theory();
 

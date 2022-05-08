@@ -30,7 +30,7 @@ Now that we have these dataypes we now introduce a set of conditions on members 
 	\begin{enumerate}
 		\setcounter{enumi}{2}
 		\item When we have \HOLtm{x ∈ RF.W} we alsohave \HOLtm{RF.R RF.Z x x}
-		\item When we have $\HOLtm{x},\,\HOLtm{x'},\,\HOLtm{y},\,\HOLtm{y'},\,\HOLtm{z},\,\HOLtm{z'}\in\HOLtm{RF.W}$ such that \HOLtm{RF.R RF.Z x' x}, \HOLtm{RF.R RF.Z y' y}\fix{hm, difficult to read}, and \HOLtm{RF.R RF.Z z z'} then \HOLtm{(RF.R x y z) ⇒ (RF.R x' y' z')}
+		\item When we have $\HOLtm{x},\,\HOLtm{x'},\,\HOLtm{y},\,\HOLtm{y'},\,\HOLtm{z},\,\HOLtm{z'}\in\HOLtm{RF.W}$ such that \HOLtm{RF.R RF.Z x' x}, \HOLtm{RF.R RF.Z y' y}, and \HOLtm{RF.R RF.Z z z'} then \HOLtm{(RF.R x y z) ⇒ (RF.R x' y' z')}
 		\item When \HOLtm{x ∈ RF.W} we have \HOLtm{RF.STAR (RF.STAR x) = x}
 		\item When we have $\HOLtm{w},\,\HOLtm{x},\,\HOLtm{y}\in\HOLtm{RF.W}$ then we have \HOLtm{(RF.R w x y) ⇒ (RF.R w (RF.STAR y) (RF.STAR x))}
 	\end{enumerate}
@@ -41,6 +41,7 @@ Now that we have these dataypes we now introduce a set of conditions on members 
 		\item When we have $\HOLtm{x},\,\HOLtm{y},\,\HOLtm{z}\in\HOLtm{RF.W}$ then we have \HOLtm{(RF.R x y z) ⇒ (RF.R y x z)}
 		\item If we have $\HOLtm{w},\,\HOLtm{x},\,\HOLtm{y},\,\HOLtm{z},\,\HOLtm{a}\in\HOLtm{RF.W}$ where we have both \HOLtm{RF.R w x a} and \HOLtm{RF.R a y z} then there exists a world \HOLtm{b ∈ RF.W} such that both \HOLtm{RF.R x y b} and \HOLtm{RF.R w b z}
 	\end{enumerate}
+	\fix{maybe I should have these as descriptions and then also enumerate them}
 	In other words:
 	\begin{holmath}
 		\HOLthm[]{RMSemantics.R_Frame_def}
@@ -64,7 +65,6 @@ Definitions~\ref{def:r-frame} and \ref{def:hereditary} leads us to the definitio
 \end{defn}
 As we consider each of the worlds in \HOLtm{RM.RF.W} to be a place where  propositions can be true, we . 
 \begin{defn}[Holds]\label{def:holds}
-	\fix{there has to be a nicer way to write STAR}
 	Given a \HOLtm{R_Model} \HOLtm{RM} and a world \HOLtm{w ∈ RM.RF.W} then when a \HOLty{:g_prop} \HOLtm{p} holds at \HOLtm{w} in the model \HOLtm{RM} then we write \HOLtm{Holds RM w p}. 
 	When \HOLtm{p = g_VAR s} for some \HOLty{:string} \HOLtm{s} then \HOLtm{p} holds at \HOLtm{w} if and only if \HOLtm{w ∈ RM.VF s}. 
 	When \HOLtm{p = A & B} then \HOLtm{p} holds at \HOLtm{w} if and only if \HOLtm{Holds RM w A} and \HOLtm{Holds RM w B}. 
@@ -84,7 +84,7 @@ It follows from immediatley from this definition that:
 	\HOLthm[nostile,width=100]{RMSemantics.OR_Holds}
 	\end{holmath}
 \end{cor}
-The hereditary property also extends to all formulae:
+It is also the case that the hereditary property extends naturally to all formulae:
 \begin{lem}[Hereditary Lemma]\label{lem:hereditary-lem}
 	\begin{holmath}
 		\HOLthm[]{RMSemantics.Hereditary_Lemma}
@@ -92,7 +92,7 @@ The hereditary property also extends to all formulae:
 \end{lem}
 \begin{proof}
 	Inducting on the structure of \HOLtm{p}, the \HOLtm{g_VAR} and \HOLtm{$&} cases are immediate using Definitions~\ref{def:hereditary}, \ref{def:r-model}, and \ref{def:holds}. 
-	\begin{itemize}
+	\begin{description}
 		\item[$\HOLtm{$-->}$:] We suppose that \HOLtm{Holds RM x (A --> B)} and \HOLtm{RM.RF.R y a b} with $\HOLtm{a},\, \HOLtm{b} \in \HOLtm{RM.RF.W}$ where \HOLtm{Holds RM a A}. 
 		It suffices to show that \HOLtm{RM.RF.R x a b} by definition~\ref{def:holds}. 
 		From definition~\ref{def:r-frame}.4 all that is require is to show that \HOLtm{RM.RF.R RM.RF.Z a a} and \HOLtm{RM.RF.R RM.RF.Z b b}, both of which follow from definition~\ref{def:r-frame}.3.
@@ -101,32 +101,254 @@ The hereditary property also extends to all formulae:
 		Then, due to the inductive hypothesis, this case follows from definition~\ref{def:r-frame}.2.
 		\item[$(\HOLtm{τ})$:] We suppose that \HOLtm{Holds RM x τ} which just means that \HOLtm{RM.RF.R RM.RF.Z RM.RF.Z x} and we need to show that \HOLtm{RM.RF.R RM.RF.Z RM.RF.Z y}. 
 		By definition~\ref{def:r-frame}.4 we get that all we need to show is \HOLtm{RM.RF.R RM.RF.Z RM.RF.Z RM.RF.Z} and \HOLtm{RM.RF.R RM.RF.Z y y}, these follow from definitions~\ref{def:r-frame}.7 and \ref{def:r-frame}.3 respectively. 
-	\end{itemize}
+	\end{description}
 \end{proof}
 
-\section{Soundness}
+\section{Soundness}\fix{maybe a subsection rather than full section?}
 In sections~\ref{sec:newhilbert} and~\ref{sec:nd-system} we showed that the new proof systems that we were introducing proved exactly the same theorems that the Goldblatt Axiomatisation could prove. 
 Semantic systems, on the other hand, create a series of rules that define a class of models where some models may prove some propositions while others don't. 
 
 The connection between semantic theories, and syntactic ones are two metatheorems called \emph{soundness} and \emph{completeness} results. 
-A \emph{soundness} result between a syntactic theory and a semantic theory states that if a proposition \HOLtm{p} is a theorem of the syntactic theory, then \HOLtm{p} holds in every model in the semantic theory. 
-Conversly a \emph{completeness} result states that if a propostion holds in every model of the semantic theory, then it is a theorem of the syntactic theory. 
+A \emph{soundness} result between a syntactic theory and a semantic theory states that if a proposition \HOLtm{p} is a theorem of the syntactic theory, then \HOLtm{p} holds in every model in the semantic theory. We may also say that the syntactic theory is \emph{sound} with respect to the semantic theory.
 
-As hinted by its title, this section will establish the soundness result between the Goldblatt axiomatisation and the Routley-Meyer semantics.
+Conversly a \emph{completeness} result states that if a propostion holds in every model of the semantic theory, then it is a theorem of the syntactic theory. Ergo, the syntactic theory is \emph{complete} with respect to the semantic theory.
 
-We will first state a useful lemma before showing the soundness result:
-\begin{lem}\label{lem:contraction-lem}
+As hinted by its title, this section will establish the soundness result between the Goldblatt axiomatisation and the Routley-Meyer semantics though We will first state a useful lemma before showing the soundness result:
+\begin{lem}[Contraction Lemma]\label{lem:contraction-lem}
 \begin{holmath}
 		\HOLthm{RMSemantics.Contraction_Lemma}
 \end{holmath}
 \end{lem}
 \begin{thm}[Soundness]\label{thm:RM-soundness}
+	The Goldblatt Axioms are \emph{sound} with respect to the Routley-Meyer Semantics
 	\begin{holmath}
 		\HOLthm[]{RMSemantics.Soundness}
 	\end{holmath}
 \end{thm}
-\begin{proof}[Sketch]
-	Induct on \HOLtm{goldblatt_provable}.
+\begin{proof}
+	Induct on \HOLtm{goldblatt_provable}. 
+	Many of the following cases are uninteresting and tedious as a result of the hereditary lemma and application of the R Frame rules. 
+	There are, however, a few exceptions. After simplifying with the definitions~\ref{def:r-frame} and \ref{def:holds}:
+	\begin{description}
+		\item[Contraction:] Suppose the existance of a world \HOLtm{aab} be a world where \HOLtm{Holds RM aab (A --> A --> B)} and \HOLtm{RM.RF.Z} it relates \HOLtm{abb} to a world \HOLtm{ab} like so \HOLtm{RM.RF.R RM.RF.Z aab ab}. 
+		We then need \HOLtm{Holds RM ab (A --> B)}, so suppose again that we have a world \HOLtm{a} such that \HOLtm{Holds RM a (A)} and \HOLtm{RM.RF.R ab a b} for some world \HOLtm{b}. 
+		But, by the fact that we have \HOLtm{Holds RM aab (A --> A --> B)}, we need only show the existance of worlds \HOLtm{x}, \HOLtm{x'}, and \HOLtm{y} such that they are all in \HOLtm{RM.RF.W}, \HOLtm{Holds RM x (A)}, A holds at both \HOLtm{x} and \HOLtm{x'} (That is: \HOLtm{Holds RM x' (A)}), and \HOLtm{y} relates to these worlds like so: \HOLtm{RM.RF.R aab x' y ∧ RM.RF.R y x b}. 
+		This works as \HOLtm{RM.RF.R aab x' y} guarantees that \HOLtm{Holds RM y (A --> B)} and then \HOLtm{RM.RF.R y x b} give us \HOLtm{Holds RM b (B)}. 
+
+		There is of course only one world where we know \HOLtm{A} holds, so \HOLtm{x} and \HOLtm{x'} are assigned to \HOLtm{a} leaving us the problem of finding our \HOLtm{y} world. 
+		With help from the aptly named Contraction Lemma~(\ref{lem:contraction-lem}) it suffices to show only that \HOLtm{RM.RF.R aab a b}. We then use Definition~\ref{def:r-frame}.4 and then \ref{def:r-frame}.3 and \ref{def:r-frame}.8 completing this case.
+		\item[Contradiction:] We suppose that there is a world \HOLtm{x} where \HOLtm{Holds RM x (A --> ~B)} which relates to another world \HOLtm{y} by \HOLtm{RM.RF.R RM.RF.Z x y} with the goal in mind of \HOLtm{Holds RM y (B --> ~A)}. 
+		We then suppose there exists worlds \HOLtm{a} and \HOLtm{b} such that \HOLtm{RM.RF.R y a b} such that \HOLtm{Holds RM (RM.RF.STAR a) A} and \HOLtm{Holds RM b B} with the idea to derive a contradiction. 
+
+		First we show that \HOLtm{RM.RF.R x (RM.RF.STAR a) (RM.RF.STAR b)} by first applying Definition~\ref{def:r-frame}.4 and then \ref{def:r-frame}.2, \ref{def:r-frame}.3, and \ref{def:r-frame}.6.
+
+		But because of this we now know that \HOLtm{¬Holds RM (RM.RF.STAR (RM.RF.STAR b)) B} because we know that \HOLtm{Holds RM x (A --> ~B)} and \HOLtm{Holds RM (RM.RF.STAR a) A}. But because of \ref{def:r-frame}.5\fix{I feel like I am relying heavily on the reader's ability to remember the definition exactly or I am asking them to keep a bookmark or something...} we derive a contradiction. 
+	\end{description}
 \end{proof}
 
 \section{Completeness}
+
+As in the previous section, a \emph{completeness} result states that if a propostion holds in every model of the semantic theory, then it is a theorem of the syntactic theory. 
+For Relevance Logic, this looks like this:
+\begin{thm}[Completeness]\label{thm:RM-completeness}
+	The Goldblatt Axioms are \emph{complete} with respect to the Routley-Meyer Semantics
+	\begin{holmath}
+		\HOLthm[]{RMSemantics.Completeness}
+	\end{holmath}
+\end{thm}
+We will hold off on a formal proof of this statement until the end of te section but the idea is: If \HOLtm{p} is a non-theorem of the Goldblatt Axioms, then we should be able to construct an \HOLtm{R_Model RM} where \HOLtm{p} does not hold, or rather \HOLtm{¬ (Holds RM RM.RF.Z p)}. We shall first briefly introduce some ideas that will be used extensivly throughout this section. 
+
+\begin{defn}[List Conjunction]\label{def:CONJl-def}
+	Where \HOLtm{[]} is the empty list of type \HOLty{:g_prop list}; \HOLtm{p},\HOLtm{q} are of type \HOLty{:g_prop}; and \HOLtm{γ} is of type \HOLty{:g_prop list} we define the conjunction over a list (\HOLtm{CONJl}) as below:
+	\begin{holmath}
+		\begin{matrix*}[l]
+		\HOLthm[aligneddef,\gamma//lp]{RMSemantics.CONJl_def}
+		\end{matrix*}
+	\end{holmath}
+\end{defn}
+\HOLtm{CONJl} by design behaves very similarly to \HOLtm{$&} and we will breifly outline some of its properties now. 
+
+\HOLtm{CONJl} naturally extends the adjunction rule per the Goldblatt Axiomatisation: 
+\begin{prop}[\HOLtm{CONJl} Adjunction]
+	If we have a list of goldblatt theorems \HOLtm{γ} then \HOLtm{CONJl γ} is also a theorem: 
+	\begin{holmath}
+		\HOLthm{RMSemantics.LIST_SUBSET_ADJUNCTION}
+	\end{holmath}
+\end{prop}
+It also naturally extends conjunction elimination and introduction:
+\begin{prop}[\HOLtm{CONJl} Elimination]\label{prop:conjl-elim}
+	If \HOLtm{delta} and \HOLtm{gamma} are lists then it follows that:
+	\begin{holmath}
+	\begin{matrix*}[l]
+	1. & \HOLthm[]{RMSemantics.CONJl_weaken_l}\\
+	2. & \HOLthm[]{RMSemantics.CONJl_weaken_r}	
+	\end{matrix*}
+	\end{holmath}	
+	Further if \HOLtm{p} is a proposition that appears in \HOLtm{gamma} then:
+	\begin{holmath}
+	\begin{matrix*}[l]
+	3. & \HOLthm[]{RMSemantics.CONJl_MEM_IMP}	
+	\end{matrix*}
+	\end{holmath}	
+\end{prop}
+\begin{prop}[\HOLtm{CONJl} Introduction]\label{prop:imp-mem-imp-conjl}
+	If a proposition \HOLtm{q} implies every member of a non-empty list of propositions \HOLtm{gamma} then it implies \HOLtm{CONJl gamma}.
+	\begin{holmath}
+		\HOLthm{RMSemantics.IMP_MEM_IMP_CONJl}
+	\end{holmath}
+\end{prop}
+We can also split and conjoin lists as we wish:
+\begin{prop}\label{prop:conjl-split}
+	If \HOLtm{gamma} and \HOLtm{delta} are both non-empty lists of propositions then: 
+	\begin{holmath}
+	\HOLthm[]{RMSemantics.CONJl_split}	
+	\end{holmath}
+\end{prop}
+Finally we can remove all instances of a proposition \HOLtm{A} from a list \HOLtm{gamma} and conjunct the resulting list with \HOLtm{A} to imply the original list.  
+\begin{prop}
+	\begin{holmath}
+		\HOLthm{RMSemantics.FILTER_AND_FILTERED_IMP_CONJl}
+	\end{holmath}
+\end{prop}
+With the definition of \HOLtm{CONJl} we will find it useful to introduce a new relation:
+\begin{defn}[Conjuctive Consequence]\label{def:pENTAILS-def}
+	Where \HOLtm{Γ} is a set of \HOLty{:g_prop}s and \HOLtm{p} is a \HOLty{:g_prop} we say that \HOLtm{p} is a conjuctive consequence of \HOLtm{Γ} (Written \HOLtm{Γ |-^ p}) when there exists a list \HOLtm{γ} of \HOLty{:g_prop}s the elements of which are in \HOLtm{Γ} such that \HOLtm{|- ((CONJl γ) --> p)}. 
+	That is:
+	\begin{holmath}
+		\HOLthm{RMSemantics.pENTAIL_def}
+	\end{holmath}
+\end{defn}
+Which naturally leads us to ask about sets that are closed under \HOLtm{$|-^}:
+\begin{defn}[\HOLtm{R_Theory}]\label{def:R-Theory-def}
+We call a set of propositions \HOLtm{Γ} an \HOLtm{R_Theory} if it is closed under conjunctive consequence:
+	\begin{holmath}
+		\HOLthm{RMSemantics.R_Theory_def}
+	\end{holmath}
+\end{defn}
+We can qualify R-Theories further:
+\begin{defn}\label{def:prime-regular-ordinary}
+Given an \HOLtm{R_Theory Γ} we say that \HOLtm{Γ} is \HOLtm{Regular} if all theorems of $\bm{R}$ are in \HOLtm{Γ}, that is:
+	\begin{holmath}
+   		\HOLthm[\Gamma//θ]{RMSemantics.Regular_def}
+	\end{holmath}   
+We can also say that \HOLtm{Γ} is \HOLtm{Prime} if whenever a disjunct \HOLtm{(A V B) ∈ Γ} then one of the disjuncts is also in \HOLtm{Γ}:
+	\begin{holmath}
+		\HOLthm[\Gamma//θ]{RMSemantics.Prime_def}
+	\end{holmath}
+Finally, if an \HOLtm{R_Theory Γ} is both \HOLtm{Regular} and \HOLtm{Prime}, then we say that it is \HOLtm{Ordinary}:
+	\begin{holmath}
+		\HOLthm[\Gamma//θ]{RMSemantics.Ordinary_def}
+	\end{holmath}
+\end{defn}
+It follows immediately:
+\begin{cor}\label{cor:conjl-in-r-theory-imp}
+	\begin{holmath}
+		\HOLthm[\Gamma//A]{RMSemantics.CONJl_IN_R_Theory_IMP}
+	\end{holmath}
+\end{cor}
+\begin{cor}\label{cor:imp-conjl-r-theory}
+	\begin{holmath}
+		\HOLthm[\Gamma//θ]{RMSemantics.IMP_CONJl_R_THEORY}
+	\end{holmath}
+\end{cor}
+The last two results we will look at in this section are very important to the next section due to \fix{complete sentence}
+\begin{thm}
+	\begin{holmath}
+		\HOLthm[\Gamma//A]{RMSemantics.Trans_pENTAILS}
+	\end{holmath}
+\end{thm}
+\begin{proof}
+	The case where \HOLtm{p ∈ Γ} holds trivially so we will assume that \HOLtm{p ∉ Γ}, similarly we will excuse the cas where \HOLtm{Γ |-^ q} as it is also trivial. 
+	This leaves us just with the case where we have \HOLtm{(set γ) ⊆ Γ}, \HOLtm{|- ((CONJl γ) --> p)}, and \HOLtm{(set delta) ⊆ (Γ cup (ss p) )}, \HOLtm{|- ((CONJl delta) --> q)}, and \HOLtm{MEM p delta} with the goal in mind to find a non-empty list, all members of which are in \HOLtm{Gamma} that implies \HOLtm{q}. 
+
+	The list that we want is of course \HOLtm{(FILTER (λx. x ≠ p) δ ⧺ γ)} as it then suffices to show that \HOLtm{|- (CONJl (FILTER (λx. x ≠ p) δ ⧺ γ) --> CONJl delta)} because of suffixing and that \HOLtm{(set (FILTER (λx. x ≠ p) δ ⧺ γ))
+	 ⊆ Gamma}. 
+
+	But showing \HOLtm{|- (CONJl (FILTER (λx. x ≠ p) δ ⧺ γ) --> CONJl delta)} turns out to be relatively easy. 
+	First we use Proposition~\ref{prop:imp-mem-imp-conjl} to show that we only need to show for every member \HOLtm{r} of \HOLtm{delta} that \HOLtm{|- (CONJl (FILTER (λx. x ≠ p) δ ⧺ γ) --> r)}. 
+	If \HOLtm{r = p} then this result holds because of Proposition~\ref{prop:conjl-elim}.1, that and that \HOLtm{gamma} implies \HOLtm{p}. When \HOLtm{r ≠ p} then we know that \HOLtm{MEM r (FILTER (λx. x ≠ p) δ)} and this result follows straightforwardly from Proposition~\ref{prop:conjl-elim}.3.
+\end{proof}
+
+\begin{thm}
+	\begin{holmath}
+		\HOLthm{RMSemantics.CONJl_NOTIN_PRIME}
+	\end{holmath}
+\end{thm}
+\begin{proof}
+	\fix{once figured out reason why important, come back for. }
+\end{proof}
+\subsection{Canonical Model}
+
+\begin{defn}
+	\begin{holmath}
+		\begin{matrix*}[l]
+			\HOLthm[aligneddef,p//A]{RMSemantics.Theta_i_def}
+		\end{matrix*}
+	\end{holmath}
+\end{defn}
+
+\begin{defn}
+	\begin{holmath}
+		\HOLthm[def,p//A]{RMSemantics.Theta_def}
+	\end{holmath}
+\end{defn}
+
+\begin{lem}\label{lem:theta-r-theory}
+	\begin{holmath}
+		\HOLthm[p//A]{RMSemantics.Theta_R_Theory}
+	\end{holmath}
+\end{lem}
+
+\begin{lem}\label{lem:theta-maximal-reject}
+	\begin{holmath}
+		\HOLthm[p//A]{RMSemantics.Theta_Maximal_Rejection}
+	\end{holmath}
+\end{lem}
+
+\begin{defn}[\HOLtm{Canonical_Frame}]
+	\begin{holmath}
+		\HOLthm[p//A,def,width=100,tr'EmitTeX: print datatypes compactly'=1]{RMSemantics.Canonical_Frame_def}
+	\end{holmath}
+\end{defn}
+
+\begin{defn}[\HOLtm{Canonical_Model}]
+	\begin{holmath}
+		\HOLthm[p//A,def,width=100]{RMSemantics.Canonical_Model_def}
+	\end{holmath}
+\end{defn}
+
+\begin{thm}[]\label{thm:canonical-constuction-r-model}
+	\begin{holmath}
+		\HOLthm[p//A]{RMSemantics.Canonical_Model_is_R_Model}
+	\end{holmath}
+\end{thm}
+\begin{proof}
+	
+\end{proof}
+
+\subsection{Completing Completeness}
+
+\begin{lem}[Truth_Lemma]\label{lem:rm-truth}
+	\begin{holmath}
+	\HOLthm[nostile]{RMSemantics.Truth_Lemma}
+	\end{holmath}
+\end{lem}
+\begin{proof}
+	
+\end{proof}
+
+Now we are in a position to show the completeness result, but we shall restate the result beforehand: 
+\begin{restatethm}{\ref{thm:RM-completeness}}{Completeness}
+The Goldblatt Axioms are \emph{complete} with respect to the Routley-Meyer Semantics
+	\begin{holmath}
+		\HOLthm[]{RMSemantics.Completeness}
+	\end{holmath}
+\end{restatethm}
+\begin{proof}
+	By contraposition we suppose that \HOLtm{¬|- p} and all that is required is to show that there exists an \HOLtm{R_Model RM} where \HOLtm{¬Holds RM RM.RF.Z p}. 
+	Of course the \HOLtm{R_Model} that we want is \HOLtm{Canonical_Model p} which we know is an \HOLtm{R_Model} because of Theorem~\ref{thm:canonical-constuction-r-model}. 
+	By the Truth Lemma (\ref{lem:rm-truth}) it suffices to show that \HOLtm{p ∉ (Canonical_Frame p).Z}. 
+	But recall that \HOLtm{Theta p} maximally excludes \HOLtm{p} when \HOLtm{p} is not a theorem of $\bm{R}$ (see Lemma~\ref{lem:theta-maximal-reject}). 
+	We then assume that \HOLtm{p ∈ Theta p} and derive a contradiction using \HOLthm[nostile]{GoldblattRL.g_identity}  
+\end{proof}
+\section{Summary}

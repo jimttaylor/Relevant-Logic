@@ -1,24 +1,23 @@
-slaney_provable 2 \ensuremath{\vdash_\textbf{S}}
-gs 4 \ensuremath{\theta_{G\rightarrow S}}
-s_VAR  4 \ensuremath{\texttt{VAR}_s}
--->ₛ 2 \ensuremath{\rightarrow_s}
-<->ₛ 2 \ensuremath{\leftrightarrow_s} 
-&ₛ 2 \ensuremath{\&_s}
-~ₛ 2 \ensuremath{{\sim_s}}
-Vₛ 2 \ensuremath{\bm{\lor}_s}
-ioₛ 2 \ensuremath{\circ_s}
-τₛ 2 \ensuremath{\tau_s}
+slaney_provable 2 \ensuremath{\vdash\sb{\bm{S}}}
+gs 2 \ensuremath{\theta\sb{s}}
+-->ₛ 2 \ensuremath{\rightarrow\sb{s}}
+<->ₛ 2 \ensuremath{\leftrightarrow\sb{s}} 
+&ₛ 2 \ensuremath{\&\sb{s}}
+~ₛ 2 \ensuremath{{\sim\sb{s}}}
+Vₛ 2 \ensuremath{\bm{\lor}\sb{s}}
+ioₛ 2 \ensuremath{\circ\sb{s}}
+τₛ 2 \ensuremath{\tau\sb{s}}
 
-goldblatt_provable 2 \ensuremath{\vdash_\textbf{R}}
-sg 4 \ensuremath{\theta_{S\rightarrow G}}
-g_VAR 4 \ensuremath{\texttt{VAR}_g}
--->ₐ 2 \ensuremath{\rightarrow_g}
-<->ₐ 2 \ensuremath{\leftrightarrow_g} 
-&ₐ 2 \ensuremath{\&_g}
-~ₐ 2 \ensuremath{{\sim_g}}
-Vₐ 2 \ensuremath{\bm{\lor}_g}
-ioₐ 2 \ensuremath{\circ_g}
-τₐ 2 \ensuremath{\tau_g}
+goldblatt_provable 2 \ensuremath{\vdash\sb{\bm{R}}}
+g_VAR 4 \ensuremath{VAR\sb{g}}
+sg 2 \ensuremath{\theta\sb{g}}
+-->ₐ 2 \ensuremath{\rightarrow\sb{g}}
+<->ₐ 2 \ensuremath{\leftrightarrow\sb{g}} 
+&ₐ 2 \ensuremath{\&\sb{g}}
+~ₐ 2 \ensuremath{{\sim\sb{g}}}
+Vₐ 2 \ensuremath{\bm{\lor}\sb{g}}
+ioₐ 2 \ensuremath{\circ\sb{g}}
+τₐ 2 \ensuremath{\tau\sb{g}}
 
 -> 1 \ensuremath{\rightarrow}
 

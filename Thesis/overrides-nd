@@ -1,5 +1,4 @@
-|- 2 \ensuremath{\vdash_\textbf{R}}
-g_VAR 4 \ensuremath{\texttt{VAR}}
+(|-) 2 \ensuremath{\vdash\sb{\bm{R}}}
 --> 2 \ensuremath{\rightarrow}
 <-> 2 \ensuremath{\leftrightarrow} 
 & 2 \ensuremath{\&}
@@ -8,10 +7,10 @@ V 2 \ensuremath{\bm{\lor}}
 ∘ᵣ 2 \ensuremath{\circ}
 τ 2 \ensuremath{\tau}
 
-||- 2 \ensuremath{\Vdash_\textbf{R}}
+||- 2 \ensuremath{\Vdash\sb{\bm{R}}}
 ； 1 \ensuremath{\bm{;}}
 ， 1 \ensuremath{\bm{,}}
-PROP 0 \ensuremath{}
+(PROP) 0 \ensuremath{}
 (REPLACE1) 1 \ensuremath{(}
 (REPLACE2) 1 \ensuremath{)}
 
@@ -22,6 +21,7 @@ PROP 0 \ensuremath{}
 
 Γ 1 \ensuremath{\Gamma}
 
-bg 1 \ensuremath{\beta}
+(bg1) 2 \ensuremath{\beta (}
+(bg2) 1 \ensuremath{)}
 
 $Turnstile$ 5 \HOLTokenTurnstile{}

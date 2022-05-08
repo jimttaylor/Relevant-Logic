@@ -2,7 +2,8 @@
 \label{sec:nd-system}
 
 Just as we demonstrated an equivalent Hilbert system in the previous section, we shall consider a natural deduction system for Relevant Logic and show that it proves the same theorems as the previous Hilbert systems. 
-From here on, we will be using the Goldblatt axiomatization and will be dropping all of the subscripts for the language, that is \HOLtm[\rightarrow_g//-->]{$-->} will become \HOLtm{$-->} and so on. 
+From here on, we will be using the Goldblatt axiomatization and will be dropping all of the subscripts for the language, that is 
+ will become \HOLtm{$-->} and so on. 
 
 \subsection{Natural Deduction for Relevant Logic}\label{subsec:ND}
 For sequents in classical logic, assumptions are put together by way of a single connective $(\bm{,})$ which is representative of the set union of these assumptions. We are also allowed to move assumptions into the conclusion by way of implication introduction. For example:
@@ -46,51 +47,50 @@ With these definitions in place we can now consider the rules of the natural ded
 	If \HOLtm{X} is a \HOLty{:Bunch}, and \HOLtm{A} is a \HOLty{:g_prop}, then \HOLtm{X ||- A} is a \emph{Relevant Sequent} if it is of the form:  
 	\begin{holmath}
 	\begin{matrix*}[c]
-  	&{\HOLthm[rule]{NaturalDeduction.Assumption}} & \textbf{\emph{A}}\\ \\
-  	{\HOLthm[rule]{NaturalDeduction.AND_Elimination_l}} & \HOLtm{$&}\textbf{\emph{E}}\textsf{ L} &
-  	{\HOLthm[rule]{NaturalDeduction.AND_Elimination_r}} & \HOLtm{$&}\textbf{\emph{E}}\textsf{ R}\\ \\
-  	{\HOLthm[rule]{NaturalDeduction.OR_Introduction_l}} & \HOLtm{$V}\textbf{\emph{I}}\textsf{ L} &
-  	{\HOLthm[rule]{NaturalDeduction.OR_Introduction_r}} & \HOLtm{$V}\textbf{\emph{I}}\textsf{ R}\\ \\
-  	{\HOLthm[rule]{NaturalDeduction.NOT_NOT_Introduction}} & \HOLtm[\sim\sim//~]{$~}\textbf{\emph{I}} &
-  	{\HOLthm[rule]{NaturalDeduction.NOT_NOT_Elimination}} & \HOLtm[\sim\sim//~]{$~}\textbf{\emph{E}}
+  	&{\HOLthm[rule]{NaturalDeduction.Assumption}} & \raisebox{7.5pt}{\textbf{\emph{A}}}\\ \\
+  	{\HOLthm[rule]{NaturalDeduction.AND_Elimination_l}} & \raisebox{7.5pt}{\HOLtm{$&}\textbf{\emph{E}}\textsf{ L}} &
+  	{\HOLthm[rule]{NaturalDeduction.AND_Elimination_r}} & \raisebox{7.5pt}{\HOLtm{$&}\textbf{\emph{E}}\textsf{ R}}\\ \\
+  	{\HOLthm[rule]{NaturalDeduction.OR_Introduction_l}} & \raisebox{7.5pt}{\HOLtm{$V}\textbf{\emph{I}}\textsf{ L}} &
+  	{\HOLthm[rule]{NaturalDeduction.OR_Introduction_r}} & \raisebox{7.5pt}{\HOLtm{$V}\textbf{\emph{I}}\textsf{ R}}\\ \\
+  	{\HOLthm[rule]{NaturalDeduction.NOT_NOT_Introduction}} & \raisebox{7.5pt}{\HOLtm[\sim\sim//~]{$~}\textbf{\emph{I}}} &
+  	{\HOLthm[rule]{NaturalDeduction.NOT_NOT_Elimination}} & \raisebox{7.5pt}{\HOLtm[\sim\sim//~]{$~}\textbf{\emph{E}}}
   	\end{matrix*}
   	\end{holmath}
   	Is derivable from one of the following rules that affect both sides of the sequent from other \emph{Relevant Sequents}:
 	\begin{holmath}
 	\begin{matrix*}[c]
-  	&{\HOLthm[rule]{NaturalDeduction.AND_Introduction}} & \HOLtm{$&}\textbf{\emph{I}}\\ \\ 
-  	{\HOLthm[rule]{NaturalDeduction.IMP_Introduction}} & \HOLtm{$-->}\textbf{\emph{I}} & 
-  	{\HOLthm[rule]{NaturalDeduction.IMP_Elimination}} & \HOLtm{$-->}\textbf{\emph{E}}\\ \\ 
-  	&{\HOLthm[rule]{NaturalDeduction.RAA}} & \textbf{\emph{RAA}}
+  	&{\HOLthm[rule]{NaturalDeduction.AND_Introduction}} & \raisebox{7.5pt}{\HOLtm{$&}\textbf{\emph{I}}}\\ \\ 
+  	{\HOLthm[rule]{NaturalDeduction.IMP_Introduction}} & \raisebox{7.5pt}{\HOLtm{$-->}\textbf{\emph{I}}} & 
+  	{\HOLthm[rule]{NaturalDeduction.IMP_Elimination}} & \raisebox{7.5pt}{\HOLtm{$-->}\textbf{\emph{E}}}\\ \\ 
+  	&{\HOLthm[rule]{NaturalDeduction.RAA}} & \raisebox{7.5pt}{\textbf{\emph{RAA}}}
    	\end{matrix*}
   	\end{holmath}
   	\begin{holmath}
   	\begin{matrix*}[c]
-		{\HOLthm[width=100,rule]{NaturalDeduction.OR_Elimination}} & \HOLtm{$V}\textbf{\emph{E}}
+		{\HOLthm[width=100,rule]{NaturalDeduction.OR_Elimination}} & \raisebox{7.5pt}{\HOLtm{$V}\textbf{\emph{E}}}
 		\end{matrix*}
   	\end{holmath}
   	Or can be derived from other \emph{Relevant Sequents} using the following structural rules:
   	\begin{holmath}
   	\begin{matrix*}[l]
-  	  	{\HOLthm[rule]{NaturalDeduction.COMMA_commutative}} & \HOLtm{$，}\textsf{ Comm.} &
-  	  	{\HOLthm[rule]{NaturalDeduction.weakening}} & \textsf{Weakening}\\ \\
-  		{\HOLthm[rule]{NaturalDeduction.COMMA_associative_lr}} & \HOLtm{$，}\textsf{ Assoc. LR} &
-  		{\HOLthm[rule]{NaturalDeduction.COMMA_associative_rl}} & \HOLtm{$，}\textsf{ Assoc. RL}
+  	  	{\HOLthm[rule]{NaturalDeduction.COMMA_commutative}} & \raisebox{7.5pt}{\HOLtm{$，}\textsf{ Comm.}} &
+  	  	{\HOLthm[rule]{NaturalDeduction.weakening}} & \raisebox{7.5pt}{\textsf{Weakening}}\\ \\
+  		{\HOLthm[rule]{NaturalDeduction.COMMA_associative_lr}} & \raisebox{7.5pt}{\HOLtm{$，}\textsf{ Assoc. LR}} &
+  		{\HOLthm[rule]{NaturalDeduction.COMMA_associative_rl}} & \raisebox{7.5pt}{\HOLtm{$，}\textsf{ Assoc. RL}}
 	\end{matrix*}
   	\end{holmath}
 	\begin{holmath}
 	\begin{matrix*}[c]
-  		{\HOLthm[rule]{NaturalDeduction.COMMA_idempotent_lr}} & \HOLtm{$，}\textsf{ Idem. LR} &
-  		{\HOLthm[rule]{NaturalDeduction.COMMA_idempotent_rl}} & \HOLtm{$，}\textsf{ Idem. RL}\\ \\
-  		{\HOLthm[rule]{NaturalDeduction.identity_lr}} & \HOLtm{$；}\textsf{ Identity LR} &
-  		{\HOLthm[rule]{NaturalDeduction.identity_rl}} & \HOLtm{$；}\textsf{ Identity RL}\\ \\
-  		{\HOLthm[rule]{NaturalDeduction.SEMICOLON_commutative}} & \HOLtm{$；}\textsf{ Comm.} &
-  		{\HOLthm[rule]{NaturalDeduction.SEMICOLON_associative_lr}} & \HOLtm{$；}\textsf{ Assoc. LR}\\ \\ 
-  		&{\HOLthm[rule]{NaturalDeduction.SEMICOLON_idempotent_lr}} & \HOLtm{$；}\textsf{ Idem. LR}
+  		{\HOLthm[rule]{NaturalDeduction.COMMA_idempotent_lr}} & \raisebox{7.5pt}{\HOLtm{$，}\textsf{ Idem. LR}} &
+  		{\HOLthm[rule]{NaturalDeduction.COMMA_idempotent_rl}} & \raisebox{7.5pt}{\HOLtm{$，}\textsf{ Idem. RL}}\\ \\
+  		{\HOLthm[rule]{NaturalDeduction.identity_lr}} & \raisebox{7.5pt}{\HOLtm{$；}\textsf{ Identity LR}} &
+  		{\HOLthm[rule]{NaturalDeduction.identity_rl}} & \raisebox{7.5pt}{\HOLtm{$；}\textsf{ Identity RL}}\\ \\
+  		{\HOLthm[rule]{NaturalDeduction.SEMICOLON_commutative}} & \raisebox{7.5pt}{\HOLtm{$；}\textsf{ Comm.}} &
+  		{\HOLthm[rule]{NaturalDeduction.SEMICOLON_associative_lr}} & \raisebox{7.5pt}{\HOLtm{$；}\textsf{ Assoc. LR}}\\ \\ 
+  		&{\HOLthm[rule]{NaturalDeduction.SEMICOLON_idempotent_lr}} & \raisebox{7.5pt}{\HOLtm{$；}\textsf{ Idem. LR}}
   	\end{matrix*}
   	\end{holmath}
 \end{defn}
-\fix{I haven't changed how I am writing the rules just yet, I wanted to think through how they should best be presented}
 Clarification should be made here regarding the system presented in~\citet{slaney1990ND} and Definition \ref{defn:natural-deduction} as Slaney uses an assumption number which behaves like an identity when assumptions are applied to it. 
 Slaney states that this 0\textsuperscript{th} assumption is the set of all logical truths rather than the empty set; we, on the other hand have defined our Bunches in terms of propositions so we can't use this set as a variable. 
 We instead give the properties of 0 to \HOLtm{τ} as we can use \HOLtm{τ} to derive any logical truth that we would need in a given proof (shall we will show this in the next section \ref{subsec:ND-equiv}). 
@@ -154,8 +154,8 @@ We also claimed in the last chapter that the reason that we chose the behaviour 
 	\end{holmath}
 \end{thm}
 \begin{proof}[Proof]
-	We induct on \HOLtm{goldblatt_provable} and, skipping the cases that follow immediately from proved theorems or the natural deduction rules: \fix {I am pretty sure that I want to itemize these sub-goals... but hopefully there is a nicer way of writing this}
-	\begin{itemize}
+	We induct on \HOLtm{goldblatt_provable} and, skipping the cases that follow immediately from proved theorems or the natural deduction rules: 
+	\begin{description}
 		\item [Suffixing:] It suffices to show that \HOLtm{(((PROP (A --> B)) ； (PROP (B --> C))) ； PROP A) ||- C} using \HOLtm{$；}\textsf{ Identity LR}, and replacement. We can then get \HOLtm{(PROP (B --> C) ； PROP (A-->B) ； PROP A) ||- C} by repeated applications of \textbf{A} and \HOLtm{$-->}\textbf{E}. Then we can get the result through from the structural rules. We shall show the whole Natural Deduction proof here for clarity, though we will omit it in the other parts of this proof. 
 		\begin{prooftree}
 			\AxiomC{\HOLtm{(PROP (B --> C)) ||- (B --> C)}}
@@ -175,7 +175,7 @@ We also claimed in the last chapter that the reason that we chose the behaviour 
 		\item [Disj Elimination:] Suffices to show \HOLtm{(PROP  ((A --> C) & (B --> C)) ； PROP (A V B)) ||- C} and we can show both \HOLtm{(PROP  ((A --> C) & (B --> C)) ； PROP A) ||- C} and \HOLtm{(PROP  ((A --> C) & (B --> C)) ； PROP B) ||- C} like in the previous case. This then follows from \HOLtm{$V}\textbf{E}. 
 		\item [Distribution:] Suffices to show \HOLtm{(PROP  (A & (B V C))) ||- ((A & B) V (A & C))}. We of course have that \HOLtm{(PROP  (A & (B V C))) ||- (A)} and \HOLtm{(PROP  (A & (B V C))) ||- ((B) V (C))} from \HOLtm{$&}\textbf{E}\textsf{ L} and \HOLtm{$&}\textbf{E}\textsf{ R}. From this we can get \HOLtm{(PROP  (A & (B V C)) ， PROP B ) ||- ((A & B) V (A & C))} and \HOLtm{(PROP  (A & (B V C)) ， PROP C ) ||- ((A & B) V (A & C))} using \HOLtm{$&}\textbf{I} and Proposition \ref{prop:nd-or-I-alt}. The result then follows from \HOLtm{$V}\textbf{E} and \HOLtm{$，}\textsf{ Idem. LR}.
 		\item [Contraposition:] Suffices to show \HOLtm{((PROP (A --> ~B)) ； PROP (B)) ||- (~A)}. Then we then get the result  from \textbf{RAA} and \HOLtm{$-->}\textbf{E}.
-	\end{itemize}
+	\end{description}
 \end{proof}
 After this result we may wonder if every valid sequent can be taken to a proposition, and further, if the sequent can be reconstructed from that proposition. 
 To show this we need a function that will take bunches to propositions.

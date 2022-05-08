@@ -286,5 +286,16 @@ Theorem g_AND_STRENGTHEN:
 Proof
   metis_tac[goldblatt_provable_rules]
 QED
-         
+
+Theorem g_imp_conj_introduction:
+  ∀ A B C D. |-  (A --> B --> C) ∧ |-  (A --> B --> D) ⇒
+             |- (A --> B --> (C & D))
+Proof
+  rpt strip_tac >>
+  ‘|- ((A ∘ᵣ B) --> C)’ by metis_tac[g_io_rule] >> 
+  ‘|- ((A ∘ᵣ B) --> D)’  by metis_tac[g_io_rule] >>
+  ‘|- ((A ∘ᵣ B) --> C & D)’  suffices_by metis_tac[g_io_rule] >>
+  metis_tac[goldblatt_provable_rules] 
+QED
+        
 val _ = export_theory();
