@@ -1,10 +1,22 @@
+%\documentclass[11pt, a4paper]{book}
+\documentclass[a4paper,twoside,cleardoublepage=plain,bibliography=totoc]{scrbook}
 
-\documentclass[11pt, a4paper]{book}
-%\usepackage{svn-multi}
-%\svnid{$Id$}
-%\usepackage{prelim2e}
-%\renewcommand{\PrelimWords}{Draft Copy \svnkw{Id}}
-%%\newcommand*{\mysvnrev}{\svnrev}
+
+\usepackage[a4paper]{geometry}
+\usepackage{datetime}
+  \newdateformat{monthonly}{\monthname[\THEMONTH]}
+\usepackage{amssymb,amsthm,amsmath}
+\usepackage{graphicx}
+\usepackage[square]{natbib}
+
+\usepackage{floatrow}
+  \floatsetup[table]{capposition=top}
+\usepackage{booktabs}
+\usepackage{paralist}
+\usepackage{titlesec}
+\usepackage[standardsections]{scrhack}
+\usepackage{parskip}
+
 \usepackage[hyperindex=true,
 			bookmarks=true,
             pdftitle={}, pdfauthor={James T. Taylor},
@@ -19,7 +31,6 @@
 %\usepackage[all]{hypcap}
 %\usepackage[palatino]{anuthesis}
 %\usepackage{afterpage}
-\usepackage{graphicx}
 %\usepackage{thesis}
 \usepackage[square]{natbib}
 %\usepackage[normalem]{ulem}
@@ -34,6 +45,13 @@
 \usepackage[scaled]{beramono}
 
 %\usepackage{multirow}
+
+\titleformat{\chapter}[display]
+{\bfseries\huge}
+{\filleft\Large\chaptertitlename~\thechapter}
+{3ex}
+{\titlerule\vspace{1.5ex}\filright}
+[\vspace{1ex}\titlerule]
 
 \usepackage{holtexbasic}
 \usepackage{proof}
@@ -55,9 +73,6 @@
 \newenvironment{holmath}{\begin{displaymath}\begin{array}{l}}{\end{array}\end{displaymath}\ignorespacesafterend}
 
 \usepackage{bm}
-\usepackage{amsthm}
-\usepackage{amsmath}
-\usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{bussproofs}
 
@@ -87,7 +102,9 @@
 %\newcommand{\fix}[1]{ *** #1 *** }
 
 
-\input{macros}            
+\input{macros}      
+\input{configuration}      
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Preamble
 \title{Working Title}
@@ -131,6 +148,7 @@
 %% Table of contents
 \cleardoublepage
 \pagestyle{headings}
+\renewcommand{\contentsname}{Table of Contents}
 \markboth{Contents}{Contents}
 \tableofcontents
 \listoffigures

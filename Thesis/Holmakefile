@@ -11,7 +11,7 @@ EXTRA_CLEANS = holtexbasic.sty proof.sty munger munger0.o mungernd mungergse chp
 all: PDFs/thesis.pdf PDFs/chpt1.pdf PDFs/chpt2.pdf PDFs/chpt3.pdf PDFs/chpt4.pdf PDFs/chpt5.pdf PDFs/chpt6.pdf PDFs/chpt7.pdf PDFs/thesis.pdf
 	:
 
-PDFs/thesis.pdf: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt6decidability.tex chpt7conclusion.tex tmp PDFs
+PDFs/thesis.pdf: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt6decidability.tex chpt7conclusion.tex tmp PDFs thesis.tex macros.tex configuration.tex
 	pdflatex -output-directory=tmp thesis.tex; \
     bibtex ./tmp/thesis.aux;                   \
 	pdflatex -output-directory=tmp thesis.tex; \
