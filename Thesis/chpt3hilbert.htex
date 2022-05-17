@@ -79,7 +79,9 @@ We can now prove a couple of useful theorems about relevance logic inside this H
    2. & \HOLthm[nostile]{GoldblattRL.g_double_neg} & \textsf{Double Negation Introduction}\\
    3. & \HOLthm[nostile]{GoldblattRL.g_double_negative_equiv} & \textsf{Double Negation Equivalence}\\ 
    4. & \HOLthm[nostile]{GoldblattRL.g_double_negative_implication_equiv} & \\
-   5. & \HOLthm[nostile]{GoldblattRL.g_contrapositive_alt} & \textsf{Contraposition alt.}
+   5. & \HOLthm[nostile]{GoldblattRL.g_contrapositive_alt} & \textsf{Contraposition alt.}\\
+   6. & \HOLthm[nostile]{RLRules.g_io_commutative_lr} & \HOLtm{$ioₐ}\textsf{ commutative} \\ 
+   7. & \HOLthm[nostile]{RLRules.g_io_distribution_equiv} & \HOLtm{$ioₐ}\textsf{ distribution}
   \end{matrix*}
   \end{holmath}
 \end{prop}
@@ -91,11 +93,13 @@ $\,$
   \item From the of definition Goldblatt provable and the definition of the bi-conditional connective.
   \item Immediate from 2.
   \item From the definition of Goldblatt provable, permutation, 3., and the definition of the bi-conditional connective.
-  \item It suffices to show that both directions of the Goldblatt bi-conditional are Goldblatt provable from the adjuction rule.
+  \item It suffices to show that both directions of the Goldblatt bi-conditional are Goldblatt provable from the adjunction rule.
   \begin{itemize}
     \item[$(\rightarrow_g)$:] Immediate from suffixing, left conjunction, modus ponens, contraposition, and 4. 
     \item[$(\leftarrow_g)$:] Immediate from suffixing, right conjunction, modus ponens, contraposition, and 4. 
   \end{itemize}
+  \item
+  \item \fix{do I care about this proof?}
   \end{enumerate}
 \end{proof}
 We can also introduce a sort of replacement for sub-propositions:
@@ -188,7 +192,7 @@ And now we will introduce a new (though somewhat similar) Hilbert system:
 \end{defn}
 Also just like in the previous system, there are a few useful propositions that we will show immediately. 
 \begin{prop}[Some theorems of the Slaney System]
-\label{prop:some-theorems-R-1}
+\label{prop:some-theorems-S-1}
   \begin{holmath}
   \begin{matrix*}[l]
    1. & \HOLthm[nostile]{SlaneyRL.s_assertion} & \text{Assertion} \\ 
@@ -266,7 +270,7 @@ We will now show that there holds an equivalence between the \HOLtm{$Vₛ} and \
 Given the propositions we have shown in the previous sections and the similarities between these Hilbert systems it seems reasonable that there should be a sort of equivalence between theorems in one system and theorems in the other; or rather, a result that looks something like:
 $$ \vdash_R A \iff \vdash_S A$$ 
 But it can't be exactly this. Why? In HOL every term is given an explicit type, so \HOLtm{A}, \HOLtm{goldblatt_provable}, and \HOLtm{slaney_provable} all have their own types in the above equivalency. 
-Going back to Definitions~\ref{def:hilbert-provable} and \ref{def:slaney-provable} we note that \HOLtm{goldblatt_provable} is of type \HOLty[of]{goldblatt_provable} and similarly \HOLtm{slaney_provable} is of type \HOLty[of]{slaney_provable}, begging the question, what is the type of \HOLtm{A}? 
+Going back to Definitions~\ref{def:hilbert-provable} and \ref{def:slaney-provable} we note that \HOLtm{goldblatt_provable} is of type \HOLty[of]{goldblatt_provable} and similarly \HOLtm{slaney_provable} is of type \HOLty[of]{slaney_provable}, raising the question, what is the type of \HOLtm{A}? 
 The answer is that the type for \HOLtm{A} is undefined as it cannot be both a \HOLty{:g_prop} and a \HOLty{:s_prop} at the same time.   
 This means that we will need to establish a different, but similar form of equivalence between these systems. 
 The idea is that, if we can create two translation functions between the propositional types, and these functions also preserve validity, then the systems prove the same theorems under equivalence. 
@@ -321,7 +325,7 @@ We will first establish the translation functions $\HOLtm{gs}:\HOLty[of]{gs}$ an
     \begin{holmath}
        \HOLtm[width=100]{slaney_provable ((A Vₛ B) <->ₛ ~ₛ (~ₛ (gs (sg A)) &ₛ ~ₛ (gs (sg B))))}
      \end{holmath} 
-    Using propostion~\ref{prop:or-s-def}, we note that it suffices to show that: 
+    Using Proposition~\ref{prop:or-s-def}, we note that it suffices to show that: 
     \begin{holmath}
        \HOLtm[width=100]{slaney_provable ((A Vₛ B) <->ₛ (gs $ sg A) Vₛ (gs $ sg B))}
     \end{holmath} 

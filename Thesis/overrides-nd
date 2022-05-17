@@ -1,4 +1,5 @@
 (|-) 2 \ensuremath{\vdash\sb{\bm{R}}}
+|- 2 \ensuremath{\vdash\sb{\bm{R}}}
 --> 2 \ensuremath{\rightarrow}
 <-> 2 \ensuremath{\leftrightarrow} 
 & 2 \ensuremath{\&}
@@ -8,6 +9,7 @@ V 2 \ensuremath{\bm{\lor}}
 τ 2 \ensuremath{\tau}
 
 ||- 2 \ensuremath{\Vdash\sb{\bm{R}}}
+prop||- 2 \ensuremath{\Vdash\sb{\bm{R}}}
 ； 1 \ensuremath{\bm{;}}
 ， 1 \ensuremath{\bm{,}}
 (PROP) 0 \ensuremath{}
@@ -21,6 +23,7 @@ V 2 \ensuremath{\bm{\lor}}
 
 Γ 1 \ensuremath{\Gamma}
 
+bg 1 \ensuremath{\beta}
 (bg1) 2 \ensuremath{\beta (}
 (bg2) 1 \ensuremath{)}
 

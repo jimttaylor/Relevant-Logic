@@ -65,18 +65,19 @@ val _ = overload_on ("；", “LSEMI”);
 Inductive R_sequent:
 (* Classical Rules *)
 [Assumption:] (∀A. R_sequent (PROP A) A) ∧
-[AND_Elimination_l:] (∀A B. R_sequent (PROP (A & B)) A) ∧
-[AND_Elimination_r:] (∀A B. R_sequent (PROP (A & B)) B) ∧
-[OR_Introduction_l:] (∀A B. R_sequent (PROP A) (A V B)) ∧
-[OR_Introduction_r:] (∀A B.R_sequent (PROP B ) (A V B)) ∧
-[NOT_NOT_Introduction:] (∀A. R_sequent (PROP A) (~~A)) ∧ 
-[NOT_NOT_Elimination:] (∀A. R_sequent (PROP (~~A)) A) ∧
+[AND_Elimination_l:] (∀X A B. R_sequent X (A & B) ⇒ R_sequent X A) ∧
+[AND_Elimination_r:] (∀X A B. R_sequent X (A & B) ⇒ R_sequent X B) ∧
+[OR_Introduction_l:] (∀X A B. R_sequent X A ⇒ R_sequent X (A V B)) ∧
+[OR_Introduction_r:] (∀X A B. R_sequent X B ⇒ R_sequent X (A V B)) ∧
+[NOT_NOT_Introduction:] (∀X A. R_sequent X A ⇒ R_sequent X (~~A)) ∧ 
+[NOT_NOT_Elimination:] (∀X A. R_sequent X (~~A) ⇒ R_sequent X A) ∧
+                       
 (* Non-Classical Rules *)
 [AND_Introduction:] (∀X Y A B. (R_sequent X A ∧ R_sequent Y B ⇒ R_sequent (X， Y) (A & B))) ∧
 [IMP_Introduction:] (∀X A B. R_sequent (X ； (PROP A)) B ⇒ R_sequent X (A --> B)) ∧
 [IMP_Elimination:] (∀X Y A B. R_sequent X (A --> B) ∧ R_sequent Y A ⇒ R_sequent (X ； Y) B) ∧
 [RAA:] (∀X Y A B. R_sequent (X ； (PROP A)) B ∧ R_sequent Y (~B) ⇒ R_sequent (X ； Y) (~A)) ∧
-[OR_Elimination:] (∀Γ X A B C. R_sequent(REPLACE Γ (PROP  A)) C ∧ R_sequent (REPLACE Γ (PROP  B)) C ∧ R_sequent X (A V B)
+[OR_Elimination:] (∀Γ X A B C. R_sequent X (A V B) ∧ R_sequent(REPLACE Γ (PROP  A)) C ∧ R_sequent (REPLACE Γ (PROP  B)) C
                                ⇒ R_sequent (REPLACE Γ X) C) ∧
 (* Structural Rules *)
 [COMMA_commutative:] (∀Γ X Y A. R_sequent (REPLACE Γ (X ， Y)) A ⇒ R_sequent (REPLACE Γ (Y ， X)) A) ∧
@@ -110,27 +111,40 @@ Proof
   metis_tac[RAA, IMP_Elimination, IMP_Introduction, Assumption]
 QED
 
-Theorem NOT_NOT_replacement:
-  ∀X A. (X ||- A) ⇔ (X ||- ~~A)
+Theorem AND_Elimination_l_alt:
+  ∀A B. R_sequent (PROP (A & B)) A
 Proof
-  rpt strip_tac >> EQ_TAC
-  >- (‘(PROP τ) ||- A --> ~~A’ by metis_tac[NOT_NOT_Introduction, identity_rl, IMP_Introduction, REPLACE_def] >> 
-      metis_tac[IMP_Elimination, identity_lr, REPLACE_def])
-  >- (‘(PROP τ) ||- ~~A --> A’ by metis_tac[NOT_NOT_Elimination, identity_rl, IMP_Introduction, REPLACE_def] >> 
-      metis_tac[IMP_Elimination, identity_lr, REPLACE_def])
+   metis_tac[R_sequent_rules]
+QED        
+
+Theorem AND_Elimination_r_alt:
+  ∀A B. R_sequent (PROP (A & B)) B
+Proof
+  metis_tac[R_sequent_rules]
 QED
 
-Theorem OR_Introduction_gen:
-  ∀X A B. (X ||- A ⇒ X ||- (A V B)) ∧
-          (X ||- A ⇒ X ||- (B V A))
+Theorem OR_Introduction_l_alt:
+  ∀A B. R_sequent (PROP A) (A V B)
 Proof
-  rw[] 
-  >- (‘PROP τ ||- A --> (A V B)’ by
-        metis_tac [OR_Introduction_l, IMP_Introduction, identity_rl, REPLACE_def] >> 
-      metis_tac [IMP_Elimination, REPLACE_def, identity_lr])
-  >- (‘PROP τ ||- A --> (B V A)’ by
-        metis_tac [OR_Introduction_r, IMP_Introduction, identity_rl, REPLACE_def] >> 
-      metis_tac [IMP_Elimination, REPLACE_def, identity_lr])
+  metis_tac[R_sequent_rules]
+QED
+
+Theorem OR_Introduction_r_alt:
+  ∀A B. R_sequent (PROP B) (A V B)
+Proof
+  metis_tac[R_sequent_rules]
+QED
+
+Theorem NOT_NOT_Introduction_alt:
+  ∀A. R_sequent (PROP A) (~~A)
+Proof
+  metis_tac[R_sequent_rules]
+QED
+
+Theorem NOT_NOT_Elimination_alt:
+  ∀A. R_sequent (PROP (~~A)) (A)
+Proof
+  metis_tac[R_sequent_rules]
 QED
      
 Theorem hilbert_to_natural_deduction:
@@ -147,7 +161,8 @@ Proof
       ‘(PROP (A-->B) ； PROP A) ||- B’ by metis_tac[IMP_Elimination] >>       
       ‘(PROP (B --> C) ； PROP (A-->B) ； PROP A) ||- C’ by metis_tac[IMP_Elimination] >>       
       assume_tac SEMICOLON_associative_rl >> 
-      last_x_assum $ qspecl_then [‘HOLE’,‘PROP  (B --> C)’, ‘PROP  (A --> B)’, ‘PROP A’, ‘C’] strip_assume_tac >> 
+      last_x_assum $ qspecl_then [‘HOLE’,‘PROP  (B --> C)’, ‘PROP  (A --> B)’,
+                                  ‘PROP A’, ‘C’] strip_assume_tac >> 
       gs[REPLACE_def] >> 
       assume_tac SEMICOLON_commutative >>
       last_x_assum $ qspecl_then [‘LSEMI HOLE (PROP A)’,‘PROP  (B --> C)’, ‘PROP  (A --> B)’, ‘C’] strip_assume_tac >> 
@@ -168,24 +183,24 @@ Proof
         metis_tac [Assumption, IMP_Elimination] >>
       metis_tac [REPLACE_def, SEMICOLON_associative_lr, SEMICOLON_idempotent_lr]
      )
-  >- metis_tac[AND_Elimination_l, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
-  >- metis_tac[AND_Elimination_r, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
+  >- metis_tac[AND_Elimination_l_alt, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
+  >- metis_tac[AND_Elimination_r_alt, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
   >- (‘(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- (B & C)’ suffices_by
         metis_tac [identity_rl, IMP_Introduction, REPLACE_def] >>
       ‘(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- B’ by
-        metis_tac[IMP_Elimination, Assumption, AND_Elimination_l] >> 
+        metis_tac[IMP_Elimination, Assumption, AND_Elimination_l_alt] >> 
       ‘(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- C’ by
-        metis_tac[IMP_Elimination, Assumption, AND_Elimination_r] >>
+        metis_tac[IMP_Elimination, Assumption, AND_Elimination_r_alt] >>
       metis_tac[AND_Introduction, COMMA_idempotent_lr, REPLACE_def]
      )
-  >- metis_tac[OR_Introduction_l, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
-  >- metis_tac[OR_Introduction_r, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
+  >- metis_tac[OR_Introduction_l_alt, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
+  >- metis_tac[OR_Introduction_r_alt, Assumption, IMP_Introduction, identity_rl, REPLACE_def]
   >- (‘(PROP  ((A --> C) & (B --> C)) ； PROP (A V B)) ||- C’ suffices_by
         metis_tac [identity_rl, IMP_Introduction, REPLACE_def] >> 
       ‘(PROP  ((A --> C) & (B --> C)) ； PROP A) ||- C’ by 
-        metis_tac[IMP_Elimination, Assumption, AND_Elimination_l] >> 
+        metis_tac[IMP_Elimination, Assumption, AND_Elimination_l_alt] >> 
       ‘(PROP  ((A --> C) & (B --> C)) ； PROP B) ||- C’ by 
-        metis_tac[IMP_Elimination, Assumption, AND_Elimination_r] >>
+        metis_tac[IMP_Elimination, Assumption, AND_Elimination_r_alt] >>
       assume_tac OR_Elimination >>
       last_x_assum $ qspecl_then [‘RSEMI (PROP  ((A --> C) & (B --> C))) HOLE’, 
                                   ‘PROP  (A V B)’, ‘A’, ‘B’, ‘C’] strip_assume_tac >>
@@ -193,12 +208,12 @@ Proof
      )
   >- (‘(PROP  (A & (B V C))) ||- ((A & B) V (A & C))’ suffices_by
         metis_tac [identity_rl, IMP_Introduction, REPLACE_def] >>
-      ‘(PROP  (A & (B V C))) ||- A’ by metis_tac[Assumption, AND_Elimination_l] >>
-      ‘(PROP  (A & (B V C))) ||- (B V C)’ by metis_tac[Assumption, AND_Elimination_r] >>
+      ‘(PROP  (A & (B V C))) ||- A’ by metis_tac[Assumption, AND_Elimination_l_alt] >>
+      ‘(PROP  (A & (B V C))) ||- (B V C)’ by metis_tac[Assumption, AND_Elimination_r_alt] >>
       ‘(PROP  (A & (B V C)) ， PROP B ) ||- ((A & B) V (A & C))’ by 
-        metis_tac [Assumption, AND_Introduction, OR_Introduction_gen] >>
+        metis_tac [Assumption, AND_Introduction, OR_Introduction_l, OR_Introduction_r] >>
       ‘(PROP  (A & (B V C)) ， PROP C ) ||- ((A & B) V (A & C))’ by 
-        metis_tac [Assumption, AND_Introduction, OR_Introduction_gen] >>
+        metis_tac [Assumption, AND_Introduction,  OR_Introduction_l, OR_Introduction_r] >>
       assume_tac OR_Elimination >>
       last_x_assum $ qspecl_then [‘RCOMMA (PROP (A & (B V C))) HOLE’,
                                   ‘PROP (A & (B V C))’, ‘B’, ‘C’,
@@ -207,9 +222,9 @@ Proof
      )
   >- (‘((PROP (A --> ~B)) ； PROP (B)) ||- (~A)’ suffices_by 
         metis_tac [identity_rl, IMP_Introduction, REPLACE_def] >> 
-      irule RAA >> metis_tac [NOT_NOT_Introduction, Assumption, IMP_Elimination]
+      irule RAA >> metis_tac [NOT_NOT_Introduction_alt, Assumption, IMP_Elimination]
      )
-  >- metis_tac [identity_rl, IMP_Introduction, REPLACE_def, NOT_NOT_Elimination]
+  >- metis_tac [identity_rl, IMP_Introduction, REPLACE_def, NOT_NOT_Elimination_alt]
   >- metis_tac[AND_Introduction, REPLACE_def, COMMA_idempotent_lr]
   >- metis_tac[IMP_Elimination, identity_lr, REPLACE_def]
   >- metis_tac[IMP_Introduction, identity_rl, REPLACE_def]
@@ -301,8 +316,13 @@ QED
 Theorem natural_deduction_to_hilbert:
   ∀X A. X ||- A ⇒ |- ((bg X) --> A)
 Proof
-  Induct_on ‘X ||- A’ >> rpt strip_tac >> 
-  gs [goldblatt_provable_rules, g_double_neg]
+  Induct_on ‘X ||- A’ >> rw[] (* 22 *)
+  >- metis_tac[goldblatt_provable_rules]
+  >- metis_tac[goldblatt_provable_rules]
+  >- metis_tac[goldblatt_provable_rules]
+  >- metis_tac[goldblatt_provable_rules]
+  >- metis_tac[goldblatt_provable_rules]
+  >- metis_tac[goldblatt_provable_rules]
   >- metis_tac[goldblatt_provable_rules]
   >- metis_tac[g_io_rule]
   >- (‘|- (bg X' --> bg X --> A')’ suffices_by
@@ -379,8 +399,13 @@ Proof
       simp[g_ICONJ_def] >> assume_tac RAA >>
       pop_assum $ qspecl_then [‘X’, ‘Y’, ‘bg X --> ~bg Y’] strip_assume_tac >>
       last_x_assum irule >> qexists_tac ‘~(bg Y)’ >> rw[]
-      >- metis_tac[NOT_NOT_replacement]
-      >- metis_tac[IMP_Elimination, SEMICOLON_commutative, Assumption, REPLACE_def]
+      >- metis_tac[NOT_NOT_Introduction]
+      >- (‘((PROP τ) ； X)||- (bg X --> ~bg Y) --> ~bg Y’ suffices_by
+            metis_tac[IMP_Elimination, Assumption, REPLACE_def, identity_lr] >>
+          ‘(PROP τ)||- bg X --> (bg X --> ~bg Y) --> ~bg Y’ suffices_by
+            metis_tac[IMP_Elimination] >>
+          metis_tac[goldblatt_provable_rules, hilbert_to_natural_deduction]
+         )
      )
 QED
         
@@ -406,11 +431,5 @@ Proof
       metis_tac[IMP_Elimination, identity_lr, REPLACE_def])
 QED
 
-Theorem hilbert_to_natural_deduction_alt_proof:
-  ∀A. |- A ⇒ (PROP  τ) ||- A
-Proof
-  rw[] >> drule_then strip_assume_tac g_tt_rl >>
-  irule bg_trans_reconstuction >> simp[]
-QED
-
 val _ = export_theory();
+

@@ -6,12 +6,12 @@ MASTER_THEORY = prettyPrintingTheory
 MASTER_THEORY_GSE = prettyPrintingGSETheory
 MASTER_THEORY_ND = prettyPrintingNDTheory
 
-EXTRA_CLEANS = holtexbasic.sty proof.sty munger munger0.o mungernd mungergse chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt6decidability.tex chpt7conclusion.tex tmp/ PDFs/
+EXTRA_CLEANS = holtexbasic.sty proof.sty munger munger0.o mungernd mungergse chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt7conclusion.tex tmp/ PDFs/
 
-all: PDFs/thesis.pdf PDFs/chpt1.pdf PDFs/chpt2.pdf PDFs/chpt3.pdf PDFs/chpt4.pdf PDFs/chpt5.pdf PDFs/chpt6.pdf PDFs/chpt7.pdf PDFs/thesis.pdf
+all: PDFs/thesis.pdf PDFs/chpt1.pdf PDFs/chpt2.pdf PDFs/chpt3.pdf PDFs/chpt4.pdf PDFs/chpt5.pdf  PDFs/chpt7.pdf PDFs/thesis.pdf
 	:
 
-PDFs/thesis.pdf: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt6decidability.tex chpt7conclusion.tex tmp PDFs thesis.tex macros.tex configuration.tex
+PDFs/thesis.pdf: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt7conclusion.tex tmp PDFs thesis.tex macros.tex configuration.tex
 	pdflatex -output-directory=tmp thesis.tex; \
     bibtex ./tmp/thesis.aux;                   \
 	pdflatex -output-directory=tmp thesis.tex; \
@@ -32,9 +32,6 @@ PDFs/chpt4.pdf: chpt4rmsemantics.tex tmp PDFs
 
 PDFs/chpt5.pdf: chpt5coversemantics.tex tmp PDFs
 	pdflatex -output-directory=tmp chpt5.tex && cp tmp/chpt5.pdf PDFs
-
-PDFs/chpt6.pdf: chpt6decidability.tex tmp PDFs
-	pdflatex -output-directory=tmp chpt6.tex && cp tmp/chpt6.pdf PDFs
 
 PDFs/chpt7.pdf: chpt7conclusion.tex tmp PDFs
 	pdflatex -output-directory=tmp chpt7.tex && cp tmp/chpt7.pdf PDFs
@@ -61,9 +58,6 @@ chpt4rmsemantics.tex: chpt4rmsemantics.htex munger holtexbasic.sty proof.sty ove
 	./munger -mc overrides < $< > $@
 
 chpt5coversemantics.tex: chpt5coversemantics.htex munger holtexbasic.sty proof.sty overrides
-	./munger -mc overrides < $< > $@
-
-chpt6decidability.tex: chpt6decidability.htex munger holtexbasic.sty proof.sty overrides
 	./munger -mc overrides < $< > $@
 
 chpt7conclusion.tex: chpt7conclusion.htex munger holtexbasic.sty proof.sty overrides

@@ -1,5 +1,5 @@
 open HolKernel boolLib Parse bossLib
-open GoldblattSlaneyEquivTheory
+open RLRulesTheory GoldblattSlaneyEquivTheory
 
 val _ = new_theory "prettyPrintingGSE"
 

@@ -14,9 +14,9 @@ V 2 \ensuremath{\bm{\lor}}
 ⇔ 2 \ensuremath{\Leftrightarrow}
 ⇒ 2 \ensuremath{\Rightarrow}
 
-$Turnstile$ 5 \HOLTokenTurnstile{}
+$Turnstile$ 8 \HOLTokenTurnstile{}
 
-α 1 \ensuremath{\alpha}
+alpha 1 \ensuremath{\alpha}
 
 <| 1 \ensuremath{\langle}
 |> 1 \ensuremath{\rangle}
@@ -38,7 +38,8 @@ Mz 2 \ensuremath{0\sb{\mathcal{M}}}
 
 (Fw) 1 \ensuremath{\sp{W}}
 Fz 2 \ensuremath{0\sb{\mathcal{F}}}
-(Fr) 1 \ensuremath{R\sb}
+(Fr1) 1 \ensuremath{R\sb{
+(Fr2) 0 }}
 (Fs) 1 \ensuremath{\sp{\ast}}
 (Fss) 2 \ensuremath{\sp{\ast\ast}}
 (Fsss) 3 \ensuremath{\sp{\ast\ast\ast}}
@@ -93,6 +94,19 @@ delta 1 \ensuremath{\delta}
 Delta 1 \ensuremath{\Delta}
 gamma 1 \ensuremath{\gamma}
 Gamma 1 \ensuremath{\Gamma}
+ThetaSymsf 1 \Thetasf
+ThetaSym 1 \ensuremath{\Theta}
 cup 1 \ensuremath{\cup}
+
 (ss1) 1 \{ 
 (ss2) 1 \}
+
+(theta_entails1) 2 \ensuremath{(\vdash^{\&}\sb{
+(theta_entails2) 1 })}
+
+S_Theory 8 \ensuremath{\mathsf{\Theta}}_Theory
+
+(s_theory1) 8 \textsf{\small{_Theory}}
+(s_theory2) 0 
+
+R_gn 4 enum

@@ -35,4 +35,8 @@ val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 			pp_elements = [TOK "(|-)"]}
 
 
+val _ = set_fixity "prop||-" (Infixr 460);
+Overload "prop||-" =  “λa b. (PROP a) ||- b”
+
+
 val _ = export_theory()

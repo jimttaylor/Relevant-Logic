@@ -18,6 +18,15 @@ Vₐ 2 \ensuremath{\bm{\lor}\sb{g}}
 ioₐ 2 \ensuremath{\circ\sb{g}}
 τₐ 2 \ensuremath{\tau\sb{g}}
 
+|- 2 \ensuremath{\vdash\sb{\bm{R}}}
+--> 2 \ensuremath{\rightarrow\sb{g}}
+<-> 2 \ensuremath{\leftrightarrow\sb{g}} 
+& 2 \ensuremath{\&\sb{g}}
+~ 2 \ensuremath{{\sim\sb{g}}}
+V 2 \ensuremath{\bm{\lor}\sb{g}}
+∘ᵣ 2 \ensuremath{\circ\sb{g}}
+τ 2 \ensuremath{\tau\sb{g}}
+
 -> 1 \ensuremath{\rightarrow}
 
 ⇔ 2 \ensuremath{\Leftrightarrow}
