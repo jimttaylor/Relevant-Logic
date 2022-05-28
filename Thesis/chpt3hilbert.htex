@@ -80,8 +80,9 @@ We can now prove a couple of useful theorems about relevance logic inside this H
    3. & \HOLthm[nostile]{GoldblattRL.g_double_negative_equiv} & \textsf{Double Negation Equivalence}\\ 
    4. & \HOLthm[nostile]{GoldblattRL.g_double_negative_implication_equiv} & \\
    5. & \HOLthm[nostile]{GoldblattRL.g_contrapositive_alt} & \textsf{Contraposition alt.}\\
-   6. & \HOLthm[nostile]{RLRules.g_io_commutative_lr} & \HOLtm{$ioₐ}\textsf{ commutative} \\ 
-   7. & \HOLthm[nostile]{RLRules.g_io_distribution_equiv} & \HOLtm{$ioₐ}\textsf{ distribution}
+   6. & \HOLthm[nostile]{RLRules.g_io_commutative_lr} & \HOLtm{$ioₐ}\textsf{ Commutative} \\ 
+   7. & \HOLthm[nostile]{RLRules.g_io_distribution_equiv} & \HOLtm{$ioₐ}\textsf{ Distribution}\\
+   8. & \HOLthm[nostile]{RLRules.g_AND_MP} & 
   \end{matrix*}
   \end{holmath}
 \end{prop}

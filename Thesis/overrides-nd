@@ -28,3 +28,5 @@ bg 1 \ensuremath{\beta}
 (bg2) 1 \ensuremath{)}
 
 $Turnstile$ 5 \HOLTokenTurnstile{}
+
++ 1 \ensuremath{{+}}

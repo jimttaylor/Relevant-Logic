@@ -5,11 +5,9 @@ INCLUDES = $(RELEVANT_DIR)
 MASTER_THEORY = prettyPrintingTheory
 MASTER_THEORY_GSE = prettyPrintingGSETheory
 MASTER_THEORY_ND = prettyPrintingNDTheory
+MUNGOPT = -mcc
 
 EXTRA_CLEANS = holtexbasic.sty proof.sty munger munger0.o mungernd mungergse chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt7conclusion.tex tmp/ PDFs/
-
-all: PDFs/thesis.pdf PDFs/chpt1.pdf PDFs/chpt2.pdf PDFs/chpt3.pdf PDFs/chpt4.pdf PDFs/chpt5.pdf  PDFs/chpt7.pdf PDFs/thesis.pdf
-	:
 
 PDFs/thesis.pdf: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt7conclusion.tex tmp PDFs thesis.tex macros.tex configuration.tex
 	pdflatex -output-directory=tmp thesis.tex; \
@@ -18,24 +16,6 @@ PDFs/thesis.pdf: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex
 	pdflatex -output-directory=tmp thesis.tex \
 	&& cp tmp/thesis.pdf PDFs
 
-PDFs/chpt1.pdf: chpt1intro.tex tmp PDFs
-	pdflatex -output-directory=tmp chpt1.tex && cp tmp/chpt1.pdf PDFs
-
-PDFs/chpt2.pdf: chpt2background.tex tmp PDFs
-	pdflatex -output-directory=tmp chpt2.tex && cp tmp/chpt2.pdf PDFs
-
-PDFs/chpt3.pdf: chpt3hilbert.tex chpt3ND.tex tmp PDFs
-	pdflatex -output-directory=tmp chpt3.tex && cp tmp/chpt3.pdf PDFs
-
-PDFs/chpt4.pdf: chpt4rmsemantics.tex tmp PDFs
-	pdflatex -output-directory=tmp chpt4.tex && cp tmp/chpt4.pdf PDFs
-
-PDFs/chpt5.pdf: chpt5coversemantics.tex tmp PDFs
-	pdflatex -output-directory=tmp chpt5.tex && cp tmp/chpt5.pdf PDFs
-
-PDFs/chpt7.pdf: chpt7conclusion.tex tmp PDFs
-	pdflatex -output-directory=tmp chpt7.tex && cp tmp/chpt7.pdf PDFs
-
 tmp: 
 	mkdir tmp
 
@@ -43,25 +23,25 @@ PDFs:
 	mkdir PDFs
 
 chpt1intro.tex: chpt1intro.htex munger holtexbasic.sty proof.sty overrides
-	./munger -mc overrides < $< > $@
+	./munger $(MUNGOPT) overrides < $< > $@
 
 chpt2background.tex: chpt2background.htex munger holtexbasic.sty proof.sty overrides
-	./munger -mc overrides < $< > $@
+	./munger $(MUNGOPT) overrides < $< > $@
 
 chpt3hilbert.tex: chpt3hilbert.htex mungergse holtexbasic.sty proof.sty overrides-goldblatt-slaney-equiv
-	./mungergse -mc overrides-goldblatt-slaney-equiv < $< > $@
+	./mungergse $(MUNGOPT) overrides-goldblatt-slaney-equiv < $< > $@
 
 chpt3ND.tex: chpt3ND.htex mungernd holtexbasic.sty proof.sty overrides-nd
-	./mungernd -mc overrides-nd < $< > $@
+	./mungernd $(MUNGOPT) overrides-nd < $< > $@
 
 chpt4rmsemantics.tex: chpt4rmsemantics.htex munger holtexbasic.sty proof.sty overrides
-	./munger -mc overrides < $< > $@
+	./munger $(MUNGOPT) overrides < $< > $@
 
 chpt5coversemantics.tex: chpt5coversemantics.htex munger holtexbasic.sty proof.sty overrides
-	./munger -mc overrides < $< > $@
+	./munger $(MUNGOPT) overrides < $< > $@
 
 chpt7conclusion.tex: chpt7conclusion.htex munger holtexbasic.sty proof.sty overrides
-	./munger -mc overrides < $< > $@
+	./munger $(MUNGOPT) overrides < $< > $@
 
 munger: $(dprot $(MASTER_THEORY)).uo $(dprot $(HOLDIR)/bin/mkmunge.exe)
 	$(protect $(HOLDIR)/bin/mkmunge.exe) -o $@ $(MASTER_THEORY)

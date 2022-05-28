@@ -148,7 +148,8 @@ Proof
 QED
      
 Theorem hilbert_to_natural_deduction:
-  ∀A. |- A ⇒ (PROP  τ) ||- A
+  ∀A. |- A
+      ⇒ (PROP  τ) ||- A
 Proof
   Induct_on ‘|-’ >> rpt strip_tac
   >- metis_tac [Assumption, identity_rl, IMP_Introduction, REPLACE_def]

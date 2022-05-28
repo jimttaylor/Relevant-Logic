@@ -36,3 +36,5 @@ phi 1 \ensuremath{\phi}
 psi 1 \ensuremath{\psi}
 
 $Turnstile$ 5 \HOLTokenTurnstile{}
+
++ 1 \ensuremath{{+}}
