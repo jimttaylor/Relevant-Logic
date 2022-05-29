@@ -5,6 +5,8 @@ INCLUDES = $(RELEVANT_DIR)
 MASTER_THEORY = prettyPrintingTheory
 MASTER_THEORY_GSE = prettyPrintingGSETheory
 MASTER_THEORY_ND = prettyPrintingNDTheory
+MASTER_THEORY_CS = prettyPrintingCSTheory
+
 MUNGOPT = -mcc
 
 EXTRA_CLEANS = holtexbasic.sty proof.sty munger munger0.o mungernd mungergse chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt7conclusion.tex tmp/ PDFs/
@@ -37,14 +39,17 @@ chpt3ND.tex: chpt3ND.htex mungernd holtexbasic.sty proof.sty overrides-nd
 chpt4rmsemantics.tex: chpt4rmsemantics.htex munger holtexbasic.sty proof.sty overrides
 	./munger $(MUNGOPT) overrides < $< > $@
 
-chpt5coversemantics.tex: chpt5coversemantics.htex munger holtexbasic.sty proof.sty overrides
-	./munger $(MUNGOPT) overrides < $< > $@
+chpt5coversemantics.tex: chpt5coversemantics.htex mungercs holtexbasic.sty proof.sty overridescs
+	./munger $(MUNGOPT) overridescs < $< > $@
 
 chpt7conclusion.tex: chpt7conclusion.htex munger holtexbasic.sty proof.sty overrides
 	./munger $(MUNGOPT) overrides < $< > $@
 
 munger: $(dprot $(MASTER_THEORY)).uo $(dprot $(HOLDIR)/bin/mkmunge.exe)
 	$(protect $(HOLDIR)/bin/mkmunge.exe) -o $@ $(MASTER_THEORY)
+
+mungercs: $(dprot $(MASTER_THEORY_CS)).uo $(dprot $(HOLDIR)/bin/mkmunge.exe)
+	$(protect $(HOLDIR)/bin/mkmunge.exe) -o $@ $(MASTER_THEORY)	
 
 mungergse: $(dprot $(MASTER_THEORY_GSE)).uo $(dprot $(HOLDIR)/bin/mkmunge.exe)
 	$(protect $(HOLDIR)/bin/mkmunge.exe) -o $@ $(MASTER_THEORY_GSE)

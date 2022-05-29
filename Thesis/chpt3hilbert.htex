@@ -9,12 +9,11 @@ When talking about logic however it can also be useful to talk about \emph{seque
 As sequents have more structure than propositions we need another way to interact with these structures, which is where Natural Deduction systems are particularly useful. 
 A Natural Deduction system is normally characterised by a set of rules that interact with the either the antecedents, the consequent, or sometimes both parts of the sequent. Furthermore, some of the rules require some preconditions to hold while others don't. 
 
-It is important to note that proof systems are \emph{syntactic} in nature; they only tell us that theorems are true rather than provide a structural reason behind why these theorems hold. 
-Though this doesn't meant that Hilbert and Natural Deduction systems aren't useful. 
-There are often reasons to work with these systems rather than \emph{semantic} ones. 
+It is important to note that proof systems are \emph{syntactic} in nature; they only tell us what is true rather than provide an reason behind why something is true, thus \emph{syntax} only tells us one half of the story; though this doesn't meant that Hilbert and Natural Deduction systems aren't useful as there are often reasons to work within these systems rather than \emph{semantic} ones. 
 For example, Natural Deduction systems make theorem proving significantly easier for logicians through the use of many rules of inference while Hilbert Systems use a much large number of axioms and are thus very explicit as to what propositions should be taken to be true. 
 
-This chapter focuses on some basic theorems of relevance logic, and the establishment of an equivalency between two other ways of characterising relevance logic.
+This chapter focuses on some basic theorems of relevance logic, and the establishment of an equivalency between two other ways of characterising relevance logic. Section~\ref{sec:hilert-system} will introduce the axiomatic system presented in \fix{ref} that we will use throughout this thesis and establish some theorems of Relevant Implication. Section~\ref{sec:newhilbert
+} will then look at another axiomatisation of Relevant Implication and show equivalence between the two axiomatic systems. Section~\ref{sec:nd-system} will then introduce a Natural Deduction system for this system and then show equivalence to the axiomatic systems.  
 \fix{refs}
 \section{A Relevant Hilbert System}
 \label{sec:hilert-system}

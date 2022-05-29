@@ -1,9 +1,26 @@
 \chapter{The Routley-Meyer Semantics}
 \label{cha:rmsemantics}
-\fix{needs some form of content introduction... probably talk about the difference between semanitic models in contrast with syntactic ones. There should also be brief explaination of Possible Worlds}
-This chapter introduces the Routley-Meyer Semantics and establishes soundness and completeness results between the Goldblatt axioms and this system.
+While \emph{syntax} is entirely concerned with transforming expressions to determine what is true, \emph{semantics} gives us an alternative way of looking at logic by providing meaning to statements through construction of \emph{models}. 
+
+One of the more popular ways we assign meaning is by determining under what circumstances a statement is \emph{true}. One method of doing this is through the consideration of \emph{possible worlds}, the idea is that something must be true only if we can show it nessisarily is true in all alternative realities that are consistant with what we already take to be true. \fix{ref} By way of example: 
+Suppose you have an opaque bottle on your desk and you were to pick up the bottle only to find it was heavier than the bottle should be, then you would conclude that something is in the bottle you cannot concieve of a world whereby the bottle is both empty and weighs more that it ought. 
+However wouldn't know what was in the bottle as you could concieve both a reality where the bottle is full of cursed treasure and another where the bottle contains a live squid. 
+\emph{Possible worlds} semantics saw massive success throughout the 1960s in the modal logics through the introduction of a binary relation on over a set of worlds where each world asserts a set of propositions to be true. In modal logic this relationship denotes \emph{accessability} meaning that when we have $R\,x\,y$ for worlds $x$ and $y$ then we either consider $y$ to be accessable from $x$, or if we find ourselves in the world $x$ (though we wouldn't know we were in $x$) then we would consider $y$ to be a \emph{possible world}. \fix{cite blackburn} 
+
+In 1973 Richard Routley (Later Svlvan) and Robert Meyer introduced a possible world semantic that followed the advances made in modal logic by using a ternary relation \HOLtm{R} over the set of worlds as well as a dual operator over worlds, \HOLtm{STAR} \citep{ROUTLEY1973199}. \citet{ROUTLEY1973199} propose a reading of \HOLtm{R w x y} that states that the world \HOLtm{y} is compatible relative to \HOLtm{w} and \HOLtm{x} together. It is natural then that the \emph{rules} of \HOLtm{w} are just propositions of the form \HOLtm{A --> B} that \HOLtm{w} asserts to be true. Then if \HOLtm{x} asserts \HOLtm{A}, then \HOLtm{B} is just a result of applying the rules of \HOLtm{w} to \HOLtm{x}, and as such \HOLtm{y} asserts \HOLtm{B}. \HOLtm{RF.STAR x} on the other hand acts as a dual world to \HOLtm{x}. In this, what we mean is that if there exists a \emph{possible world} that does not explicitly reject a set of statements then there must exist a \emph{possible world} that asserts that all of these statements are true. We also choose a world that we read as the \emph{logical world} and it is where we evaluate truth for the whole model.   
+
+An important note to make is that quite unlike semantics for modal logic we also do not require that worlds be \emph{consistant}. In some cases it is nessisary that some worlds be inconsistant otherwise we could show that \HOLtm{A & ~A --> B} is a rule of all possible worlds including the \emph{logical world} for any choice of \HOLtm{A} and \HOLtm{B} that this shouldn't be derivable.  
+
+The connection between semantic and syntactic systems are two metatheorems called \emph{soundness} and \emph{completeness} results. 
+A \emph{soundness} result between a syntactic theory and a semantic theory states that if a proposition \HOLtm{p} is a theorem of the syntactic theory, then \HOLtm{p} holds in every model of the semantic theory. We may also say that the syntactic theory is \emph{sound} with respect to the semantic theory.
+Conversly a \emph{completeness} result states that if a propostion holds in every model of the semantic theory, then it is a theorem of the syntactic theory. Ergo, the syntactic theory is \emph{complete} with respect to the semantic theory.
+
+\fix{refs}
+
+This chapter introduces the Routley-Meyer Semantics and establishes soundness and completeness results between the Goldblatt axioms and this system. In Section~\ref{sec:RMsystem} we present the Routley-Meyer Semantic theory and show that our Hilbert System is sound with respect to these semantics. In Section~\ref{sec:RMcompleteness} we will formalise the full completeness proof for relevant implication.
 \section{The Routley-Meyer System}
-As with the formalisations given in chapter~\ref{cha:proof-systems} we will first begin with the types of structures that are begin dealt with in the Routley-Meyer semantics, so without much ado:  
+\label{sec:RMsystem}
+As with the formalisations given in Chapter~\ref{cha:proof-systems} we will first begin with the types of structures that we will be working with in the Routley-Meyer semantics, so without much ado:  
 \begin{defn}[]\label{def:frame-models}
 	An \HOLty{:α FRAME} is a record type with fields \HOLtm{W}, \HOLtm{Z}, \HOLtm{R}, and \HOLtm{STAR}. 
 	\HOLtm{W} is a set of worlds of type \HOLty{:α}. \HOLtm{Z} is of type \HOLty{:α}, \HOLtm{R} is a ternary relation over \HOLty{:α}, \HOLtm{STAR} is an operator over \HOLty{:α}.
@@ -16,16 +33,14 @@ As with the formalisations given in chapter~\ref{cha:proof-systems} we will firs
 		\HOLthm[width=100]{RMSemantics.datatype_MODEL}
 	\end{holmath}
 \end{defn}
-A \emph{world} in the sense of Definition~\ref{def:frame-models} is a place where propositions taken to be true or false. 
-In the Routley-Meyer semantics each world isn't required to be \emph{consistant}, that is: if \HOLtm{p} is a propsition and \HOLtm{w} a \emph{world}, then both \HOLtm{p} and \HOLtm{~p} can be true at \HOLtm{w} at the same time or neither true. \fix {maybe put in the introduction of chpr} 
-Now that we have these dataypes we now introduce a set of conditions on members of the datatypes to get \emph{frames} and \emph{models} of the logic: 
+ Now that we have these basic dataypes we now introduce a set of conditions on members of the datatypes to get \emph{frames} and \emph{models} of the logic: 
 \begin{defn}[\HOLtm{R_Frame}]\label{def:r-frame}
 	If \HOLtm{RF} is of type \HOLty{:α FRAME} and then it is an \HOLtm{R_Frame} if it has the following closure properties:
 	\begin{enumerate}
 		\item \HOLtm{RF.Z ∈ RF.W}
 		\item If \HOLtm{x ∈ RF.W} then so is \HOLtm{RF.STAR x}
 	\end{enumerate}	
-	We also have the following rules which make \HOLtm{RF} a member of the class of substructural logics:\fix{I will breifly talk about substructural logics in the Background} that contain Relevance Logic.  
+	We also have the following rules which make \HOLtm{RF} a member of the class of  logics that contain Relevance Logic \fix{cite}.  
 	\begin{enumerate}
 		\setcounter{enumi}{2}
 		\item When we have \HOLtm{x ∈ RF.W} we also have \HOLtm{RF.R RF.Z x x}
@@ -45,8 +60,11 @@ Now that we have these dataypes we now introduce a set of conditions on members 
 		\HOLthm[]{RMSemantics.R_Frame_def}
 	\end{holmath}
 \end{defn} 
-We will then take our \HOLtm{R_Frame} and assign a valuation function taking propositional variable to worlds and creating an \HOLty{:α MODEL}. 
-Because of how we have understood \HOLtm{$-->} to behave\fix{going ot need to explain how arrow and not behave in the frame}, not valuation functions are created equal. What we really want is when \HOLtm{x} and \HOLtm{y} are worlds such that \HOLtm{RF.R RF.Z x y} then when \HOLtm{s} is a propositional variable and \HOLtm{x ∈ RM.VF (s)} then \HOLtm{y ∈ RM.VF (s)}. We call this the \emph{hereditary property} as \HOLtm{y} inherits it membership of \HOLtm{RM.VF (s)} by its relationship to \HOLtm{x}.
+We will then take our \HOLtm{R_Frame} and assign a valuation function taking propositional variable to worlds and creating an \HOLty{:α MODEL}. But not all valuation functions are created equal. 
+
+As we are taking \HOLtm{RM.RF.Z} to be the \emph{logical world} and that we read \HOLtm{RM.RF.R w x y} as \HOLtm{y} is compatible with the result of applying the rules of \HOLtm{w} to \HOLtm{x}; then the reading of \HOLtm{RM.RF.R RM.RF.Z x y} is naturally \HOLtm{y} is compatible with the result of applying the rules of \emph{logic} to \HOLtm{x}. A desirable rule of our \emph{logical world} is that, by applying the rules of the logical world, we cannot change the valuation of the propositional varibles; as such we will need a condition on the valuation function to reflect this. 
+
+What we need is: when \HOLtm{x} and \HOLtm{y} are worlds such that \HOLtm{RF.R RF.Z x y} then when \HOLtm{s} is a propositional variable and \HOLtm{x ∈ RM.VF (s)} then \HOLtm{y ∈ RM.VF (s)}. We call this the \emph{hereditary property} as \HOLtm{y} inherits it membership of \HOLtm{RM.VF (s)} by its relationship to \HOLtm{x}.
 
 \begin{defn}[Hereditary property]\label{def:hereditary}
 	An \HOLty{:α MODEL}, \HOLtm{RM} has the \emph{hereditary property} if and only if whenever we both have \HOLtm{RM.RF.R RM.RF.Z x y} and \HOLtm{x ∈ RM.VF s} then we also have \HOLtm{y ∈ RM.VF s}:
@@ -56,10 +74,7 @@ Because of how we have understood \HOLtm{$-->} to behave\fix{going ot need to ex
 	If an \HOLty{:α MODEL} \HOLtm{RM} has the hereditary property, then we say that \HOLtm{RM} is \emph{hereditary}.
 \end{defn}
 
-Why impose this condition? Considering that we are taking \HOLtm{RM.RF.Z} to be the \emph{logical world} and a way we can read \HOLtm{RM.RF.R w x y} to be that \HOLtm{y} agrees with all results of applying the rules of \HOLtm{w} to \HOLtm{x}; 
-then a desirable quality then of our \emph{logical world} is that, by only applying the rules of the logical world, we cannot change the valuation of the propositional varibles. 
-
-Definitions~\ref{def:r-frame} and \ref{def:hereditary} leads us to the formal definition of an \HOLtm{R_Model}:
+Definitions~\ref{def:r-frame} and \ref{def:hereditary} then lead us to the formal definition of an \HOLtm{R_Model}:
 \begin{defn}[\HOLtm{R_Model}]\label{def:r-model}
 	If \HOLtm{RM} is of type \HOLty{:α MODEL} then it is an \HOLtm{R_Model} if \HOLtm{RM.RF} is an \HOLtm{R_Frame} and \HOLtm{RM} is hereditary.
 	\begin{holmath}
@@ -106,15 +121,9 @@ It is also the case that the hereditary property extends naturally to all formul
 \end{proof}
 
 \subsection{Soundness}
-In sections~\ref{sec:newhilbert} and~\ref{sec:nd-system} we showed that the new proof systems that we were introducing proved exactly the same theorems that the Goldblatt Axiomatisation could prove. 
-Semantic systems, on the other hand, create a series of rules that define a class of models where some models may prove some propositions while others don't. 
+In sections~\ref{sec:newhilbert} and~\ref{sec:nd-system} we showed that the new proof systems that we were introducing proved exactly the same theorems that the Goldblatt Axiomatisation could prove. \emph{Soundness} the direction of showing a type of equivalence between our Hilbert system and the Routley-Meyer semantics. That being: 
+if \HOLtm{p} is a theorem and \HOLtm{RM} is an \HOLtm{R_Model}, then \HOLtm{Holds RM RM.RF.Z p}.
 
-The connection between semantic theories, and syntactic ones are two metatheorems called \emph{soundness} and \emph{completeness} results. 
-A \emph{soundness} result between a syntactic theory and a semantic theory states that if a proposition \HOLtm{p} is a theorem of the syntactic theory, then \HOLtm{p} holds in every model in the semantic theory. We may also say that the syntactic theory is \emph{sound} with respect to the semantic theory.
-
-Conversly a \emph{completeness} result states that if a propostion holds in every model of the semantic theory, then it is a theorem of the syntactic theory. Ergo, the syntactic theory is \emph{complete} with respect to the semantic theory.
-
-As hinted by its title, this subsection will establish the soundness result between the Goldblatt axiomatisation and the Routley-Meyer semantics. 
 We will first state a useful lemma before showing the soundness result:
 \begin{lem}[Contraction Lemma]\label{lem:contraction-lem}
 If \HOLtm{RF} is an \HOLtm{R_Frame} with worlds \HOLtm{w}, \HOLtm{x}, and \HOLtm{y} that are related such that \HOLtm{RF.R w x y} then we can always construct an intermediate world \HOLtm{b} such that \HOLtm{RF.R w x b} and \HOLtm{RF.R b x y}:
@@ -153,7 +162,7 @@ We call Lemma~\ref{lem:contraction-lem} the Contraction Lemma as the direct resu
 \end{proof}
 
 \section{Completeness}
-
+\label{sec:RMcompleteness}
 As in the previous section, a \emph{completeness} result states that if a propostion holds in every model of the semantic theory, then it is a theorem of the syntactic theory. 
 For Relevance Logic, this looks like this:
 \begin{thm}[Completeness]\label{thm:RM-completeness}
@@ -489,10 +498,9 @@ Finally we also need that \HOLtm{STAR} is its own inverse (or equivalently is of
 
 Now we could go on to show postulates 1-8 from Definition~\ref{def:r-frame} right now, but we will hold off on the full proof of Theorem~\ref{thm:canonical-frame-is-r-frame} as it turns out that showing that the final postulate 9 holds for \HOLtm{Canonical_Frame p} when \HOLtm{p} is a non-theorem is a bit more involved. 
 
-First and foremost we are going to use the following construction to define our 
-
+First and foremost we should consider what would be the natural set choice of world for the choice of \HOLtm{b}. We would need that everything in \HOLtm{APPLYING x y} to be known to be in \HOLtm{b} and that \HOLtm{APPLYING w b} be a subset of \HOLtm{z} so, if \HOLtm{q ∉ z} and \HOLtm{p --> q ∈ w} then \HOLtm{p ∉ b}. Finally we would also need to show that \HOLtm{b} is \HOLtm{S_Theory (Theta p)} and \HOLtm{Prime}. To do this we are going to use a trick we have already seen before and construct \HOLtm{b} in the exact same what we constructed \HOLtm{Theta p}:
 \begin{defn}\label{def:B-world}
-	Where \HOLtm{ThetaSym}, \HOLtm{i}, and \HOLtm{r} are sets of \HOLty{:g_prop}, and $\{\HOLtm{LINV R_gn UNIV n}\}_{n\in\mathbb N}$ is an enumeration over \HOLtm{UNIV g_prop} then we define \HOLtm{B_WORLD_i n ThetaSym i r} inductively as:
+	Where \HOLtm{ThetaSym}, \HOLtm{i}, and \HOLtm{r} are sets of \HOLty{:g_prop}, and $\{\HOLtm{LINV R_gn UNIV n}\}_{n\in\mathbb N}$ is an enumeration over \HOLtm{(UNIV :g_prop set)} then we define \HOLtm{B_WORLD_i n ThetaSym i r} inductively as:
 	\begin{holmath}
 		\HOLthm[def,i//S,r//R]{prettyPrinting.B_WORLD_i_def_pp}\\
 	\end{holmath}
@@ -502,34 +510,60 @@ First and foremost we are going to use the following construction to define our
 	\end{holmath}
 	We can thus think about \HOLtm{B_WORLD ThetaSym i r} as the world that contains all of \HOLtm{i} and rejects everything in \HOLtm{r} under \HOLtm{ThetaSym}. 
 \end{defn}
-Due to the constraints HOL4 we have to be explicit about the initial set \HOLtm{i}, rejection set \HOLtm{r}, and which \HOLtm{Thetasym} we will be defining our rejection with respect to. hence we have constructed our the world that we will use to show that Definition~\ref{def:r-frame}.9 holds for \HOLtm{Canonical_frame p} as a function of a number of different 
+Due to the constraints HOL4 we have to be explicit about the initial set \HOLtm{i}, rejection set \HOLtm{r}, and which \HOLtm{Thetasym} we will be defining our rejection with respect to otherwise we wouldn't be able to show this holds for any choice of \HOLtm{z}. 
 
-Given that Definition~\ref{def:B-world} shares remarkable similarities to Definition~\ref{def:theta}, and due to the fact that it shares a similar argument to Lemma~\ref{lem:finite-subset-theta}, we will state without proof that:
+Given that Definition~\ref{def:B-world} by design shares has remarkable similarities to Definition~\ref{def:theta}, and due to the fact that it shares a similar argument to Lemma~\ref{lem:finite-subset-theta}, we will state without proof that:
 \begin{prop}
+	If \HOLtm{s} is a finite set of \HOLty{:g_prop} then it is a subset of \HOLtm{B_WORLD ThetaSym i r} if and only if there exists an \HOLtm{n} such that \HOLtm{s ⊆ B_WORLD_i n ThetaSym i r}:
 	\begin{holmath}
-		\HOLthm{RMSemantics.FINITE_SUBSET_B_WORLD}
+		\HOLthm[i//A,r//R]{RMSemantics.FINITE_SUBSET_B_WORLD}
 	\end{holmath}
 \end{prop}
 
-\fix{add proofs for these statments}
-\begin{lem}
+As we reject everything in \HOLtm{r} and assume everything in \HOLtm{i}, it seems that \HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} the natural choice for \HOLtm{b} when showing Definition~\ref{def:r-frame}.9. We shall now show that this set exists in \HOLtm{Canonical_Frame p} with the idea in our heads that we will show that these preconditions hold when we show \ref{def:r-frame}.9.
+
+\begin{lem}\label{lem:S-Theory-B-WORLD}
+	\HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} is a \HOLtm{S_Theory (Theta p)} is an \HOLtm{S_Theory (Theta p)} when the following three preconditions hold:
+	\begin{holmath}
+		\begin{matrix*}[l]
+			1. & \HOLtm{¬ |- p} \\ 
+			2. & \HOLtm{S_Theory (Theta p) w} \\
+			3. & \HOLtm{APPLYING w (B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\})}
+		\end{matrix*} 	
+	\end{holmath} 
+	Or rather: 
+	\begin{holmath}
+		\HOLthm[p//A]{RMSemantics.S_Theory_B_WORLD}
+	\end{holmath}
+\end{lem}
+\begin{proof}
+	
+\end{proof}
+\fix{add proof}
+
+Looking at how \HOLtm{B_WORLD theta i r} has been constructed to exclude everything that could imply a proposition outside of \HOLtm{r} and it contains all other propositions, we can informally say that \HOLtm{B_WORLD theta i r} \emph{maximally excludes} \HOLtm{r}. 
+In this sense we will propose a varient of Lemma~\ref{lem:exists-theta-prop} that for our specific \HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}}. 
+
+\begin{prop}\label{prop:b-world-prop-exists}
+	Let \HOLtm{p} be a non-theorem, \HOLtm{z} be \HOLtm{Prime}, and \HOLtm{w} a \HOLtm{S_Theory (Theta p)}. 
+
+	Then whenever \HOLtm{C} is not in \HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} then we know that there is a \HOLtm{D ∉ z} such that \HOLtm{d ∈ B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} and \HOLtm{d & C --> D ∈ w}:
 	\begin{holmath}
 		\HOLthm{RMSemantics.B_WORLD_prop_exists}
 	\end{holmath}
-\end{lem}
+\end{prop}
 
-\begin{lem}
+Naturally, like in the proof of the primality of \HOLtm{Theta p} we will use the preceding proposition to show that \HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} is indeed prime: 
+
+\begin{prop}label{prop:b-world-prime}
 	\begin{holmath}
-		\HOLthm{RMSemantics.S_Theory_B_WORLD}
+		\HOLthm[p//A]{RMSemantics.Prime_B_WORLD}
 	\end{holmath}
-\end{lem}
+\end{prop}
 
-\begin{lem}
-	\begin{holmath}
-		\HOLthm{RMSemantics.Prime_B_WORLD}
-	\end{holmath}
-\end{lem}
+We will omit the proof as the argument follows similarly to that of Theorem~\ref{thm:theta-prime}, except that we use Proposition~\ref{prop:b-world-prop-exists} the regulaity of \HOLtm{Theta p} to use the rules of the goldblatt axioms, and that \HOLtm{z} is \HOLtm{Prime} to derive a contradiction.
 
+Now we are able to show that \HOLtm{Canonical_Frame p} is an \HOLtm{R_Frame} in full:
 \begin{proof}[Proof (Theorem~\ref{thm:canonical-frame-is-r-frame})]
 	We show that given a non-theorem \HOLtm{p} each of the nine conditions for \HOLtm{R_Frame}s hold:
 	\begin{enumerate}
@@ -578,68 +612,67 @@ What we really want is some connection between the propositions inside these wor
 \end{lem}
 
 The complex part about this proof, is dealing with the case where \HOLtm{q} is of the form \HOLtm{A --> B}. 
-The only way that we are able to really do this is by showing its contrapositive, and then constructing worlds that show that it doesn't hold. 
-But we already have a method of constructing worlds with the canonical frame. That is, choose a set of propositions that we want the world to definitely have and another set of propositions that we don't. 
-Then itteratively add all the propostions we can to the starting set with the condition that we don't entail the rejection set. 
+The way that we will show this the contrapositive statement by letting \HOLtm{A --> B ∉ w} and \HOLtm{(Canonical_Frame p).R w x y}, and then constucting worlds \HOLtm{x} and \HOLtm{y} such that \HOLtm{A ∈ x} and \HOLtm{B ∉ y}. 
+ 
+We already have a method of constructing worlds with the canonical frame. That is, choose a set of propositions that we want the world to definitely have and another set of propositions that we want the world to reject and then iteratively add all the propostions we can to the starting set with the condition that we don't end up implying the rejection set:
 
-\fix{introduce each}
 \begin{defn}\label{def:X-world}
+	Where \HOLtm{ThetaSym}, \HOLtm{i}, \HOLtm{r}, and \HOLtm{w} are sets of \HOLty{:g_prop}, and $\{\HOLtm{LINV R_gn UNIV n}\}_{n\in\mathbb N}$ is an enumeration over \HOLtm{(UNIV :g_prop set)} we define \HOLtm{X_WORLD_i n ThetaSym i r w} inductively as:
 	\begin{holmath}
-		\HOLthm[p//A,def]{prettyPrinting.X_WORLD_i_def_pp}\\
-		\HOLthm[def]{RMSemantics.X_WORLD_def}
+		\HOLthm[i//S,r//R,p//A,def]{prettyPrinting.X_WORLD_i_def_pp}
+	\end{holmath}
+	We then take the union of \HOLtm{X_WORLD_i n ThetaSym i r w} over \HOLtm{n} to get:
+	\begin{holmath}
+		\HOLthm[i//S,r//R,def]{RMSemantics.X_WORLD_def}
 	\end{holmath}
 \end{defn}
-
+Similarly we define:
 \begin{defn}\label{def:Y-world}
+	Where \HOLtm{ThetaSym}, \HOLtm{i}, and \HOLtm{r} are sets of \HOLty{:g_prop}, and $\{\HOLtm{LINV R_gn UNIV n}\}_{n\in\mathbb N}$ is an enumeration over \HOLtm{(UNIV :g_prop set)} we define \HOLtm{Y_WORLD_i n ThetaSym i r} inductively as:
 	\begin{holmath}
-		\HOLthm[p//A,def]{prettyPrinting.Y_WORLD_i_def_pp}\\
-		\HOLthm[def]{RMSemantics.Y_WORLD_def}
+		\HOLthm[i//S,r//R,p//A,def]{prettyPrinting.Y_WORLD_i_def_pp}
+	\end{holmath}
+	We then take the union of \HOLtm{Y_WORLD_i n ThetaSym i r} over \HOLtm{n} to get:
+	\begin{holmath}
+		\HOLthm[i//S,r//R,def]{RMSemantics.Y_WORLD_def}
 	\end{holmath}
 \end{defn}
+Naturally we want \HOLtm{X_WORLD (Theta p) {A\} {B\} w} and \HOLtm{Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A\} {B\} w)) {B\}} for any given proposions \HOLtm{A} and \HOLtm{B}. 
 
-\begin{prop}\label{prop:x-world-s-theory}
+Just like with our treatment of \HOLtm{B_WORLD Thetasym i r} in Definition~\ref{def:B-world} we both these worlds are \HOLtm{S_Theory (Theta p)} when few conditions are met: 
+\begin{prop}\label{prop:x-world-s-theory}\
+	When \HOLtm{p} is a non-theorem, \HOLtm{w} is a \HOLtm{S_Theory (Theta p)}, and \HOLtm{A --> B ∉ w} we have that \HOLtm{X_WORLD (Theta p) {A\} {B\} w} is a \HOLtm{S_Theory (Theta p)}:
 	\begin{holmath}
 		\HOLthm{RMSemantics.X_WORLD_THETA_THEORY}
 	\end{holmath}
 \end{prop}
 
-\begin{prop}
-	\begin{holmath}
-		\HOLthm{RMSemantics.X_WORLD_prop_exists}
-	\end{holmath}
-\end{prop}
-
-\begin{prop}\label{prop:x-world-prime}
-	\begin{holmath}
-		\HOLthm{RMSemantics.X_WORLD_Prime}
-	\end{holmath}
-\end{prop}
-
-
 \begin{prop}\label{prop:y-world-s-theory}
+	When \HOLtm{p} is a non-theorem, \HOLtm{x} is a \HOLtm{S_Theory (Theta p)}, and \HOLtm{B ∉ x} we have that \HOLtm{Y_WORLD (Theta p) x {B\}} is a \HOLtm{S_Theory (Theta p)}:
 	\begin{holmath}
 		\HOLthm{RMSemantics.Y_WORLD_THETA_THEORY}
 	\end{holmath}
 \end{prop}
 
-\begin{prop}
+And similarly they are both \HOLtm{Prime}:\footnote{The way we show primality here requires that we show a similar Proposition to either \ref{lem:exists-theta-prop} or \ref{prop:b-world-prop-exists} for each world. }
+
+\begin{prop}\label{prop:x-world-prime}
+	When \HOLtm{p} is a non-theorem, \HOLtm{w} is a \HOLtm{Prime} \HOLtm{S_Theory (Theta p)}, and \HOLtm{A --> B ∉ w} we have that \HOLtm{X_WORLD (Theta p) {A\} {B\} w} is \HOLtm{Prime}:
 	\begin{holmath}
-		\HOLthm{RMSemantics.Y_WORLD_prop_exists}
+		\HOLthm{RMSemantics.X_WORLD_Prime}
 	\end{holmath}
 \end{prop}
 
 \begin{prop}\label{prop:y-world-prime}
+	When \HOLtm{p} is a non-theorem, \HOLtm{x} is a \HOLtm{S_Theory (Theta p)}, and \HOLtm{B ∉ x} we have that \HOLtm{Y_WORLD (Theta p) x {B\}} is a \HOLtm{Prime}:
 	\begin{holmath}
 		\HOLthm{RMSemantics.Y_WORLD_Prime}
 	\end{holmath}
 \end{prop}
-
-
-
-
+Now we can go ahead and proof the Truth Lemma:
 {
 \setlist[description]{font=\normalfont}
-\begin{proof}[Proof of the Truth Lemma (Lemma~\ref{lem:rm-truth}).]
+\begin{proof}[Proof (Lemma~\ref{lem:rm-truth}).]
 	Setting \HOLtm{p} we then induct on the structure of \HOLtm{A}. Taking \HOLtm{w} to be the world in question:
 	\begin{description}
 		\item[\HOLtm{g_VAR s}:] Holds from the definition of \HOLtm{(Canonical_Model p).VF}.
@@ -685,16 +718,16 @@ Then itteratively add all the propostions we can to the starting set with the co
 		\end{holmath}
 		\HOLtm{S_Theory (Theta p) (APPLYING w (X_WORLD (Theta p) {A\} {B\} w))} is immedate from Proposition~\ref{prop:APPLIED-S-THEORY}. 
 
-		Now that we have that both \HOLtm{X_WORLD (Theta p) {A\} {B\} w} and \HOLtm{Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A\} {B\} w)) {B\}} are worlds in the canonical frame, we only need to show that:
+		Now that we have that both  our choice of \HOLtm{x = X_WORLD (Theta p) {A\} {B\} w} and \HOLtm{y = Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A\} {B\} w)) {B\}} are worlds in the canonical frame, we only need to show that:
 		\begin{holmath}
 		\begin{matrix*}[l]
-			1. & \HOLtm{(Canonical_Frame p).R w (X_WORLD (Theta p) {A\} {B\} w)
-          (Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A\} {B\} w)) {B\})}\\
+			1. & \HOLtm[width=100]{APPLYING w (X_WORLD (Theta p) {A\} {B\} w) ⊆ (Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A\} {B\} w)) {B\})}\\
 			2. & \HOLtm{A ∈ X_WORLD (Theta p) {A\} {B\} w}\\
 			3. & \HOLtm{B ∉ Y_WORLD (Theta p) (APPLYING w (X_WORLD (Theta p) {A\} {B\} w)) {B\}}
 		\end{matrix*}
 		\end{holmath}
-		The first two are immedately obvious and the third is again a natural result though it is tedious to show.
+
+		The 1. and 2. are immedately obvious from Definitions~\ref{def:X-world} and \ref{def:Y-world}, while the third is again a natural result though it is tedious to show.
 
 		\item[\HOLtm{A & B}:] We need to show that \HOLtm{A ∈ w} and \HOLtm{B ∈ w} if and only if \HOLtm{A & B ∈ w}. 
 		As \HOLtm{w} is a \HOLtm{S_Theory (Theta p)} and \HOLtm{Theta p} is \HOLtm{Regular}, the showing the result is straightforward. 
@@ -726,3 +759,6 @@ The Goldblatt Axioms are \emph{complete} with respect to the Routley-Meyer Seman
 	We then assume that \HOLtm{p ∈ Theta p} and derive a contradiction using \HOLthm[nostile,p//A]{GoldblattRL.g_identity}. 
 \end{proof}
 \section{Summary}
+This chapter introduced the Routley-Meyer semantic system for Relevant Implication and formalised both semantic soundness and completeness between the Goldblatt axiomatisation and the Routley-Meyer system. Inside the HOL development, this required 2211 lines of source code contained entirely inside \texttt{RMSemanticsScript.sml}. 
+
+We shall now take a look at an alternative semantic system for \HOLtm{R_set}.    
