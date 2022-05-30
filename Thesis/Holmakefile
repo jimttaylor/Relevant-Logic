@@ -40,7 +40,7 @@ chpt4rmsemantics.tex: chpt4rmsemantics.htex munger holtexbasic.sty proof.sty ove
 	./munger $(MUNGOPT) overrides < $< > $@
 
 chpt5coversemantics.tex: chpt5coversemantics.htex mungercs holtexbasic.sty proof.sty overridescs
-	./munger $(MUNGOPT) overridescs < $< > $@
+	./mungercs $(MUNGOPT) overridescs < $< > $@
 
 chpt7conclusion.tex: chpt7conclusion.htex munger holtexbasic.sty proof.sty overrides
 	./munger $(MUNGOPT) overrides < $< > $@
@@ -49,7 +49,7 @@ munger: $(dprot $(MASTER_THEORY)).uo $(dprot $(HOLDIR)/bin/mkmunge.exe)
 	$(protect $(HOLDIR)/bin/mkmunge.exe) -o $@ $(MASTER_THEORY)
 
 mungercs: $(dprot $(MASTER_THEORY_CS)).uo $(dprot $(HOLDIR)/bin/mkmunge.exe)
-	$(protect $(HOLDIR)/bin/mkmunge.exe) -o $@ $(MASTER_THEORY)	
+	$(protect $(HOLDIR)/bin/mkmunge.exe) -o $@ $(MASTER_THEORY_CS)
 
 mungergse: $(dprot $(MASTER_THEORY_GSE)).uo $(dprot $(HOLDIR)/bin/mkmunge.exe)
 	$(protect $(HOLDIR)/bin/mkmunge.exe) -o $@ $(MASTER_THEORY_GSE)

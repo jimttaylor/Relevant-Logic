@@ -1136,7 +1136,7 @@ QED
 
 Theorem Prime_B_WORLD:
   ∀A w x y z.¬ |- A ∧
-           Prime z ∧ S_Theory (Theta A) z ∧ S_Theory (Theta A) w ∧
+           Prime z ∧ S_Theory (Theta A) w ∧
            APPLYING w (B_WORLD (Theta A) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)}) ⊆ z
            ⇒
            Prime (B_WORLD (Theta A) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)})
@@ -2209,4 +2209,3 @@ Proof
 QED
  
 val _ = export_theory();
-
