@@ -398,7 +398,6 @@ Proof
   >- metis_tac[R_sequent_rules]
   >- (rename[‘X ； Y ||- _’] >>
       simp[g_ICONJ_def] >> assume_tac RAA >>
-      pop_assum $ qspecl_then [‘X’, ‘Y’, ‘bg X --> ~bg Y’] strip_assume_tac >>
       last_x_assum irule >> qexists_tac ‘~(bg Y)’ >> rw[]
       >- metis_tac[NOT_NOT_Introduction]
       >- (‘((PROP τ) ； X)||- (bg X --> ~bg Y) --> ~bg Y’ suffices_by

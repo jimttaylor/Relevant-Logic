@@ -1,11 +1,492 @@
 \chapter{Cover Semantics}
 \label{cha:coversemantics}
+\begin{tikzpicture}[overlay,remember picture]
+ \node[anchor=north,inner sep=0pt]at ([xshift=-0.5cm,yshift=-1.5cm]current page.north) {\includegraphics[width=4cm]{figures/Relevant-Star-chpt4.PNG}};
+\end{tikzpicture}
 
 
+\fix{talk about, a flaw of the RM semantics, topology, the idea behind cover semantics}
 
 
-\section{Direct Cost}
+\fix{refs}
 
+This chapter introduces the Cover Semantics for unquantified relevant implication and establishes soundness and completeness results between the Goldblatt axioms and this system. In Section~\ref{sec:CSsystem} we present Cover Semantics as described by \citet{GoldblattRobert2011Qpai} adn we will also establish \emph{semantic soundness} between the Hilbert System is and this alternative semantic system. In Section~\ref{sec:CScompleteness} we will formalise \emph{semantic completeness} for relevant implication with respect to the cover semantics.
 
+\section{The Goldblatt System}\label{sec:CSsystem}
+
+Before we get into defining the Cover Semantics formally, we should first define a notion of \HOLtm{PREORDER}.
+A preorder is defined mathematically as a binary relation over a set $X$ such that it is both reflexive and transitive. 
+In HOL there is already a defined predicate for preorder as well as reflexivity and transitivity, but these are defined for all of \HOLtm{UNIV} i.e. a function is only reflexive if it is reflexive over all of \HOLtm{UNIV}. 
+
+For our purposes in this chapter what we really want is a predicate that captures preorder over a defined set of type \HOLty{:'a} rather than \HOLtm{UNIV}. 
+\begin{defn}[\HOLtm{PREORDER}]\label{def:preorder}
+	A binary operator \HOLtm{R} is a \HOLtm{PREORDER} over a set \HOLtm{X} if
+	\begin{enumerate}
+		\item For all \HOLtm{x} in \HOLtm{X} we have that \HOLtm{R x x}
+		\item For all \HOLtm{x}, \HOLtm{y}, \HOLtm{z} in \HOLtm{X} we have that if \HOLtm{R x y} and \HOLtm{R y z}, then \HOLtm{R x z}. 
+	\end{enumerate}
+	\begin{holmath}
+		\HOLthm[def]{CoverSemantics.PREORDER_def}
+	\end{holmath}
+\end{defn}
+
+\subsection{Beginning with Cover Systems}
+Let us first define what structures we will be working with:
+\begin{defn}\label{def:cover-system}
+	An \HOLty{:α COVER_SYSTEM} is a record type with fields \HOLtm{W}, \HOLtm{$REF}, \HOLtm{COVER}. \HOLtm{W} is a set of worlds of type \HOLty{:α}, \HOLtm{REF} is a binary relation over \HOLty{:α}, and \HOLtm{COVER} is a relation between sets containing elements of \HOLty{:α} and and elements of \HOLty{:α}. 
+	\begin{holmath}
+		\HOLthm{CoverSemantics.datatype_COVER_SYSTEM}
+	\end{holmath}
+\end{defn}
+
+We should keep in mind that the only members of this datatype that are interesting for our purposes are the ones where \HOLtm{REF} is a \HOLtm{PREORDER} over \HOLtm{W}. 
+With this in mind we will define an \emph{upwardly-closed set} or \emph{upset} with respect to a \HOLty{:α COVER_SYSTEM}.
+
+\begin{defn}[Upset]\label{def:upset}
+	A set \HOLtm{X} is an \HOLtm{Upset (to_CS RCS)} with respect to a \HOLty{:α COVER_SYSTEM} \HOLtm{CS} if 
+	\begin{holmath}
+		\begin{matrix*}[l]
+			1. & \HOLtm{X ⊆ CS.W}\\
+			2. & \HOLtm{∀d e. d ∈ X ∧ e ∈ CS.W ∧ CS.REF d e ⇒ e ∈ X}
+		\end{matrix*}
+	\end{holmath}
+	or rather:
+	\begin{holmath}
+		\HOLthm[]{CoverSemantics.Upset_def}
+	\end{holmath}
+\end{defn}
+
+We can also define the \emph{upward closure} of a set \HOLtm{X}:
+\begin{defn}\label{def:up}
+	If \HOLtm{X} is a set, then the \emph{upward closure} with respect to an \HOLty{:α COVER_SYSTEM} \HOLtm{CS} is the set of all elements in \HOLtm{CS.W} such that there exists a \HOLtm{x} \HOLtm{x ∈ X} and \HOLtm{CS.REF x u}:
+	\begin{holmath}
+		\HOLthm[X//x,x//w,def]{CoverSemantics.Up_def}
+	\end{holmath}
+	When \HOLtm{X} is a singleton \HOLtm{{x\}} we drop the set notation and write \HOLtm{Up CS {x\}} for clarity.
+\end{defn}
+Now we are able to define a Cover System:
+\begin{defn}\label{def:cover-system}
+	A \HOLty{:α COVER_SYSTEM} \HOLtm{CS} is a \HOLtm{Is_Cover_System} if the following are true:
+	\begin{enumerate}
+		\item \HOLtm{CS.REF} is a \HOLtm{PREORDER} over \HOLtm{CS.W}
+		\item If \HOLtm{CS.REF x y} then both \HOLtm{x} and \HOLtm{y} are in \HOLtm{CS.W} 
+		\item If \HOLtm{x ∈ CS.W} then there exists a \HOLtm{Z} such that \HOLtm{CS.COVER Z x} 
+		\item If \HOLtm{x ∈ CS.W} and \HOLtm{CS.COVER Z x} then \HOLtm{Z ⊆ Up CS {x\}}
+	\end{enumerate}
+	In other words:
+	\begin{holmath}
+		\HOLthm{CoverSemantics.Is_Cover_System_def}
+	\end{holmath}
+\end{defn}
+As we now have the \HOLtm{PREORDER} condition on \HOLtm{CS} we can now claim that a set \emph{upset} and invariance under \emph{upward closure} are the same thing.
+\begin{prop}
+	A set \HOLtm{X} is an \HOLtm{Upset} with respect to a \HOLtm{Is_Cover_System} CS if and only if it is invarient under \emph{upward closure}. That is:
+	\begin{holmath}
+		\HOLthm{CoverSemantics.Upset_up}
+	\end{holmath}
+\end{prop}
+We will also define a function \HOLtm{j CS} over subsets of \HOLtm{CS.W}:
+\begin{defn}
+	\begin{holmath}
+		\HOLthm[def]{CoverSemantics.j_def}
+	\end{holmath}
+\end{defn}
+We should ask what \HOLtm{j CS} actually means. 
+If \HOLtm{w ∈ j CS X} then \HOLtm{w} has a covering that is constained inside of \HOLtm{X}, or with the natural reading from the introduction, all members of \HOLtm{Z} are members of \HOLtm{X} so being a member of \HOLtm{X} is \emph{locally holds} of \HOLtm{w}. 
+In this sense \HOLtm{j CS X} can be considered the set of \emph{local members} of \HOLtm{X}. 
+\begin{defn}[Localized]\label{def:localized}
+We say that a set \HOLtm{X} is \HOLtm{Localized} in a Cover System CS when all local members of \HOLtm{X} are in \HOLtm{X}
+	\begin{holmath}
+	\HOLthm{CoverSemantics.Localized_def}
+	\end{holmath}
+\end{defn}
+
+\begin{lem}\label{lem:lemma6-3-1}
+	If \HOLtm{CS} is a Cover System, and \HOLtm{X} is an Upset in \HOLtm{CS} then all members of \HOLtm{X} are also \emph{local members} of \HOLtm{X}. Or rather:
+	\begin{holmath}
+		\HOLthm{CoverSemantics.lemma6_3_1}
+	\end{holmath}
+\end{lem}
+\begin{proof}
+	\fix{add proof}
+\end{proof}
+
+\subsection{Making Cover Systems Relevant}
+In order to make this semantic appropriate for Relevant Implication, we need to introduce a number of extra relationships to our cover systems: 
+\begin{defn}
+	An \HOLty{:α R_COVER_SYSTEM} is a record type with fields \HOLtm{W}, \HOLtm{REF}, \HOLtm{COVER}, \HOLtm{FUSE}, \HOLtm{E}, and \HOLtm{ORTH}. Like in Definition~\ref{def:cover-system}, \HOLtm{W} is a set of worlds of type \HOLty{:α}, \HOLtm{REF} is a binary relation over \HOLty{:α}, and \HOLtm{COVER} is a relation between sets containing elements of \HOLty{:α} and and elements of \HOLty{:α}. 
+	\HOLtm{FUSE} is a binary operator over elements of \HOLty{:α},
+	\HOLtm{E} is a specific element of type\HOLty{:α} , and 
+	\HOLtm{ORTH} is a binary relation over elements of \HOLty{:α}. 
+	\begin{holmath}
+		\HOLthm{CoverSemantics.datatype_R_COVER_SYSTEM}
+	\end{holmath}
+\end{defn}
+With the new operator \HOLtm{$⬝ₐ} we write can use the shorthand \HOLtm{x ⬝ₐ Y = {x ⬝ₐ y | y ∈ Y\}} and similarly \HOLtm{X ⬝ₐ y = {x ⬝ₐ y | x ∈ X\}} for fusion over sets. Similarly, for \HOLtm{$⊥ₐ} we can use the shorthand \HOLtm{x ⊥ₐ Y <=> ∀y. y ∈ Y ⇒ x ⊥ₐ y} and \HOLtm{X ⊥ₐ y <=> ∀x. x ∈ X ⇒ x ⊥ₐ y}.
+
+As an \HOLty{:α R_COVER_SYSTEM} is also just an extension of an \HOLty{:α COVER_SYSTEM} we note that \HOLtm{j}, \HOLtm{Upset}, and \HOLtm{Localized} naturally extend to \HOLty{:α R_COVER_SYSTEM}. 
+
+With this structure, we define a \HOLtm{Is_Relevant_Cover_System}:
+\begin{defn}\label{def:relevant-cover-system}
+	A \HOLtm{Is_Relevant_Cover_System RCS} is an \HOLty{:α R_COVER_SYSTEM} that satisfies the following closure properties:
+	\begin{enumerate}
+		\item \HOLtm{x ≼ₐ y ⇒ x ∈ RCS.W ∧ y ∈ RCS.W}
+		\item \HOLtm{Z ▹ₐ x ⇒ x ∈ RCS.W ∧ Z ⊆ RCS.W}
+		\item \HOLtm{x ∈ RCS.W ∧ y ∈ RCS.W ⇒ x ⬝ₐ y ∈ RCS.W}
+		\item \HOLtm{x ⊥ₐ y ⇒ x ∈ RCS.W ∧ y ∈ RCS.W}
+	\end{enumerate}
+	And, assuming that all variables are already in \HOLtm{RCS.W}, the following statements hold:
+	\begin{enumerate}
+		\setcounter{enumi}{5}
+		\item \HOLtm{RCS.W}, \HOLtm{RCS.REF}, and \HOLtm{RCS.COVER} together are a \HOLtm{Is_Cover_System}
+		\item \HOLtm{(x ⬝ₐ RCS.E) = x} and \HOLtm{(RCS.E ⬝ₐ x) = x}
+		\item \HOLtm{$⬝ₐ} is \emph{commutative} and \emph{associative} over \HOLtm{RCS.W}
+		\item If \HOLtm{ x ≼ₐ x'} and \HOLtm{y ≼ₐ y'} then it is the case that \HOLtm{(x ⬝ₐ y) ≼ₐ (x' ⬝ₐ y')} 
+		\item \HOLtm{(x ⬝ₐ x) ≼ₐ x} for all \HOLtm{x}
+		\item If \HOLtm{Z ▹ₐ x} and \HOLtm{y ∈ RCE.W} then \HOLtm{(Z ⬝ₐ y) ▹ₐ (x ⬝ₐ y)}
+		\item If \HOLtm{x ≼ₐ x'} and \HOLtm{y ≼ₐ y'} and \HOLtm{x ⊥ₐ y} then \HOLtm{x' ⊥ₐ y'}
+		\item If \HOLtm{Z ▹ₐ x} and \HOLtm{Z ⊥ₐ RCS.E} then it is the case that \HOLtm{x ⊥ₐ RCS.E}
+		\item If \HOLtm{(x ⬝ₐ y) ⊥ₐ z} then \HOLtm{(x ⬝ₐ z) ⊥ₐ y}
+	\end{enumerate}
+	In other words:
+	\begin{holmath}
+		\HOLthm{CoverSemantics.Is_Relevant_Cover_System_def}
+	\end{holmath}
+\end{defn}
+The important mechanism here is \HOLtm{Is_Relevant_Cover_System} is 13. which makes orthogonality to \HOLtm{RCS.E} a \emph{locally determined property}. 
+As we read \HOLtm{Z ▹ₐ x} to mean that \HOLtm{x} is precisely what statements the collection of possible worlds \HOLtm{Z} agree on, and each member of \HOLtm{Z} disagrees with \HOLtm{RCS.E} in some way, then there is some information that all members of \HOLtm{Z} agree on that is in conflict with \HOLtm{RCS.E}. 
+
+Now we will define a couple of extra operators over the set of worlds \HOLtm{RCS.W}. 
+\begin{defn}[Orthocompliment, Orthojoin, and Implication]\label{def:orthcomp-orthjoin-imp}
+Inside an \HOLtm{Is_Relevant_Cover_System RCS}, the \emph{Orthocompliment} of a set \HOLtm{X} is the set of of worlds that are orthogonal to all worlds in \HOLtm{x}:
+\begin{holmath}
+ 	\HOLthm[def]{CoverSemantics.Perp_def}
+\end{holmath} 
+The \emph{orthojoin} of two sets \HOLtm{X} and \HOLtm{Y} then is then the double application of orthogonality to, or \HOLtm{orthoclosure} of, the union of the two sets: 
+\begin{holmath}
+	\HOLthm[def]{CoverSemantics.Orthojoin_def}
+\end{holmath}
+We also define the implication under \HOLtm{RCS} from \HOLtm{X} to \HOLtm{Y} as set of worlds \HOLtm{w} such \HOLtm{w} fused to all members of \HOLtm{X} is a subset of \HOLtm{Y}:
+\begin{holmath}
+	\HOLthm[def]{CoverSemantics.IMP_def}
+\end{holmath}
+\end{defn}
+We can show the following properties of any \HOLtm{RCS} that is a \HOLtm{Is_Relevant_Cover_System}:
+\begin{lem}\label{lem:lemma6-4-1}
+\begin{enumerate}
+	\item \HOLtm{w ⊥ₐ u} is true if and only if \HOLtm{(w ⬝ₐ u)⊥ₐ RCS.E}.
+	\item \HOLtm{Perp RCS X} is \HOLtm{Localized} in, and an \HOLtm{Upset} of, \HOLtm{RCS}.
+	\item If \HOLtm{Y} is an \HOLtm{Upset} of \HOLtm{RCS} then so is \HOLtm{X ⟹ₐ Y}.
+	\item If \HOLtm{Y} is \HOLtm{Localized} in \HOLtm{RCS} then so is \HOLtm{X ⟹ₐ Y}.
+	\item If \HOLtm{w ⊥ₐ X} then \HOLtm{a ⊥ₐ j X}. Or, \HOLtm{Perp X ⊆ Perp (j X)}
+	\item \HOLtm{(j X) ⊆ Perp (Perp (j X))} and \HOLtm{Perp (Perp (j X)) ⊆ Perp (Perp X)}
+	\item If \HOLtm{X} is an \HOLtm{Upset} of \HOLtm{RCS} then, \HOLtm{w ⊥ₐ u} if and only if \HOLtm{w ⊥ₐ j X}. Or, \HOLtm{Perp X = Perp (j X)}
+	\item If \HOLtm{X} is an \HOLtm{Upset} of \HOLtm{RCS} then: \HOLtm{X ⊆ j X}, \HOLtm{j X ⊆ j (Perp (Perp X))}, and \HOLtm{j (Perp (Perp X)) = Perp (Perp X)}
+\end{enumerate}
+\begin{holmath}
+		 \HOLthm{CoverSemantics.lemma6_4_1_1}\\
+		 \HOLthm{CoverSemantics.lemma6_4_1_2}\\
+		 \HOLthm{CoverSemantics.lemma6_4_1_3}\\
+		 \HOLthm{CoverSemantics.lemma6_4_1_4}\\
+		 \HOLthm{CoverSemantics.lemma6_4_1_5}\\
+		 \HOLthm{CoverSemantics.lemma6_4_1_6}\\
+		 \HOLthm{CoverSemantics.lemma6_4_1_7}\\
+		 \HOLthm{CoverSemantics.lemma6_4_1_8}
+\end{holmath}
+\end{lem}
+\begin{proof}
+	\fix{add proof}
+\end{proof}
+
+It follows immediatly from Lemma~\ref{lem:lemma6-4-1} that
+\begin{cor}\label{lem:corollary6-4-2}
+	\begin{cor}
+		\HOLthm{CoverSemantics.corollary6_4_2}
+	\end{cor}
+\end{cor}
+
+\subsection{Model Systems, Models, and Soundness}
+\begin{defn}\label{def:model-system}
+	An \HOLtm{R_MODEL_SYSTEM} is a \HOLtm{Is_Relevant_Cover_System} together with a collection of subsets of \HOLtm{RCS.W} \HOLtm{Prop}, called the \emph{admissable propositions} of the 
+	such that for all \HOLtm{X} and \HOLtm{Y} in \HOLtm{Prop} we have that:
+	\begin{enumerate}
+		\item \HOLtm{Up (to_CS RCS) {RCS.E\} ∈ Prop}.
+		\item \HOLtm{X} is an \HOLtm{Upset}.
+		\item \HOLtm{X = Perp (Perp X)} 
+		\item \HOLtm{Perp X ∈ Prop}
+		\item \HOLtm{X ∩ Y ∈ Ps}
+		\item \HOLtm{X ⟹ₐ Y ∈ Ps}
+		\item \HOLtm{Orthojoin X Y = j (X ∪ Y)}
+	\end{enumerate}
+	\begin{holmath}
+		\HOLthm{CoverSemantics.R_MODEL_SYSTEM_def}
+	\end{holmath}
+\end{defn}
+
+\begin{defn}\label{def:model-function}
+	A Model Function \HOLtm{M} is a function that is inductively defined from \HOLty{:g_prop} into \HOLtm{Prop} such that each propositional variable is assigned a set inside \HOLtm{Prop}, \HOLtm{tau} is assigned \HOLtm{Up (to_CS RCS) {RCS.E\}}. Then \HOLtm{M (A & B)} goes to \HOLtm{M A ∩ M B}, \HOLtm{M (A --> B)} goes to \HOLtm{M A ⟹ M B}, and \HOLtm{M (~A)} goes to \HOLtm{Perp (M A)}:
+	\begin{holmath}
+		\HOLthm{CoverSemantics.Model_Function_def}
+	\end{holmath}
+\end{defn}
+\begin{cor}
+	It is also the case that \HOLtm{M(A V B)} goes to \HOLtm{Orthojoin (M A) (M B)}.
+	\begin{holmath}
+		\HOLthm{CoverSemantics.Model_Function_or}
+	\end{holmath}
+\end{cor}
+
+Using this we are able to determine ..  
+\begin{defn}\label{def:c-holds}
+	
+	\begin{holmath}
+		\HOLthm{CoverSemantics.C_Holds_def}
+	\end{holmath}
+\end{defn}
+
+\begin{cor}\label{def:holds-conditions}
+
+	\begin{holmath}
+		\HOLthm{CoverSemantics.C_Holds_conditions}
+	\end{holmath}
+\end{cor}
+\begin{proof}
+	
+\end{proof}
+
+These condi
+\begin{thm}\label{thm:CSsoundness}
+	The Goldblatt Axioms are \emph{sound} with respect to the Cover Semantics:
+	\begin{holmath}
+		\HOLthm[]{CoverSemantics.soundness}
+	\end{holmath}
+\end{thm}
+\begin{proof}
+	
+\end{proof}
+
+\section{Completeness}\label{sec:CSCompleteness}
+For the cover semantics, our completeness result will take the form of: 
+\begin{holmath}
+	\HOLthm[nostile]{CoverSemantics.completeness}
+\end{holmath}
+Like we did for the Routley-Meyer Semantics we will construct a canonical \HOLtm{R_MODEL_SYSTEM} to show completeness with respect to the cover semamtics, however we will be using it in a competely different way. 
+The idea is to show that if \HOLtm{p} is valid in all \HOLtm{RCS} then it muust be valid in the canonical \HOLtm{R_MODEL_SYSTEM}, and then we will show that if \HOLtm{p} is valid in the canonical \HOLtm{R_MODEL_SYSTEM} then it is a theorem of the Goldblatt Hilbert System.
+
+But first we will look at some useful constructs beforehand:
+
+\begin{defn}[Entails]\label{def:entails}
+	We will define a relationship over \HOLty{:g_prop} which we will 
+	\begin{holmath}
+		\HOLthm[def]{CoverSemantics.ENTAILS_def}
+	\end{holmath}
+	We should then read \HOLtm{ENTAILS A B} as \HOLtm{B} is a \emph{consequence} of \HOLtm{A}.\footnote{Note that this is just a special case of Definition~\ref{def:pENTAILS-def}.}
+\end{defn}
+And naturally we will observe the following results of Definition~\ref{def:entails}
+\begin{prop}[Some results of entails]\label{prop:entails-results}
+	\begin{holmath}
+		\begin{matrix*}[l]
+			1. & \HOLthm[nostile]{CoverSemantics.ENTAILS_PREORDER}\\
+			2. & \HOLthm[nostile]{CoverSemantics.ENTAILS_REFL}\\
+			3. & \HOLthm[nostile]{CoverSemantics.ENTAILS_TRANS}\\
+			4. & \HOLthm[nostile]{CoverSemantics.ENTAILS_AND}\\
+			5. & \HOLthm[nostile]{CoverSemantics.OR_ENTAILS}\\
+			6. & \HOLthm[nostile]{CoverSemantics.ENTAILS_CONTRAPOS}\\
+			7. & \HOLthm[nostile]{CoverSemantics.ENTAILS_CONTRAPOS_alt}\\
+			8. & \HOLthm[nostile]{CoverSemantics.ENTAILS_DOUBLE_NEG}\\
+			9. & \HOLthm[nostile]{CoverSemantics.ENTAILS_ICONJ_COMM}\\
+			10. & \HOLthm[nostile]{CoverSemantics.ENTAILS_ICONJ_MONOTONE}\\
+			11. & \HOLthm[nostile]{CoverSemantics.ENTAILS_ICONJ_MONOTONE_alt}\\
+			12. & \HOLthm[nostile]{CoverSemantics.ENTAILS_ICONJ_RULE}\\
+			13. & \HOLthm[nostile]{CoverSemantics.ENTAILS_ICONJ_ASSOC}\\
+			14. & \HOLthm[nostile]{CoverSemantics.ENTAILS_ICONJ_T}\\
+			15. & \HOLthm[nostile]{CoverSemantics.ENTAILS_ICONJ_SELF}
+		\end{matrix*}
+	\end{holmath}
+\end{prop}
+We naturally call the set of all propositions that are the consequence of \HOLtm{A} the \emph{prinicple theory} of \HOLtm{A} and define:
+\begin{defn}[Principle Theory]\label{defn:principle-theory}
+	The \HOLtm{principle theory} of \HOLtm{A} is the set of all propositions are \emph{consequents} of \HOLtm{A} under \HOLtm{$|-^}. We write \HOLtm{Theory A} to denote this set.
+	\begin{holmath}
+		\HOLthm[def]{CoverSemantics.Theory_def}
+	\end{holmath}
+\end{defn}
+We also can derive the following closure and containment properties of \emph{principle theories} from Proposition~\ref{prop:entails-results}
+\begin{prop}[properties of \HOLtm{Theory}]\label{prop:theory-results}
+	\begin{holmath}
+		\begin{matrix*}[l]
+			1. & \HOLthm[nostile]{CoverSemantics.Theory_closed_ENTAILS}\\
+			2. & \HOLthm[nostile]{CoverSemantics.Theory_closed_CONJ}\\
+			3. & \HOLthm[nostile]{CoverSemantics.Theory_SUBSET}\\
+			4. & \HOLthm[nostile]{CoverSemantics.Theory_EQ}
+		\end{matrix*}
+	\end{holmath}
+\end{prop}
+
+The next few definitions are quite important as they allow us to create well-defined functions for fusion and orthogonality inside our Canonical System. 
+
+\begin{defn}[Equivalence Class]\label{def:EQUIV-def}
+	The \emph{equivalence class}\footnote{We are borrowing terminology from the ...}\fix{footnote} of a Goldblatt proposition \HOLtm{A} is the set of propositions where both \HOLtm{A |-^ B} and \HOLtm{B |-^ A}. 
+	\begin{holmath}
+		\HOLthm[def]{CoverSemantics.EQUIV_def}
+	\end{holmath}
+	We also say that a set \HOLtm{X} is an equivalence class if there exists a proposition \HOLtm{A} such that \HOLtm{X = EQUIV A} or \HOLtm{X = ∅}.
+	\begin{holmath}
+		\HOLthm[nostile]{CoverSemantics.is_EQUIV_def}
+	\end{holmath}
+\end{defn}
+If we know that \HOLtm{X} can be expressed in the form \HOLtm{Theory} then we say that \HOLtm{A} generates \HOLtm{X}. \HOLtm{X} could also reasonably have more than one generator so it makes sense to talk about the set of generators of \HOLtm{X}  
+
+\begin{defn}[Generators]\label{def:generators}
+	A \emph{generator} of a set \HOLtm{X} is a propostition \HOLtm{A} such that \HOLtm{Theory A = X}. The \emph{generators} of\HOLtm{X} is the set all such \HOLtm{A}s:
+	\begin{holmath}
+	  	\HOLthm[def]{CoverSemantics.gens_def}
+	  \end{holmath}  
+\end{defn}
+It is also the case that any two generators of the same set are in the same equivalent class from Proposition~\ref{prop:prop:theory-results}, so:
+\begin{cor}\label{lem:gens-is-equiv}
+	It is the case that the set of \emph{generators} of a set \HOLtm{X} form an \emph{equivilance class}:
+	\begin{holmath}
+		 \HOLthm{CoverSemantics.gens_is_EQUIV}
+	\end{holmath} 
+\end{cor}
+
+Finally we can consider taking the union of every \HOLtm{Theory A} when \HOLtm{A} appears inside another set \HOLtm{X}. 
+\begin{defn}[Union of Theories]\label{def:Theory-union-def}
+	Given a set \HOLtm{X} we say that the \HOLtm{Theory_union} of \HOLtm{X} is just the union of all \HOLtm{Theory A} where \HOLtm{A} appears in \HOLtm{X}. 
+	\begin{holmath}
+		\HOLthm[def]{CoverSemantics.Theory_union_def}
+	\end{holmath}
+\end{defn}
+When it is the case that our \HOLtm{X} is a non-empty equivalence class of a Goldblatt proposition, then the union of all the theories generated by members of \HOLtm{X} is precisely \HOLtm{Theory A} 
+\begin{cor}\label{lem:theory-equiv}
+	The union of all theories generated by \HOLtm{EQUIV A} is precicely \HOLtm{Theory A}.
+	\begin{holmath}
+		\HOLthm{CoverSemantics.Theorem_EQUIV}
+	\end{holmath}
+\end{cor}
+Now we are able to define the relations we will use for Fusion and Orthogonality:
+\begin{defn}\label{def:canfusion}
+	For sets of Goldblatt propostions \HOLtm{x} and \HOLtm{y} we define the operator\HOLtm{$⬝ₘ} to be:
+	\begin{holmath}
+	 	\HOLthm[def]{CoverSemantics.CAN_FUSION_def}
+	\end{holmath}
+\end{defn}
+
+\begin{defn}\label{def:canorth}
+	For sets of Goldblatt propostions \HOLtm{x} and \HOLtm{y} we define the relation \HOLtm{$⊥ₘ} to be:
+	\begin{holmath}
+	 	\HOLthm[def]{CoverSemantics.CAN_ORTH_def}
+	\end{holmath}
+\end{defn}
+
+When \citep{GoldblattRobert2011Qpai} defined fusion and orthogonality for the canonical system, he only defined it over the canonical frame's set of worlds which was the set of all sets which were theories. In HOL we aren't able to do this, so we proposed \HOLtm{$⬝ₘ} and \HOLtm{$⊥ₘ} as above and an operator and relation over all sets of propositions. We can show that these agree with Goldblatt's definitions below:
+\begin{thm}
+	Where \HOLtm{A} and \HOLtm{B} are Goldblatt propositions then:
+	\begin{holmath}
+		\HOLthm[nostile]{CoverSemantics.CAN_FUSION_alt}
+	\end{holmath}
+\end{thm}
+\begin{proof}
+	\fix{add proof}
+\end{proof}
+
+\begin{thm}
+	Where \HOLtm{A} and \HOLtm{B} are Goldblatt propositions then:
+	\begin{holmath}
+		\HOLthm[nostile]{CoverSemantics.CAN_ORTH_alt}
+	\end{holmath}
+\end{thm}
+\begin{proof}
+	\fix{add proof}
+\end{proof}
+
+\subsection{The Canonical System and Completeness}
+Now that we have all the underlying stuctures defined will now move onto constructing this canonical system:
+\begin{defn}
+	The Canonical System \HOLtm{Canonical_System} is a set of worlds \HOLtm{Canonical_System.W} given by the set of \HOLtm{Theory A} where \HOLtm{A} is a Goldblatt Proposition. A refinement operation \HOLtm{Canonical_System.REF} given by containment, that is for worlds \HOLtm{x} and \HOLtm{y}, \HOLtm{(Canonical_System.REF x y) <=> (x ⊆ y)}. A Covering relation given by \HOLtm{(Canonical_System.COVER Z x) <=> (BIGINTER Z = x)} where \HOLtm{Z} is a subset of \HOLtm{Canonical_System.W} and \HOLtm{x} is in \HOLtm{Canonical_System.W}. 
+	Our \HOLtm{Canonical_System.E = Theory tau}. Fusion and Orthogonality are given by Defintions~\ref{def:canfusion} and \ref{def:canorth}:
+	\begin{holmath}
+		\HOLthm[def]{CoverSemantics.Canonical_System_def}
+	\end{holmath}
+\end{defn}
+
+Now that we have our choice of Canonical System, before we go any further we should make sure that actually a Relevant Cover System:
+\begin{thm}[]
+	\HOLtm{Canonical_System} is a \emph{Relevant Cover System}:
+	\begin{holmath}
+		\HOLthm{CoverSemantics.Canonical_System_is_RCS}
+	\end{holmath}
+\end{thm}
+\begin{proof}
+	\fix{add proof}
+\end{proof}
+
+We will also simultaniously define the set of \emph{Propositions} that we will use as the basis for an \HOLtm{R_MODEL_SYSTEM}:
+\begin{defn}
+	Where \HOLtm{EQUIV_W A} denotes the set of worlds in \HOLtm{Canonical_System.W} which contain \HOLtm{A} 
+	\begin{holmath}
+	\HOLthm[def]{CoverSemantics.EQUIV_W_def}
+	\end{holmath}
+	We define the \emph{canonical admissable propoistions} (\HOLtm{Canonical_System_Ps}) as:
+	\begin{holmath}
+		\HOLthm[def]{CoverSemantics.Canonical_System_Ps_def}
+	\end{holmath}
+\end{defn}
+There is also an equivalence between the Goldblatt Propositions and the structure of our set of admissable propoistions \HOLtm{Canonical_System_Ps}. 
+\begin{lem}[Properties of \HOLtm{EQUIV_W bullet}]
+	\begin{holmath}
+		\begin{matrix*}[l]
+			1. & \HOLthm[nostile]{CoverSemantics.lemma6_5_3_1}\\
+			2. & \HOLthm[nostile]{CoverSemantics.lemma6_5_3_2}\\
+			3. & \HOLthm[nostile]{CoverSemantics.lemma6_5_3_3}\\
+			4. & \HOLthm[nostile]{CoverSemantics.lemma6_5_3_4}\\
+			5. & \HOLthm[nostile]{CoverSemantics.lemma6_5_3_5}
+		\end{matrix*}
+	\end{holmath}	
+\end{lem}
+\begin{proof}
+	\fix{add proof}
+\end{proof}
+
+\begin{thm}[]\label{thm:CanS-r-model-system}
+	\HOLtm{Canonical_System} together with \HOLtm{Canonical_System_Ps} constitutes a \HOLtm{R_MODEL_SYSTEM}
+	\begin{holmath}
+		\HOLthm{CoverSemantics.Canonical_System_is_R_Model_system}
+	\end{holmath}
+\end{thm}
+\begin{proof}
+	\fix{add proof - only last postulate though}
+\end{proof}
+
+Now that we actually have that \HOLtm{Canonical_System} and \HOLtm{Canonical_System_Ps} together set up a \HOLtm{R_MODEL_SYSTEM} we have everything we need to show completeness, which we will show by way of a chain of implications. 
+\begin{thm}[Model System Characterisation of $\bm{R}$]
+	For any formula \HOLtm{p} the following are equivalent:
+z	\begin{enumerate}
+		\item \HOLtm{|- p}
+		\item \HOLtm{(∀RCS Ps M. R_MODEL_SYSTEM RCS Ps ∧ Model_Function RCS Ps M ⇒ C_Holds RCS Ps M RCS.E p)}
+		\item \HOLtm{∀M. Model_Function Canonical_System Canonical_System_Ps M ⇒
+          C_Holds Canonical_System Canonical_System_Ps M Canonical_System.E p}
+	\end{enumerate}
+\end{thm}
+\begin{proof}
+	{
+	\setlist[description]{font=\normalfont}
+	$\,$
+	\begin{description} 
+		\item[$1 \Rightarrow 2$:] See Theorem~\ref{thm:CSsoundness}.
+		\item[$2 \Rightarrow 3$:] Follows as an immediate consequence of Theorem~\ref{thm:CanS-r-model-system}.
+		\item[$3 \Rightarrow 1$:]
+	\end{description}
+	}
+	\fix{finish proof}
+\end{proof}
+Which yields the completeness result:
+\begin{cor}[Completeness]\label{cor:CScompleteness}
+	The Goldblatt Axioms are \emph{complete} with respect to the Cover Semantics:
+	\begin{holmath}
+		\HOLthm[]{CoverSemantics.completeness}
+	\end{holmath} 
+\end{cor}
 
 \section{Summary}

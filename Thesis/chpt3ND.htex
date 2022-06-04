@@ -1,14 +1,14 @@
 \section{A Natural Deduction System}
 \label{sec:nd-system}
 
-While a Hilbert system presents a theory of logic as a collection of axioms with a collection of transform rules to generate theorems, it is not the only way that we could present a logic. 
-A \emph{Natural Deduction} system has very few `axioms' and instead codes the structure of the logic with the introduction of many rules that govern how connectives behave under certain conditions.
+While Hilbert systems presents a theory of logic as a collection of axioms and ways to transform propositions using rules of inference, it is not the only way that we could present a logic. 
+A \emph{Natural Deduction} system has very few `axioms' (if any) and instead encodes the structure of the logic inside many different rules that govern how connectives behave under certain conditions.
 It should be noted that Natural Deduction operates using \emph{sequents}, or \emph{assumption}-\emph{conclusion} pairs where the conclusion is a result of the assumption, rather than propositions by themselves like seen in Hilbert systems. 
-\emph{Assumptions} in this case are generally structured collections of propositions while conclusions are just resultant propositions. 
+An \emph{assumption} is generally a structured collection of propositions while a conclusion is just a proposition by itself . 
 
-Just as we demonstrated an equivalent Hilbert system in the previous section, we shall consider a natural deduction system for Relevant Logic and show that it proves the same theorems as the previous Hilbert systems. 
-From here on, we will be using the Goldblatt axiomatization and will be dropping all of the subscripts for the language, that is 
- will become \HOLtm{$-->} and so on. 
+Just as we demonstrated an equivalent Hilbert system in the previous section, we shall consider a Natural Deduction system for Relevant Implication and show that it is equivalent to the previous Hilbert systems. 
+From here on, we will be using the Goldblatt Axiomatization and language, and as such will be dropping all of the subscripts for the language, that is 
+ \HOLtm[-->_g//-->]{$-->} becomes \HOLtm{$-->} and so on. 
 
 \subsection{Natural Deduction for Relevant Logic}\label{subsec:ND}
 For sequents in classical logic, assumptions are put together by way of a single connective $(\bm{,})$ which is representative of the set union of these assumptions. We are also allowed to move assumptions into the conclusion by way of implication introduction. For example:
@@ -16,16 +16,16 @@ For sequents in classical logic, assumptions are put together by way of a single
 \AxiomC{$a_1\bm{,} ...\bm{,} a_{n-1} \bm{,} a_n\Vdash c$}
 \UnaryInfC{$a_1\bm{,} ...\bm{,} a_{n-1}\Vdash a_n \rightarrow c$}
 \end{prooftree}
-But the comma $(\bm{,})$ can also behave exactly like the conjunct $(\bm{\land})$ between assumptions which enables us to weaken the assumptions by adding new, irrelevant, assumptions and then move them into the conclusion as irrelevant antecedent like so:
+But the comma $(\bm{,})$ could also be read as the conjunction $(\bm{\land})$ between assumptions and still preserve meaning. This enables us to weaken the assumptions by adding new assumptions to the sequent that are irrelevant to the proof and then move them into the conclusion as the antecedent to an implication like so:
 \begin{prooftree}
 \AxiomC{$\Gamma\Vdash c$}
 \UnaryInfC{$\Gamma\bm{,} a \Vdash c$}
 \UnaryInfC{$\Gamma\Vdash a \rightarrow c$}
 \end{prooftree}
-This, of course, poses a bit of a problem for the creation of a Natural Deduction system for relevant logic where we are still able to weaken assumptions and shift assumptions into the conclusion while also maintaining the desirable characteristics of \HOLtm{$-->}.
+This poses a problem for the creation of a Natural Deduction system for relevant implication where we are still able to weaken assumptions and shift assumptions into the conclusion while also maintaining the desirable characteristics of \HOLtm{$-->}. That being that we cannot introduce irrelevant antecedents given a known conclusion. 
 
-Luckily \citet{slaney1990ND} gives us a solution by way of bunching our assumptions with not one, but two different connectives: The first \HOLtm{$，} is coupled with conjunction, while the second \HOLtm{$；} is associated with implication. 
-Of course, in HOL this means that we will have a new data type for these connectives and, taking inspiration from \citet{slaney1990ND}, we will also call these bunches. 
+Luckily \citet{slaney1990ND} gives us a solution by structuring our assumption with not one, but two different connectives: The first \HOLtm{$，} is coupled with conjunction, while the second \HOLtm{$；} is associated with implication. 
+Of course, in HOL this means that we will need a new data-type for these connectives and, taking inspiration from \citet{slaney1990ND}, we will also call these bunches. 
 \begin{defn}[Bunches]\label{def:bunch}
 	A \HOLty{:Bunch} is formalized in HOL as an inductive type: 
 	\begin{holmath}
@@ -34,14 +34,12 @@ Of course, in HOL this means that we will have a new data type for these connect
 	We drop \HOLtm{PROP} for clarity whenever \HOLty{:g_prop} appears explicitly in a bunch. 
 \end{defn}  
 \citet{slaney1990ND} also introduces a way for us to access a privileged position inside a bunch which can be manipulated while keeping the rest of the structure as it is. 
-In our formalisation, we will take this to be a sort of context with a hole and a replacement function that takes a bunch and a context and replaces the hole producing a new bunch both of which are given below with the following:
+In our formalisation, we will take this to be a sort of context with a hole and a replacement function that takes both a bunch and a context and produces a new bunch by filling the hole in the context with the bunch:
 \begin{defn}[B Contexts]\label{defn:b-context}
 	A \HOLty{:B_Context} is formalised in HOL as an inductive type: 
 	\begin{holmath}
 		\HOLthm[tr'EmitTeX: print datatypes compactly'=1]{NaturalDeduction.datatype_B_Context}
 	\end{holmath}
-	We should be explicate here that the \HOLtm{$，} and \HOLtm{$；} that appear here are not the same symbols that appear in Definition~\ref{def:bunch} nor are they the same symbols within this definition; 
-	However, as they have very similar meanings we choose to overload these functions on the same symbol as seen in Definition~\ref{def:bunch}.
 \end{defn}   
 
 \begin{defn}[Replacement]\label{def:replace}
@@ -50,7 +48,10 @@ In our formalisation, we will take this to be a sort of context with a hole and 
 		\HOLthm[def,B//b]{NaturalDeduction.REPLACE_def}
 	\end{holmath}
 \end{defn}
-With these definitions in place we can now consider the rules of the natural deduction system.
+While \HOLtm{$，} and \HOLtm{$；} in Definition~\ref{defn:b-context} are the same symbols as seen in Definition~\ref{def:bunch} they are not the same object. 
+We only use these symbols in this context as when a \HOLty{:B_Context} is taken, together with Definition~\ref{def:replace} these symbols effectively have the same meaning as their \HOLty{:Bunch} counterparts.
+
+With these definitions in place we can now consider the rules of the Natural Deduction system.
 \begin{defn}[Natural Deduction]\label{defn:natural-deduction}
 	If \HOLtm{X} is a \HOLty{:Bunch}, and \HOLtm{A} is a \HOLty{:g_prop}, then \HOLtm{X ||- A} is a \emph{Relevant Sequent} if it is of the form:  
 	\begin{holmath}
@@ -100,9 +101,9 @@ With these definitions in place we can now consider the rules of the natural ded
   	\end{matrix*}
   	\end{holmath}
 \end{defn}
-Clarification should be made here regarding the system presented in~\citet{slaney1990ND} and Definition \ref{defn:natural-deduction} as Slaney uses an assumption number which behaves like an identity when assumptions are applied to it. 
-Slaney states that this 0\textsuperscript{th} assumption is the set of all logical truths rather than the empty set; we, on the other hand have defined our Bunches in terms of propositions so we can't use this set as a variable. 
-We instead give the properties of 0 to \HOLtm{τ} as we can use \HOLtm{τ} to derive any logical truth that we would need in a given proof (shall we will show this in the next section \ref{subsec:ND-equiv}). 
+Clarification should be made here regarding the system presented in \citet{slaney1990ND} and Definition \ref{defn:natural-deduction}. \citet{slaney1990ND} uses what he calls the 0\textsuperscript{th} assumption and assigns an identity like behaviour with \HOLtm{$；}. 
+\citet{slaney1990ND} states that this 0\textsuperscript{th} assumption is the set of all logical truths; we, on the other hand, have defined our Bunches in terms of propositions so we can't use this set in our Bunches. 
+We instead give the properties of 0 to \HOLtm{τ} as we hope that we can use use \HOLtm{τ} to derive any logical truth that we would need in a given proof (we show this in the next subsection \ref{subsec:ND-equiv}). 
 
 We can now work our way through a couple of propositions that we can produce within this natural deduction system. 
 \begin{prop}[\HOLtm{$；}\textsf{ Assoc. RL}]
@@ -129,7 +130,7 @@ There are also a number of useful results that we derive from the definition of 
 \end{prop}
 \subsection{From the Hilbert System to Natural Deduction and Back Again}\label{subsec:ND-equiv}
 
-We claimed in the last chapter that the reason that we chose the behaviour of \HOLtm{τ} with the \HOLtm{$；} was because we hoped that we could derive any logical truth from it using the Natural Deduction rules; we shall show that now.
+We claimed in the last chapter that the reason that we to give the identity behaviour with the \HOLtm{$；} to \HOLtm{τ} was because we hoped that we would be able to derive any logical truth from it using the Natural Deduction rules; we shall show that now.
 \begin{thm}\label{thm:hil-to-ND}
 	If \HOLtm{A} is Goldblatt Provable, then \HOLtm{(PROP τ) ||- A} is a valid sequent of the Natural Deduction system, that is:
 	\begin{holmath}
@@ -137,9 +138,11 @@ We claimed in the last chapter that the reason that we chose the behaviour of \H
 	\end{holmath}
 \end{thm}
 \begin{proof}[Proof]
-	We induct on \HOLtm{$|-} and, skipping the cases that follow immediately from proved theorems or the natural deduction rules: 
+	Induct on \HOLtm{$|-}. We skip the cases that follow immediately from already shown results or the natural deduction rules: 
 	\begin{description}
-		\item [Suffixing:] It suffices to show that \HOLtm{(((PROP (A --> B)) ； (PROP (B --> C))) ； PROP A) ||- C} using \HOLtm{$；}\textsf{ Identity RL}, and Definition~\ref{def:replace}. We can get \HOLtm{(PROP (B --> C) ； PROP (A-->B) ； PROP A) ||- C} through repeated applications of \textbf{A} and \HOLtm{$-->}\textbf{E}. The result Then follows from structural rules. We shall show the whole Natural Deduction proof here for clarity, though we will omit it in the other parts of this proof. 
+		\item [Suffixing:] It suffices to show that \HOLtm{(((PROP (A --> B)) ； (PROP (B --> C))) ； PROP A) ||- C} by using \HOLtm{$；}\textsf{ Identity RL}, and Definition~\ref{def:replace}. 
+		We can then get \HOLtm{(PROP (B --> C) ； PROP (A-->B) ； PROP A) ||- C} through repeated applications of \textbf{A} and \HOLtm{$-->}\textbf{E}. The result then follows from structural rules. 
+		The whole Natural Deduction proof is shown here for clarity, though we will omit it in the other parts of this proof. 
 		\begin{prooftree}
 			\AxiomC{\HOLtm{(PROP (B --> C)) ||- (B --> C)}}
 			\AxiomC{\HOLtm{(PROP (A --> B)) ||- (A --> B)}}
@@ -163,9 +166,14 @@ We claimed in the last chapter that the reason that we chose the behaviour of \H
 		\end{prooftree}
 		\item [Assertion:] It suffices to show that \HOLtm{((PROP  A) ； (PROP (A-->B))) ||- B}. This result then follows from \HOLtm{$-->}\textbf{E} and \HOLtm{$；}\textsf{ Comm.}
 		\item [Contraction:] This follows largely from \HOLtm{$；}\textsf{ Idem. LR} and \HOLtm{$；}\textsf{ Assoc. LR}
-		\item [Conj Introduction:] It suffices to show that \HOLtm{(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- (B & C)} but we can get \HOLtm{(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- B} and \HOLtm{(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- C} using \HOLtm{$&}\textbf{E}\textsf{ L} and \HOLtm{$&}\textbf{E}\textsf{ R} respectively together with \HOLtm{$-->}\textbf{E}. The result then follows from \HOLtm{$，}\textsf{ Idem. LR}.
+		\item [Conj Introduction:] It suffices to show that \HOLtm{(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- (B & C)} but we can get \HOLtm{(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- B} and \HOLtm{(PROP  ((A --> B) & (A --> C)) ； PROP A) ||- C} by using \HOLtm{$-->}\textbf{E} together with \HOLtm{$&}\textbf{E}\textsf{ L} and \HOLtm{$&}\textbf{E}\textsf{ R} respectively. The result then follows from \HOLtm{$，}\textsf{ Idem. LR}.
 		\item [Disj Elimination:] It suffices to show \HOLtm{(PROP  ((A --> C) & (B --> C)) ； PROP (A V B)) ||- C} and we can show both \HOLtm{(PROP  ((A --> C) & (B --> C)) ； PROP A) ||- C} and \HOLtm{(PROP  ((A --> C) & (B --> C)) ； PROP B) ||- C} like in the previous case. This result then follows from \HOLtm{$V}\textbf{E}. 
-		\item [Distribution:] It suffices to show \HOLtm{(PROP  (A & (B V C))) ||- ((A & B) V (A & C))}. We can show that \HOLtm{(PROP  (A & (B V C))) ||- (A)} and \HOLtm{(PROP  (A & (B V C))) ||- ((B) V (C))} from \HOLtm{$&}\textbf{E}\textsf{ L} and \HOLtm{$&}\textbf{E}\textsf{ R}. From this we can get \HOLtm{(PROP  (A & (B V C)) ， PROP B ) ||- ((A & B) V (A & C))} and \HOLtm{(PROP  (A & (B V C)) ， PROP C ) ||- ((A & B) V (A & C))} using \HOLtm{$&}\textbf{I} and Proposition \ref{prop:nd-or-I-alt}. The result then follows from \HOLtm{$V}\textbf{E} and \HOLtm{$，}\textsf{ Idem. LR}.
+		\item [Distribution:] It suffices to show \HOLtm{(PROP  (A & (B V C))) ||- ((A & B) V (A & C))}. We can show that \HOLtm{(PROP  (A & (B V C))) ||- (A)} and \HOLtm{(PROP  (A & (B V C))) ||- ((B) V (C))} from \HOLtm{$&}\textbf{E}\textsf{ L} and \HOLtm{$&}\textbf{E}\textsf{ R}. From this we can get both:
+		\begin{holmath}
+		\HOLtm{(PROP  (A & (B V C)) ， PROP B ) ||- ((A & B) V (A & C))}\\
+		\HOLtm{(PROP  (A & (B V C)) ， PROP C ) ||- ((A & B) V (A & C))} 
+		\end{holmath}
+		By using \HOLtm{$&}\textbf{I} and Proposition \ref{prop:nd-or-I-alt}. The result then follows from \HOLtm{$V}\textbf{E} and \HOLtm{$，}\textsf{ Idem. LR}.
 		\item [Contraposition:] It suffices to show \HOLtm{((PROP (A --> ~B)) ； PROP (B)) ||- (~A)}. Then we then get the result from \textbf{RAA} and \HOLtm{$-->}\textbf{E}.
 	\end{description}
 \end{proof}
@@ -179,7 +187,7 @@ To show this we need a function that takes bunches to propositions.
 		\end{matrix*}
 	\end{holmath}
 \end{defn}
-The first of two theorems we will need for the backwards direction is as follows
+The first of two theorems we will want to show to establish that every valid sequent of the Natural Deduction system has an associated Goldblatt Provable proposition:
 \begin{thm}\label{thm:ND-to-hil}
 	If \HOLtm{(X) ||- A} is a valid sequent of the Natural Deduction system, then 
 	\HOLtm{bg(X) --> A} is Goldblatt Provable, that is:
@@ -195,8 +203,8 @@ In order to show this we need the following lemmata:
 \end{lem}
 \begin{proof}[Sketch]
 	We induct on \HOLtm{Γ}. Noting that \HOLtm{Γ} is a \HOLty{:B_Context} there are 2 \HOLtm{$，} cases and two \HOLtm{$；} cases. 
-	The \HOLtm{$，} cases hinge on the commutativity of \HOLtm{$&} and the distribution axiom and can be proven directly from the Goldblatt Axioms. 
-	The \HOLtm{$；} cases rely on the commutativity of \HOLtm{$∘ᵣ} and the fact that it is also distributive over \HOLtm{$V} both results come from Proposition~\ref{prop:some-theorems-R-1}. 
+	The \HOLtm{$，} cases hinge on the commutativity of \HOLtm{$&} and the distribution axiom and can then be proven directly from the Goldblatt Axioms. 
+	The \HOLtm{$；} cases rely on the commutativity of \HOLtm{$∘ᵣ} and the fact that it is also distributive over \HOLtm{$V} (Propositions~\ref{prop:some-theorems-R-1}.6 and \ref{prop:some-theorems-R-1}.7). 
 \end{proof}
 \begin{lem}\label{lem:CONTEXT-IMP}
 \begin{holmath}
@@ -218,25 +226,25 @@ In order to show this we need the following lemmata:
 	Then, by the Goldblatt Axioms, it suffices to show \HOLtm{|- (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)) --> C)}.
 	by specializing Lemma~\ref{lem:CONTEXT-IMP} appropriately we get that this follows from Lemma~\ref{lem:OR-bunch-rule}, Suffixing and Modus Ponens.
 \end{proof}
-This theorem gives us that we can take sequents to Goldblatt provable proposition, but not that the original sequent is recoverable from the Goldblatt proposition, though we can definitely do so:
+Theorem~\ref{thm:ND-to-hil} gives us that we can take sequents to Goldblatt provable proposition, but not that the original sequent is recoverable from the Goldblatt proposition, though this is definitely the case:
 \begin{thm}\label{thm:bg-trans}
 	If \HOLtm{bg(X) --> A} is Goldblatt Provable, then \HOLtm{(X) ||- A} is a valid sequent inside the Natural Deduction system.
 	\begin{holmath}
 		\HOLthm[nostile]{NaturalDeduction.bg_trans_reconstuction}
 	\end{holmath}
 \end{thm}
-We will need the following lemma to prove this:
+We will need the following lemma to show this:
 \begin{lem}\label{lem:X-derive-bg-X}
 	\begin{holmath}
 		\HOLthm[nostile]{NaturalDeduction.X_derive_bg_X}
 	\end{holmath}
 \end{lem}
 \begin{proof}
-	Induct on the structure of \HOLtm{X}. The base and \HOLtm{$，} cases follow immediately from the Natural Deduction rules. The \HOLtm{$；} case follows from the definition of \HOLtm{$∘ᵣ}. 
-	We then apply \textbf{RAA} and show that the antecedents hold using \HOLtm[\sim\sim//~]{$~}\textbf{\emph{I}} for \HOLtm{Y ||- ~~bg Y} and \HOLtm{$-->}\textbf{E} and \HOLtm{$；}\textsf{ Comm.} along with \textbf{A} and Replacement.  
+	Induct on the structure of \HOLtm{X}. The base and \HOLtm{$，} cases follow immediately from the Natural Deduction rules. 
+	For the \HOLtm{$；} case we use the definition of \HOLtm{$∘ᵣ} and then apply \textbf{RAA}. Then we only need to show that \HOLtm{X ； bg X --> ~bg Y ||- ~bg Y} and \HOLtm{Y ||- ~~bg Y}. But these follow by using \HOLtm[\sim\sim//~]{$~}\textbf{\emph{I}} for \HOLtm{Y ||- ~~bg Y} and \HOLtm{$-->}\textbf{E} and \HOLtm{$；}\textsf{ Comm.} along with \textbf{A} and Replacement for \HOLtm{X ； bg X --> ~bg Y ||- ~bg Y}.  
 \end{proof}
 \begin{proof}[Proof (Theorem \ref{thm:bg-trans})]
-	Suffices to show that given \HOLtm{|- (bg(X) --> A)} we can get \HOLtm{((PROP τ) ； X) ||- A}. Then it follows immediately from \HOLtm{$-->}\textbf{E}, Lemma~\ref{lem:X-derive-bg-X}, and Theorem~\ref{thm:hil-to-ND}.
+	This suffices to show that given \HOLtm{|- (bg(X) --> A)} we can get \HOLtm{((PROP τ) ； X) ||- A}. Then it follows immediately from \HOLtm{$-->}\textbf{E}, Lemma~\ref{lem:X-derive-bg-X}, and Theorem~\ref{thm:hil-to-ND}.
 \end{proof}
 
 \subsection{Summary}
@@ -247,4 +255,4 @@ showing the equivalence between the Goldblatt and Slaney systems requires a furt
 and the introduction and equivalence results of the Natural Deduction system consists of 435 lines of HOL4 in \texttt{NaturalDeductionScript.sml}; for a total of 927 lines of HOL4.
 There was also further work done in support of this chapter in the \texttt{RLRulesScript.sml} notably Propositions~\ref{prop:some-theorems-R-1}.6 and \ref{prop:some-theorems-R-1}.7.
 
-Now that we have thoroughly explored our syntactic systems, it follows that we should now consider our first \emph{semantic} one. 
+Now that we have thoroughly explored our \emph{syntactic} systems, it follows that we should now consider our first \emph{semantic} one. 

@@ -26,7 +26,8 @@ alpha 1 \ensuremath{\alpha}
 RM 1 \ensuremath{\mathcal{M}}
 RF 1 \ensuremath{\mathcal{F}}
 VF 1 \ensuremath{V}
-Z 1 \ensuremath{0}
+
+Z 1 0
 STAR 1 \ensuremath{\ast}
 
 (Mw) 1 \ensuremath{\sp{W}}
@@ -52,6 +53,7 @@ Fz 2 \ensuremath{0\sb{\mathcal{F}}}
 (CFss) 2 \ensuremath{\sp{\ast\ast}}
 (CFsss) 3 \ensuremath{\sp{\ast\ast\ast}}
 
+Holds 1 \ensuremath{\models}
 (HOLDS1) 2 \ensuremath{,\,} 
 (HOLDS2) 1 \ensuremath{\models}
 
@@ -71,6 +73,8 @@ R_set 1 \ensuremath{\bm{R}}
 
 (Ap1) 1 (
 (Ap2) 1 )
+
+(filt) 3 \,-\,
 
 CONJl 1 \ensuremath{\raisebox{-1pt}{\scalebox{1.2}{\usefont{OT1}{cmr}{m}{it} \textbf{\&}}}}
 (CONJl1) 1 \ensuremath{\raisebox{-1pt}{\scalebox{1.2}{\usefont{OT1}{cmr}{m}{it} \textbf{\&}}}}
@@ -118,9 +122,11 @@ S_Theory 8 \ensuremath{\mathsf{\Theta}}_Theory
 (s_theory1) 8 \textsf{\small{_Theory}}
 (s_theory2) 0 
 
-R_gn 4 enum
+(R_gn1) 2 \ensuremath{\eta(
+(R_gn2) 1 )}
 
 + 1 \ensuremath{{+}}
+
 
 (x1) 1 \ensuremath{x\sb{
 (x2) 1 }(
@@ -148,3 +154,5 @@ R_gn 4 enum
 (Y1) 2 \ensuremath{Y(
 (Y2) 2 ,\,
 (Y3) 1 )}
+
+set 0 {}

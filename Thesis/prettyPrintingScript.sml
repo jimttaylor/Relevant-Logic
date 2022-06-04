@@ -218,6 +218,12 @@ val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 			term_name = "Enum",
 			pp_elements = [TOK "(Enum1)", TM, TOK "(Enum2)"]}
 
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+			paren_style = OnlyIfNecessary,
+			fixity = Closefix,
+			term_name = "R_gn",
+			pp_elements = [TOK "(R_gn1)", TM, TOK "(R_gn2)"]}
+
 Overload "ss" = “λp. {p}”
 val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 			paren_style = OnlyIfNecessary,
@@ -281,5 +287,13 @@ Theorem B_WORLD_i_def_pp = RMSemanticsTheory.B_WORLD_i_def |> SRULE[arithmeticTh
 Theorem Y_WORLD_i_def_pp = RMSemanticsTheory.Y_WORLD_i_def |> SRULE[arithmeticTheory.ADD1] 
 Theorem X_WORLD_i_def_pp = RMSemanticsTheory.X_WORLD_i_def |> SRULE[arithmeticTheory.ADD1] 
 Theorem Theta_i_def_pp = RMSemanticsTheory.Theta_i_def |> SRULE[arithmeticTheory.ADD1] 
+
+
+Overload "filt" = “λy p. FILTER (λx. x ≠ p) y”
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+			paren_style = OnlyIfNecessary,
+			fixity = Infixl 110,
+			term_name = "filt",
+			pp_elements = [TOK "(filt)"]}
 
 val _ = export_theory()

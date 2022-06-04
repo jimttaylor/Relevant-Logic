@@ -30,7 +30,7 @@ Definition Is_Cover_System_def:
                        (∀x. x ∈ CS.W ⇒ ∃Z. CS.COVER Z x) ∧
                        (∀x Z. x ∈ CS.W ∧ CS.COVER Z x ⇒ Z ⊆ Up CS {x})
 End
-
+       
 Theorem Upset_up:
   Is_Cover_System CS ⇒ 
   (Upset CS X ⇔ Up CS X = X)
@@ -106,22 +106,22 @@ Definition to_CS_def:
   (to_CS: α R_COVER_SYSTEM -> α COVER_SYSTEM) RCS = <|W := RCS.W; REF := RCS.REF; COVER := RCS.COVER |>
 End
            
-val _= set_mapped_fixity {term_name = "BOT", fixity = Infix (NONASSOC, 450), tok="⊥ₐ"};
-Overload "BOT" = “λ x y. rel_Lift_1 RCS.ORTH (x: α set) y”
-Overload "BOT" = “λ x y. rel_Lift_2 RCS.ORTH (x: α) y”
-Overload "BOT" = “λ x y. RCS.ORTH (x: α) y”
+val _= set_mapped_fixity {term_name = "rcsBOT", fixity = Infix (NONASSOC, 450), tok="⊥ₐ"};
+Overload "rcsBOT" = “λ x y. rel_Lift_1 RCS.ORTH (x: α set) y”
+Overload "rcsBOT" = “λ x y. rel_Lift_2 RCS.ORTH (x: α) y”
+Overload "rcsBOT" = “λ x y. RCS.ORTH (x: α) y”
 
-val _= set_mapped_fixity {term_name = "FUSE", fixity = Infix (NONASSOC, 450), tok="⬝ₐ"};
-Overload "FUSE" = “λ x y. op_Lift_1 RCS.FUSE (x: α set) y”
-Overload "FUSE" = “λ x y. op_Lift_2 RCS.FUSE (x: α) y”
-Overload "FUSE" = “λ x y. RCS.FUSE (x: α) y”
+val _= set_mapped_fixity {term_name = "rcsFUSE", fixity = Infix (NONASSOC, 450), tok="⬝ₐ"};
+Overload "rcsFUSE" = “λ x y. op_Lift_1 RCS.FUSE (x: α set) y”
+Overload "rcsFUSE" = “λ x y. op_Lift_2 RCS.FUSE (x: α) y”
+Overload "rcsFUSE" = “λ x y. RCS.FUSE (x: α) y”
 
-val _= set_mapped_fixity {term_name = "REF", fixity = Infix (NONASSOC, 450), tok="≼ₐ"};
-Overload "REF" = “λ x y. RCS.REF (x: α) y”
+val _= set_mapped_fixity {term_name = "rcsREF", fixity = Infix (NONASSOC, 450), tok="≼ₐ"};
+Overload "rcsREF" = “λ x y. RCS.REF (x: α) y”
 
 
-val _= set_mapped_fixity {term_name = "COVER", fixity = Infix (NONASSOC, 450), tok="▹ₐ"};
-Overload "COVER" = “λ (x : α set) y. RCS.COVER x y”
+val _= set_mapped_fixity {term_name = "rcsCOVER", fixity = Infix (NONASSOC, 450), tok="▹ₐ"};
+Overload "rcsCOVER" = “λ (x : α set) y. RCS.COVER x y”
                      
          
 Overload "j" = “λ (X: α set). j (to_CS RCS) X”
@@ -219,8 +219,8 @@ Proof
 QED
         
 Theorem lemma6_4_1_2:
-  ∀RCS X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ⇒
-          Is_Prop RCS (Perp X)
+  ∀X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ⇒
+          Is_Prop RCS (Perp RCS X)
 Proof
   reverse $ rw[Is_Prop_def, Localized_def, Perp_def] 
   >- (rw[Upset_def, SUBSET_DEF, to_CS_def] >> irule RCS_REFINEMENT_ORTHOGONAL >>
@@ -297,7 +297,7 @@ QED
 
 Theorem lemma6_4_1_6:
   ∀RCS X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ⇒
-          j X ⊆ Perp (Perp (j X)) ∧ Perp (Perp (j X)) ⊆ Perp (Perp X) 
+          j X ⊆ Perp (Perp (j X)) ∧ Perp (Perp (j X)) ⊆ Perp (Perp X)  
 Proof
   rw[]
   >- (rw[SUBSET_DEF, j_def, to_CS_def, Perp_def] >>
@@ -357,7 +357,7 @@ Overload "Orthojoin" = “λ (X: α set). Orthojoin RCS X”
         
 Definition R_MODEL_SYSTEM_def:
   R_MODEL_SYSTEM RCS Ps ⇔ Is_Relevant_Cover_System RCS ∧
-                          ({w | RCS.E ≼ₐ w ∧ w ∈ RCS.W} ∈ Ps) ∧
+                          ((Up (to_CS RCS) {RCS.E}) ∈ Ps) ∧
                           (∀X. X ∈ Ps ⇒ Upset X) ∧
                           (∀X. X ∈ Ps ⇒ X = Perp (Perp X)) ∧ 
                           (∀X. X ∈ Ps ⇒ Perp X ∈ Ps) ∧
@@ -401,7 +401,6 @@ Overload "gFUSE" = “λ x y. op_Lift_2 RCS.FUSE (x: g_prop set) y”
 Overload "gREF" = “λ x y. RCS.REF (x: g_prop set) y”
 
 Overload "gCOVER" = “λ (x : (g_prop set) set) y. RCS.COVER x y”
-                     
          
 Overload "j" = “λ (X: (g_prop set) set). j (to_CS RCS) X”
 Overload "Upset" = “λ (X: (g_prop set) set). Upset (to_CS RCS) X”
@@ -413,7 +412,7 @@ Overload "Orthojoin" = “λ (X: (g_prop set) set). Orthojoin RCS X”
 Definition Model_Function_def:
   Model_Function (RCS: (g_prop set) R_COVER_SYSTEM) Ps M ⇔ 
     (∀a A. M (g_VAR a) = A ⇒ A ∈ Ps) ∧ 
-    (M τ = {w | RCS.E ≼ w ∧ w ∈ RCS.W}) ∧
+    (M τ = Up (to_CS RCS) {RCS.E}) ∧
     (∀A B. M (A & B) = M A ∩ M B) ∧
     (∀A B. M (A --> B) = (M A ⟹ M B)) ∧
     (∀A. M (~A) = Perp (M A))
@@ -433,15 +432,23 @@ Proof
   >- metis_tac[Ps_membership, SUBSET_DEF]
   >- gs[IMP_def]
   >- gs[Perp_def]
+  >- gs[R_MODEL_SYSTEM_def, Up_def, to_CS_def]
 QED
 
 Theorem M_IN_Ps_W:
   ∀RCS Ps M A. Model_Function RCS Ps M ∧ R_MODEL_SYSTEM RCS Ps ⇒ 
           M A ∈ Ps
 Proof
-  rpt strip_tac >> Induct_on ‘A’ >> gs[Model_Function_def, SUBSET_DEF] >> rw[] >> 
-  metis_tac[Ps_membership, SUBSET_DEF, R_MODEL_SYSTEM_IMP_PS, R_MODEL_SYSTEM_INTER_PS,
-            R_MODEL_SYSTEM_PERP_PS, R_MODEL_SYSTEM_E_CONE_PS]
+  rpt strip_tac >> Induct_on ‘A’ >> gs[Model_Function_def, SUBSET_DEF] >> rw[] 
+  >- metis_tac[Ps_membership, SUBSET_DEF, R_MODEL_SYSTEM_IMP_PS, R_MODEL_SYSTEM_INTER_PS,
+               R_MODEL_SYSTEM_PERP_PS, R_MODEL_SYSTEM_E_CONE_PS, to_CS_def, Up_def]
+  >- metis_tac[Ps_membership, SUBSET_DEF, R_MODEL_SYSTEM_IMP_PS, R_MODEL_SYSTEM_INTER_PS,
+               R_MODEL_SYSTEM_PERP_PS, R_MODEL_SYSTEM_E_CONE_PS, to_CS_def, Up_def]
+  >- metis_tac[Ps_membership, SUBSET_DEF, R_MODEL_SYSTEM_IMP_PS, R_MODEL_SYSTEM_INTER_PS,
+               R_MODEL_SYSTEM_PERP_PS]
+  >- (drule_then strip_assume_tac R_MODEL_SYSTEM_E_CONE_PS >>
+      ‘Up (to_CS RCS) {RCS.E} = {w | RCS.E ≼ w ∧ w ∈ RCS.W}’ suffices_by
+        metis_tac[] >> rw[Once EXTENSION, Up_def, to_CS_def, EQ_IMP_THM])
 QED
 
 Theorem Model_Function_or:
@@ -468,7 +475,7 @@ Theorem C_Holds_conditions:
              (∀A B. C_Holds RCS Ps M w (A --> B) ⇔ ∀u. C_Holds RCS Ps M u A ⇒ C_Holds RCS Ps M (w ⬝ u) B)
 Proof
   rw[C_Holds_def, SUBSET_DEF, EQ_IMP_THM] >>
-  gs[Model_Function_def, Perp_def, IMP_def, SUBSET_DEF] >> 
+  gs[Model_Function_def, Perp_def, IMP_def, SUBSET_DEF, Up_def, to_CS_def] >> 
   metis_tac[RCS_ORTHOGONAL_CLOSURE, RCS_FUSION_CLOSURE, M_SUBSET_RCS_W, SUBSET_DEF]  
 QED
         
@@ -746,22 +753,22 @@ Proof
       >- metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_IDENTITY]
       >- (‘Upset (M p)’ by metis_tac[M_IN_Ps_W, R_MODEL_SYSTEM_PS_UPSET] >>
           gs[Upset_def] >> last_x_assum irule >> rw[]
-          >- (‘RCS.E ⬝ x' ∈ RCS.W’ suffices_by rw[to_CS_def] >>
+          >- (‘RCS.E ⬝ x' ∈ RCS.W’ suffices_by rw[to_CS_def] >> gs[Up_def, to_CS_def] >> 
               metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_FUSION_LEFT_IDENTITY])
           >- (qexists_tac ‘RCS.E’ >> simp[] >>
               ‘RCS.E ≼ (RCS.E ⬝ x')’ suffices_by rw[to_CS_def] >>
-              ‘(RCS.E ⬝ RCS.E) ≼ (RCS.E ⬝ x')’ suffices_by
-                metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_FUSION_LEFT_IDENTITY] >>
-              irule RCS_FUSION_MONO_REFINEMENT >> simp[] >>
+              ‘(RCS.E ⬝ RCS.E) ≼ (RCS.E ⬝ x')’ suffices_by (gs[Up_def, to_CS_def] >> 
+                metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_FUSION_LEFT_IDENTITY]) >>
+              irule RCS_FUSION_MONO_REFINEMENT >> simp[] >> gs[Up_def, to_CS_def] >>
               metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_PREORDER, PREORDER_def, SUBSET_DEF, RCS_IDENTITY])
          )
-     )  
+     ) 
   >- (‘C_Holds RCS Ps M RCS.E (τ --> p)’ by gs[] >> 
       drule_then strip_assume_tac Model_Function_imp >>
       drule_then strip_assume_tac Model_Function_t >>
       gs[C_Holds_def, IMP_def, SUBSET_DEF] >>
       last_x_assum irule >>
-      qexists_tac ‘RCS.E’ >> 
+      qexists_tac ‘RCS.E’ >> gs[Up_def, to_CS_def] >>
       metis_tac[RCS_FUSION_RIGHT_IDENTITY, R_MODEL_SYSTEM_R_COVER_SYSTEM,
                 RCS_PREORDER, PREORDER_def, SUBSET_DEF, RCS_IDENTITY])                
 QED
@@ -923,8 +930,8 @@ Definition is_EQUIV_def:
   is_EQUIV X ⇔ ∃A. X = EQUIV A ∨ X = ∅
 End
 
-Definition Theory_set_def:
-  Theory_set X = BIGUNION {Theory A | A ∈ X}
+Definition Theory_union_def:
+  Theory_union X = BIGUNION {Theory A | A ∈ X}
 End
 
 Theorem gens_is_EQUIV:
@@ -945,29 +952,24 @@ Proof
 QED
 
 Theorem Theorem_EQUIV:
-  ∀A. Theory_set (EQUIV A) = Theory A
+  ∀A. Theory_union (EQUIV A) = Theory A
 Proof
   rw[EQUIV_def, EQ_IMP_THM] >>
   irule SUBSET_ANTISYM >> reverse $ rw[]
-  >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
+  >- (rw[Theory_union_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
       qexists_tac ‘A’ >> metis_tac[ENTAILS_REFL]
      )
-  >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF, Theory_EQ] >>
+  >- (rw[Theory_union_def, BIGUNION, PULL_EXISTS, SUBSET_DEF, Theory_EQ] >>
      gs[])
 QED
-        
+
+ 
 Definition CAN_FUSION_def:
-  CAN_FUSION X Y =
-  if ∃A B. X = Theory A ∧ Y = Theory B
-  then Theory_set {x ∘ᵣ y | x ∈ gens X ∧ y ∈ gens Y}
-  else ∅
+  CAN_FUSION X Y = Theory_union {x ∘ᵣ y | x ∈ gens X ∧ y ∈ gens Y}
 End
 
 Definition CAN_ORTH_def:
-  CAN_ORTH X Y =
-  if ∃A B. X = Theory A ∧ Y = Theory B
-  then ∃A B. A ∈ gens X ∧ B ∈ gens Y ∧ A |-^ (~B)
-  else F
+  CAN_ORTH X Y = ∃A B. A ∈ gens X ∧ B ∈ gens Y ∧ A |-^ (~B)
 End
          
 Definition Canonical_System_def:
@@ -1016,15 +1018,12 @@ Overload "Orthojoin" = “λ (X: (g_prop set) set). Orthojoin Canonical_System X
 Theorem CAN_FUSION_alt:
   ∀A B. CAN_FUSION (Theory A) (Theory B) = Theory (A ∘ᵣ B)
 Proof
-  reverse $ rw[CAN_FUSION_def]
-  >- metis_tac[]
-  >- (irule SUBSET_ANTISYM >> reverse $ rw[]
-      >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
-          qexistsl_tac [‘A’, ‘B’] >> simp[gens_def])
-      >- (rw[Theory_set_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
-          gs[gens_def, GSYM Theory_EQ] >> gs[Theory_def] >>
-          metis_tac[ENTAILS_TRANS, ENTAILS_ICONJ_MONOTONE_alt])
-     )
+  reverse $ rw[CAN_FUSION_def] >> irule SUBSET_ANTISYM >> reverse $ rw[] 
+  >- (rw[Theory_union_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
+      qexistsl_tac [‘A’, ‘B’] >> simp[gens_def])
+  >- (rw[Theory_union_def, BIGUNION, PULL_EXISTS, SUBSET_DEF] >>
+      gs[gens_def, GSYM Theory_EQ] >> gs[Theory_def] >>
+      metis_tac[ENTAILS_TRANS, ENTAILS_ICONJ_MONOTONE_alt])
 QED
 
 Theorem CAN_ORTH_alt:
@@ -1033,7 +1032,6 @@ Proof
   rw[CAN_ORTH_def, EQ_IMP_THM, gens_def]
   >- (gs[GSYM Theory_EQ] >>
       metis_tac[ENTAILS_TRANS, ENTAILS_CONTRAPOS_alt])
-  >- metis_tac[]
   >- metis_tac[]
 QED
 
@@ -1047,8 +1045,8 @@ Proof
   >- (gs[Canonical_System_def] >> metis_tac[])
   >- (gs[Canonical_System_def] >> metis_tac[])
   >- (gs[Canonical_System_def] >> metis_tac[CAN_FUSION_alt])
-  >- (gs[Canonical_System_def] >> metis_tac[CAN_ORTH_def])
-  >- (gs[Canonical_System_def] >> metis_tac[CAN_ORTH_def])
+  >- (gs[Canonical_System_def] >> gs[CAN_ORTH_def, gens_def] >> metis_tac[])
+  >- (gs[Canonical_System_def] >> gs[CAN_ORTH_def, gens_def] >> metis_tac[])
   >- (rw[Canonical_System_def, to_CS_def, Is_Cover_System_def]
       >- (rw[PREORDER_def] >> metis_tac[SUBSET_TRANS])
       >- (qexists_tac ‘{Theory A}’ >> simp[BIGINTER] >> metis_tac[])
@@ -1185,16 +1183,8 @@ Theorem Canonical_System_is_R_Model_system:
   R_MODEL_SYSTEM Canonical_System Canonical_System_Ps
 Proof
   rw[R_MODEL_SYSTEM_def, Canonical_System_is_RCS] 
-  >- (simp[Canonical_System_Ps_def, GSYM lemma6_5_3_1, Up_def, Theory_def, to_CS_def, EXTENSION] >>
-      qexists_tac ‘τ’ >> rw[Once EQ_IMP_THM]
-      >- (qexists_tac ‘Canonical_System.E’ >>
-          rw[Canonical_System_def] >> gs[Theory_def])
-      >- (gs[Canonical_System_def] >> rw[]
-          >- gs[SUBSET_DEF, EXTENSION, Theory_def]
-          >- metis_tac[]
-          >- metis_tac[]
-         )      
-     )
+  >- (simp[Canonical_System_Ps_def, GSYM lemma6_5_3_1] >> 
+      qexists_tac ‘τ’ >> simp[Canonical_System_def])
   >- gs[Canonical_System_Ps_def, Upset_def, to_CS_def,
         EQUIV_W_def, Canonical_System_def, SUBSET_DEF]
   >- (gs[Canonical_System_Ps_def, lemma6_5_3_3] >>
@@ -1250,6 +1240,7 @@ Proof
      )
 QED
 
+        
 Theorem Model_System_Characterisation_1_2:
   ∀p. |- p ⇒ (∀RCS Ps M. R_MODEL_SYSTEM RCS Ps ∧ Model_Function RCS Ps M ⇒ C_Holds RCS Ps M RCS.E p)
 Proof
@@ -1257,10 +1248,11 @@ Proof
 QED
 
 Theorem Model_System_Characterisation_2_3:
-  ∀p. (∀RCS Ps M. C_Holds RCS Ps M RCS.E p) ⇒
-      ∀M. C_Holds Canonical_System Canonical_System_Ps M Canonical_System.E p
+  ∀p. (∀RCS Ps M. R_MODEL_SYSTEM RCS Ps ∧ Model_Function RCS Ps M ⇒ C_Holds RCS Ps M RCS.E p) ⇒
+      ∀M. Model_Function Canonical_System Canonical_System_Ps M ⇒
+          C_Holds Canonical_System Canonical_System_Ps M Canonical_System.E p
 Proof
-   rw[]
+  rw[] >> last_x_assum irule >> gs[Canonical_System_is_R_Model_system]
 QED
         
 Theorem Model_System_Characterisation_3_1:
@@ -1273,7 +1265,8 @@ Proof
     (rw[Model_Function_def] 
      >- (rw[Canonical_System_Ps_def] >> metis_tac[])
      >- (rw[GSYM lemma6_5_3_1, Up_def, Theory_def, to_CS_def, EXTENSION, Once EQ_IMP_THM]
-         >- (gs[Canonical_System_def, to_CS_def, Theory_def] >> metis_tac[])
+         >- (qexists_tac ‘w’ >> simp[] >> 
+             gs[Canonical_System_def, to_CS_def, Theory_def])
          >- (qexists_tac ‘Canonical_System.E’ >>
              gs[Canonical_System_def, Theory_def] >> metis_tac[])
         )
@@ -1281,13 +1274,13 @@ Proof
      >- gs[GSYM lemma6_5_3_4]
      >- gs[GSYM lemma6_5_3_3]
     ) >>
-   gs[C_Holds_def, EQUIV_W_def, Canonical_System_def, Theory_def] >>
+  gs[C_Holds_def, EQUIV_W_def, Canonical_System_def, Theory_def] >>
   metis_tac[goldblatt_provable_rules, ENTAILS_def]
 QED
         
 Theorem completeness:
-  (∀(RCS: ((g_prop set) R_COVER_SYSTEM)) Ps M. C_Holds RCS Ps M RCS.E p) ⇒
-             |- p
+  (∀RCS Ps M. R_MODEL_SYSTEM RCS Ps ∧ Model_Function RCS Ps M ⇒ C_Holds RCS Ps M RCS.E p) ⇒
+  |- p
 Proof
   rw[] >> drule_then strip_assume_tac Model_System_Characterisation_2_3 >>
   rw[] >> irule Model_System_Characterisation_3_1 >> gs[]

@@ -7,144 +7,88 @@ V 2 \ensuremath{\bm{\lor}}
 ∘ᵣ 2 \ensuremath{\circ}
 τ 1 \ensuremath{\tau}
 tau 1 \ensuremath{\tau}
-
-
-|-^ 2 \ensuremath{\vdash^{\&}\sb{\bm{R}}}
-
--> 1 \ensuremath{\rightarrow}
-
-⇔ 2 \ensuremath{\Leftrightarrow}
-⇒ 2 \ensuremath{\Rightarrow}
-
-$Turnstile$ 4 \HOLTokenTurnstile{}
-
 alpha 1 \ensuremath{\alpha}
 
 <| 1 \ensuremath{\langle}
 |> 1 \ensuremath{\rangle}
 
-RM 1 \ensuremath{\mathcal{M}}
-RF 1 \ensuremath{\mathcal{F}}
-VF 1 \ensuremath{V}
-Z 1 \ensuremath{0}
-STAR 1 \ensuremath{\ast}
+RCS 1 \ensuremath{\mathcal{S}}
 
-(Mw) 1 \ensuremath{\sp{W}}
-Mz 2 \ensuremath{0\sb{\mathcal{M}}}
-(Mr) 1 \ensuremath{R\sb}
-(Ms) 1 \ensuremath{\sp{\ast}}
-(Mss) 2 \ensuremath{\sp{\ast\ast}}
-(Msss) 3 \ensuremath{\sp{\ast\ast\ast}}
-(CMs) 1 \ensuremath{\sp{\ast}}
-(CMss) 2 \ensuremath{\sp{\ast\ast}}
-(CMsss) 3 \ensuremath{\sp{\ast\ast\ast}}
-(Mv) 1 \ensuremath{\sp{V}}
-(Mf) 1 \ensuremath{\sp{\mathcal{F}}}
+|-^ 1 \ensuremath{\vdash\sb{\bm{R}}}
 
-(Fw) 1 \ensuremath{\sp{W}}
-Fz 2 \ensuremath{0\sb{\mathcal{F}}}
-(Fr1) 1 \ensuremath{R\sb{
-(Fr2) 0 }}
-(Fs) 1 \ensuremath{\sp{\ast}}
-(Fss) 2 \ensuremath{\sp{\ast\ast}}
-(Fsss) 3 \ensuremath{\sp{\ast\ast\ast}}
-(CFs) 1 \ensuremath{\sp{\ast}}
-(CFss) 2 \ensuremath{\sp{\ast\ast}}
-(CFsss) 3 \ensuremath{\sp{\ast\ast\ast}}
+-> 1 \ensuremath{\rightarrow}
+$Turnstile$ 4 \HOLTokenTurnstile{}
 
-(HOLDS1) 2 \ensuremath{,\,} 
-(HOLDS2) 1 \ensuremath{\models}
+ 
+⬝ₐ 1 \ensuremath{\cdot}
+⊥ₐ 1 \ensuremath{\bot}
+≼ₐ 1 \ensuremath{\leqslant}
+▹ₐ 1 \ensuremath{\triangleright}
+⟹ₐ 2 \ensuremath{\hookrightarrow}
 
-(MHOLDS1) 1 \ensuremath{\models}
+⬝ 1 \ensuremath{\cdot}
+⊥ 1 \ensuremath{\bot}
+≼ 1 \ensuremath{\leqslant}
+▹ 1 \ensuremath{\triangleright}
+⟹ 2 \ensuremath{\hookrightarrow}
 
-(Ti1) 1 \ensuremath{\theta\sb{
-(Ti2) 1 }(
-(Ti3) 1 )}
+⇔ 2 \ensuremath{\Leftrightarrow}
+⇒ 2 \ensuremath{\Rightarrow}
 
-(T1) 1 \ensuremath{\Theta (
-(T2) 1 )}
 
-(sENT1) 2 \ensuremath{\vdash^{\&}\sb{
-(sENT2) 1 }}
+⟹ₘ 2 \ensuremath{\hookrightarrow\sb{\mathfrak{C}}}
+⬝ₘ 2 \ensuremath{\cdot\sb{\mathfrak{C}}}
+⊥ₘ 2 \ensuremath{\bot\sb{\mathfrak{C}}}
+≼ₘ 2 \ensuremath{\leqslant\sb{\mathfrak{C}}}
+▹ₘ 2 \ensuremath{\triangleright\sb{\mathfrak{C}}}
 
-R_set 1 \ensuremath{\bm{R}}
+FUSE 2 \ensuremath{\cdot}
+ORTH 2 \ensuremath{\bot}
+REF 2 \ensuremath{\leqslant}
+COVER 2 \ensuremath{\triangleright}
 
-(Ap1) 1 (
-(Ap2) 1 )
+CAN_FUSION 2 \ensuremath{\cdot\sb{\mathfrak{C}}}
+CAN_ORTH 2 \ensuremath{\bot\sb{\mathfrak{C}}}
 
-CONJl 1 \ensuremath{\raisebox{-1pt}{\scalebox{1.2}{\usefont{OT1}{cmr}{m}{it} \textbf{\&}}}}
-(CONJl1) 1 \ensuremath{\raisebox{-1pt}{\scalebox{1.2}{\usefont{OT1}{cmr}{m}{it} \textbf{\&}}}}
+(cfuse) 2 \ensuremath{\cdot\sb{\mathfrak{C}}}
+(corth) 2 \ensuremath{\bot\sb{\mathfrak{C}}}
 
-(op_imp_l1) 2 \ensuremath{\left(
-(op_imp_l2) 3 {}
-(op_imp_l3) 0 \right)\rightarrow
-(op_imp_l4) 0 }
 
-(op_imp_r1) 2 \ensuremath{
-(op_imp_r2) 3 \rightarrow\left(
-(op_imp_r3) 0 {}
-(op_imp_r4) 0 \right)}
+Canonical_System_Ps 5 \ensuremath{Prop\sb{\mathfrak{C}}}
+Canonical_System 1 \ensuremath{\mathfrak{C}}
+Is_Relevant_Cover_System 11 Relevant_CS
+Is_Cover_System 12 Cover_System
+R_MODEL_SYSTEM 12 Model_System 
 
-(CF1) 2 \ensuremath{\mathfrak{F}(
-(CF2) 1 )}
+(EQUIV_W1) 1 \ensuremath{\left|
+(EQUIV_W2) 2 \right|\sb{\bm{R}}}
 
-(CM1) 2 \ensuremath{\mathfrak{M}(
-(CM2) 1 )}
+bullet 3 \,\cdot\,
+(orthojoin) 1 +
 
-(LEQ1) 1 \ensuremath{\leq\sb{
-(LEQ2) 0 }}
+up_set 5 Upset
 
-(Enum1) 1 \ensuremath{A\sb{
-(Enum2) 0 }} 
+(Perps) 1 \ensuremath{\sp{\bot}}
+(dPerp) 1 \ensuremath{\sp{\bot\bot}}
+(tPerp) 1 \ensuremath{\sp{\bot\bot\bot}}
 
-delta 1 \ensuremath{\delta}
-Delta 1 \ensuremath{\Delta}
-gamma 1 \ensuremath{\gamma}
-Gamma 1 \ensuremath{\Gamma}
-ThetaSymsf 1 \Thetasf
-ThetaSym 1 \ensuremath{\Theta}
-cup 1 \ensuremath{\cup}
+(upfunc1) 1 \ensuremath{\uparrow\sb{\scalebox{0.8}{
+(upfunc2) 0 }}}
 
-theta 1 \ensuremath{\theta}
+(C_Holds1) 1 \ensuremath{(
+(C_Holds2) 2 ,\,
+(C_Holds3) 2 ,\,
+(C_Holds4) 2 )\, 
+(C_Holds5) 1 \models}
 
-(ss1) 1 \{ 
-(ss2) 1 \}
+(MHolds1) 1 \ensuremath{(
+(MHolds2) 2 ,\,
+(MHolds3) 2 ,\,
+(MHolds4) 2 )\, \models}
 
-(theta_entails1) 2 \ensuremath{(\vdash^{\&}\sb{
-(theta_entails2) 1 })}
+Ps 4 Prop
 
-S_Theory 8 \ensuremath{\mathsf{\Theta}}_Theory
+E 1 \ensuremath{\varepsilon}
+(theory) 1 \ensuremath{\sp{\vdash}}
 
-(s_theory1) 8 \textsf{\small{_Theory}}
-(s_theory2) 0 
-
-R_gn 4 enum
-
-+ 1 \ensuremath{{+}}
-
-(x1) 1 \ensuremath{x\sb{
-(x2) 1 }(
-(x3) 2 ,\,
-(x4) 1 )}
-
-(X1) 2 \ensuremath{X(
-(X2) 2 ,\,
-(X3) 1 )}
-
-(b1) 1 \ensuremath{b\sb{
-(b2) 1 }(
-(b3) 2 ,\,
-(b4) 1 )}
-
-(B1) 2 \ensuremath{B(
-(B2) 2 ,\,
-(B3) 1 )}
-
-(y1) 1 \ensuremath{y\sb{
-(y2) 1 }(
-(y3) 2 ,\,
-(y4) 1 )}
-
-(Y1) 2 \ensuremath{Y(
-(Y2) 2 ,\,
-(Y3) 1 )}
+PREORDER 8 Preorder

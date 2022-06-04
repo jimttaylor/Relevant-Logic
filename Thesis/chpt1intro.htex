@@ -1,6 +1,8 @@
 \chapter{Introduction}
 \label{cha:intro}
-
+\begin{tikzpicture}[overlay,remember picture]
+ \node[anchor=north,inner sep=0pt]at ([xshift=-0.5cm,yshift=-1.5cm]current page.north) {\includegraphics[width=4cm]{figures/Relevant-Star-chpt1.PNG}};
+\end{tikzpicture}
 
 \section{Thesis Statement}
 \label{sec:thesisstatement}

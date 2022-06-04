@@ -11,7 +11,7 @@ MUNGOPT = -mcc
 
 EXTRA_CLEANS = holtexbasic.sty proof.sty munger munger0.o mungernd mungergse chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt7conclusion.tex tmp/ PDFs/
 
-PDFs/thesis.pdf: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt7conclusion.tex tmp PDFs thesis.tex macros.tex configuration.tex
+PDFs/thesis.pdf: chpt1intro.tex chpt2background.tex chpt3hilbert.tex chpt3ND.tex chpt4rmsemantics.tex chpt5coversemantics.tex chpt7conclusion.tex tmp PDFs thesis.tex macros.tex configuration.tex thesis.bib titlepage.tex
 	pdflatex -output-directory=tmp thesis.tex; \
     bibtex ./tmp/thesis.aux;                   \
 	pdflatex -output-directory=tmp thesis.tex; \
