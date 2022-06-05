@@ -8,7 +8,7 @@ An \emph{assumption} is generally a structured collection of propositions while 
 
 Just as we demonstrated an equivalent Hilbert system in the previous section, we shall consider a Natural Deduction system for Relevant Implication and show that it is equivalent to the previous Hilbert systems. 
 From here on, we will be using the Goldblatt Axiomatization and language, and as such will be dropping all of the subscripts for the language, that is 
- \HOLtm[-->_g//-->]{$-->} becomes \HOLtm{$-->} and so on. 
+ \HOLtm[\rightarrow_g//-->]{$-->} becomes \HOLtm{$-->} and so on. 
 
 \subsection{Natural Deduction for Relevant Logic}\label{subsec:ND}
 For sequents in classical logic, assumptions are put together by way of a single connective $(\bm{,})$ which is representative of the set union of these assumptions. We are also allowed to move assumptions into the conclusion by way of implication introduction. For example:

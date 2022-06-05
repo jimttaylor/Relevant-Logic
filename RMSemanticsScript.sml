@@ -1274,11 +1274,12 @@ Proof
             pop_assum mp_tac >> 
             qpat_x_assum ‘APPLYING w x ⊆ a’ mp_tac >> 
             qpat_x_assum ‘APPLYING a y ⊆ z’ mp_tac >>
-            rw[APPLYING_def, SUBSET_DEF] >> 
-            last_x_assum irule >> qexists_tac ‘γ'’ >> 
+            rw[APPLYING_def, SUBSET_DEF] >>
+            rename[‘∀x. MEM x δ ⇒ x ∈ y’] >>
+            last_x_assum irule >> qexists_tac ‘δ’ >> 
             simp[] >> last_x_assum irule >>
-            qexists_tac ‘[CONJl γ' --> CONJl γ]’ >> simp[CONJl_def] >>
-            ‘|- ((CONJl γ --> β)  --> (CONJl γ' --> CONJl γ) --> CONJl γ' --> β)’ by
+            qexists_tac ‘[CONJl δ --> CONJl γ]’ >> simp[CONJl_def] >>
+            ‘|- ((CONJl γ --> β)  --> (CONJl δ --> CONJl γ) --> CONJl δ --> β)’ by
               metis_tac [goldblatt_provable_rules, g_permutation] >>
             gs[S_Theory_def] >> last_x_assum irule >> simp[sENTAILS_def] >>
             qexists_tac ‘[CONJl γ --> β]’ >> gs[CONJl_def, Ordinary_def, Regular_def]

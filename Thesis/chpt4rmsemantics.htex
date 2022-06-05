@@ -7,10 +7,10 @@
 
 While \emph{syntax} is entirely concerned with transforming expressions to determine what is true, \emph{semantics} gives us an alternative way of looking at logic by providing meaning to statements through construction of \emph{models}. 
 
-One of the more popular ways we assign meaning is by determining under what circumstances a statement is \emph{true}. One method of doing this is through the consideration of \emph{possible worlds}, the idea is that something must be true only if we can show it necessarily is true in all alternative realities that are consistent with what we already take to be true. \fix{ref} By way of example: 
+One of the more popular ways we assign meaning is by determining under what circumstances a statement is \emph{true}. One method of doing this is through the consideration of \emph{possible worlds}, the idea is that something must be true only if we can show it necessarily is true in all alternative realities that are consistent with what we already take to be true. By way of example: 
 Suppose you have an opaque bottle on your desk and you were to pick up the bottle only to find it was heavier than the bottle should be, then you would conclude that something is in the bottle you cannot conceive of a world whereby the bottle is both empty and weighs more that it ought. 
 However wouldn't know what was in the bottle as you could conceive both a reality where the bottle is full of cursed treasure and another where the bottle contains a live squid. 
-\emph{Possible worlds} semantics saw massive success throughout the 1960s in the modal logics through the introduction of a binary relation on over a set of worlds where each world asserts a set of propositions to be true. In modal logic this relationship denotes \emph{accessibility} meaning that when we have $R\,x\,y$ for worlds $x$ and $y$ then we either consider $y$ to be accessible from $x$, or if we find ourselves in the world $x$ (though we wouldn't know we were in $x$) then we would consider $y$ to be a \emph{possible world}. \fix{cite blackburn} 
+\emph{Possible worlds} semantics saw massive success throughout the 1960s in the modal logics through the introduction of a binary relation on over a set of worlds where each world asserts a set of propositions to be true. In modal logic this relationship denotes \emph{accessibility} meaning that when we have $R\,x\,y$ for worlds $x$ and $y$ then we either consider $y$ to be accessible from $x$, or if we find ourselves in the world $x$ (though we wouldn't know we were in $x$) then we would consider $y$ to be a \emph{possible world} \citep{Blackburn2002-BLAML-2}. 
 
 In 1973 Richard Routley (later Svlvan) and Robert Meyer introduced a possible world semantics that followed the advances made in modal logic by using a ternary relation \HOLtm{R} over the set of worlds as well as a dual operator over worlds, \HOLtm{STAR} \citep{ROUTLEY1973199}. \citet{ROUTLEY1973199} propose a reading of \HOLtm{R w x y} that states that the world \HOLtm{y} is compatible relative to \HOLtm{w} and \HOLtm{x} together. It is natural then that the \emph{rules} of \HOLtm{w} are just propositions of the form \HOLtm{A --> B} that \HOLtm{w} asserts to be true. Then if \HOLtm{x} asserts \HOLtm{A}, then \HOLtm{B} is just a result of applying the rules of \HOLtm{w} to \HOLtm{x}, and as such \HOLtm{y} asserts \HOLtm{B}. \HOLtm{RF.STAR x} on the other hand acts as a dual world to \HOLtm{x}. In this, what we mean is that if there exists a \emph{possible world} that does not explicitly reject a set of statements then there must exist a \emph{possible world} that asserts that all of these statements are true. We also choose a world that we read as the \emph{logical world} and it is where we evaluate truth for the whole model.   
 
@@ -19,8 +19,6 @@ An important note to make is that quite unlike semantics for modal logic we also
 The connection between semantic and syntactic systems are two metatheorems called \emph{soundness} and \emph{completeness} results. 
 A \emph{soundness} result between a syntactic theory and a semantic theory states that if a proposition \HOLtm{p} is a theorem of the syntactic theory, then \HOLtm{p} holds in every model of the semantic theory. We may also say that the syntactic theory is \emph{sound} with respect to the semantic theory.
 Conversely a \emph{completeness} result states that if a proposition holds in every model of the semantic theory, then it is a theorem of the syntactic theory. Ergo, the syntactic theory is \emph{complete} with respect to the semantic theory.
-
-\fix{refs}
 
 This chapter introduces the Routley-Meyer Semantics and establishes soundness and completeness results between the Goldblatt axioms and this system. In Section~\ref{sec:RMsystem} we present the Routley-Meyer Semantic theory and show that our Hilbert System is sound with respect to these semantics. In Section~\ref{sec:RMcompleteness} we will formalise the full completeness proof for relevant implication.
 \section{The Routley-Meyer System}
@@ -47,7 +45,7 @@ As with the formalisations given in Chapter~\ref{cha:proof-systems} we will firs
 		\item \HOLtm{RF.Z ∈ RF.W}
 		\item If \HOLtm{x ∈ RF.W} then so is \HOLtm{RF.STAR x}
 	\end{enumerate}	
-	\HOLtm{RF} must also satisfy the following postulates that make \HOLtm{RF} a member of the class of  logics that contain Relevance Logic \fix{cite}.  
+	\HOLtm{RF} must also satisfy the following postulates that make \HOLtm{RF} a member of the class of  logics that contain Relevance Logic \citep[pp.298-299]{RoutleyRLTR}.  
 	\begin{enumerate}
 		\setcounter{enumi}{2}
 		\item When we have \HOLtm{x ∈ RF.W} we also have \HOLtm{RF.R RF.Z x x}
@@ -55,7 +53,7 @@ As with the formalisations given in Chapter~\ref{cha:proof-systems} we will firs
 		\item When \HOLtm{x ∈ RF.W} we have \HOLtm{RF.STAR (RF.STAR x) = x}
 		\item When we have $\HOLtm{w},\,\HOLtm{x},\,\HOLtm{y}\in\HOLtm{RF.W}$ then we have \HOLtm{(RF.R w x y) ⇒ (RF.R w (RF.STAR y) (RF.STAR x))}
 	\end{enumerate}
-	Fo Relevant Implication we also require that \HOLtm{RF} satisfy the following three propositions:
+	Fo Relevant Implication we also require that \HOLtm{RF} satisfy the following three propositions \citep{ROUTLEY1980305}:
 	\begin{enumerate}
 		\setcounter{enumi}{6}
 		\item When we have \HOLtm{x ∈ RF.W} we also have \HOLtm{RF.R x x x}
@@ -99,18 +97,18 @@ As we consider each of the worlds in \HOLtm{RM.RF.W} to be a place where proposi
 	\begin{holmath}
 		\HOLthm[def,A//a,B//b,tr'EmitTeX: print datatypes compactly'=1]{RMSemantics.Holds_def}
 	\end{holmath}
-	We also say that a proposition \HOLtm{p} holds at a model if and only if it holds at the \HOLtm{RM.RF.Z} and we write \HOLtm{Holds RM RM.RF.Z p}.
+	We also say that a proposition \HOLtm{p} holds at a model if and only if it holds at \HOLtm{RM.RF.Z} and we write \HOLtm{Holds RM RM.RF.Z p}.
 \end{defn}
 It follows from immediately from this definition that:
 \begin{cor}[\HOLtm{$V} Holds]
-	\fix{add explaination}
+	When \HOLtm{RM} is an \HOLtm{R_Model} and \HOLtm{w ∈ RM.RF.W} we have that \HOLtm{Holds RM w (A V B)} if and only if at least one of \HOLtm{Holds RM w A} or \HOLtm{Holds RM w B}
 	\begin{holmath}
 	\HOLthm[]{RMSemantics.OR_Holds}
 	\end{holmath}
 \end{cor}
 It is also the case that the hereditary property extends to all formulae:
 \begin{lem}[Hereditary Lemma]\label{lem:hereditary-lem}
-	\fix{add explaination}
+	When \HOLtm{RM} is an \HOLtm{R_Model} and \HOLtm{x} and \HOLtm{y} are worlds of \HOLtm{RM} such that \HOLtm{RM.RF.R RM.RF.Z x y}, then when a proposition \HOLtm{p} holds at \HOLtm{x} then it also holds at \HOLtm{y}:
 	\begin{holmath}
 		\HOLthm[]{RMSemantics.Hereditary_Lemma}
 	\end{holmath}
@@ -178,6 +176,18 @@ For Relevance Logic, this looks like this:
 		\HOLthm[nostile]{RMSemantics.Completeness}
 	\end{holmath}
 We will hold off on proving this statement until the end of this section but the idea is: If \HOLtm{p} is a non-theorem of the Goldblatt Axioms, then we should be able to construct an \HOLtm{R_Model RM} where \HOLtm{p} does not hold, or rather \HOLtm{¬ (Holds RM RM.RF.Z p)}. We shall first briefly introduce some ideas that will be used extensively throughout this section. 
+
+We utilise the HOL list type, given by type \HOLty[of]{[]}, extensively throughout this section and we will briefly state a few facts that will be helpful to understanding the next definitions:
+\begin{itemize}
+	\item Lists can be expressed in explicately where every element of the list is defined and seperated by a semicolon, for example \HOLtm{[a; b; c]}.
+	\item \HOLtm{append} is a function that takes an object \HOLtm{a} and a list \HOLtm{l} and returns another list with \HOLtm{a} as the first value and all others preceeding it, for example \HOLtm{a::l}.
+	\item List concatenation is given by \HOLtm{$++} and represents joining one list to another head to tail.
+	\item \HOLtm{Filter} is a function that a function \HOLtm{f} from elements of the list to \HOLty{:bool} and a list \HOLtm{l}. 
+	It returns another list \HOLtm{l'} which is precisely the list containing elements of \HOLtm{l} that satisfy \HOLtm{f}.
+	We only use the case where \HOLtm{f = λx. x ≠ a} for some predefined \HOLtm{a} and as such we use the statement \HOLtm{Filter (λx. x ≠ a) l} to mean, remove all elements of \HOLtm{a} from \HOLtm{l}.
+	\item \HOLtm[set//set]{set} is a function that takes a list \HOLtm{l} to the set of all of its elements. 
+	We omit expliciately showing this function, prefering to use statements such as \HOLtm{set l ⊆ L} to mean that all the elements of \HOLtm{l} are in \HOLtm{L}
+\end{itemize}
 
 \begin{defn}[List Conjunction]\label{def:CONJl-def}
 	Where \HOLtm{[]} is the empty list of type \HOLty{:g_prop list}; \HOLtm{p},\HOLtm{q} are of type \HOLty{:g_prop}; and \HOLtm{γ} is of type \HOLty{:g_prop list} we define the conjunction over a list (\HOLtm{CONJl}) as below:
@@ -519,7 +529,7 @@ First and foremost we should consider what would be the natural choice of world 
 Due to the constraints HOL4 we have to be explicit about the initial set \HOLtm{i}, rejection set \HOLtm{r}, and which \HOLtm{ThetaSym} we will be defining our rejection with respect to otherwise we wouldn't be able to show this holds for any choice of \HOLtm{z}. 
 
 Given that Definition~\ref{def:B-world} by design shares has remarkable similarities to Definition~\ref{def:theta}, and due to the fact that it shares a similar argument to Lemma~\ref{lem:finite-subset-theta}, we will state without proof that:
-\begin{prop}
+\begin{prop}\label{prop:finite-subset-b-world}
 	If \HOLtm{s} is a finite set of \HOLty{:g_prop} then it is a subset of \HOLtm{B_WORLD ThetaSym i r} if and only if there exists an \HOLtm{n} such that \HOLtm{s ⊆ B_WORLD_i n ThetaSym i r}:
 	\begin{holmath}
 		\HOLthm[i//A,r//R]{RMSemantics.FINITE_SUBSET_B_WORLD}
@@ -533,7 +543,7 @@ As we reject everything in \HOLtm{r} and assume everything in \HOLtm{i}; the nat
 We shall now show that this set satisfies the conditions for membership to \HOLtm{(Canonical_Frame p).W} when several preconditions hold with the idea in our heads that we will show that these preconditions hold in the proof of Theorem~\ref{thm:canonical-frame-is-r-frame}.
 
 \begin{lem}\label{lem:S-Theory-B-WORLD}
-	\HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} is a \HOLtm{S_Theory (Theta p)} is an \HOLtm{S_Theory (Theta p)} when the following three preconditions hold:
+	\HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} is an \HOLtm{S_Theory (Theta p)} when the following three preconditions hold:
 	\begin{holmath}
 		\begin{matrix*}[l]
 			1. & \HOLtm{¬ |- p} \\ 
@@ -547,15 +557,47 @@ We shall now show that this set satisfies the conditions for membership to \HOLt
 	\end{holmath}
 \end{lem}
 \begin{proof}
-	
+	We are required to show that given 	
+	\begin{holmath}
+	\begin{matrix*}[l]
+		1. & \HOLtm{CONJl γ --> C ∈ Theta p}\\
+		2. & \HOLtm{set γ ⊆
+        B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}}
+	\end{matrix*}
+	\end{holmath}
+	that 
+	\begin{holmath}
+		\HOLtm{C ∈ B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}}
+	\end{holmath}
+	But this is just the same as showing that there exists an \HOLtm{n} for which this holds and we will choose \HOLtm{n = (R_gn C) + 1} because this value of \HOLtm{n} for which we add \HOLtm{C} into 
+	\begin{holmath}
+		\HOLtm{B_WORLD_i n (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}}. 
+	\end{holmath}
+
+	It then suffices derive a contradiction from assuming that there is exists a \HOLtm{D} and \HOLtm{q} such that \HOLtm{D --> q ∈ w}, \HOLtm{q ∉ z}, and 
+	\begin{holmath}
+	\HOLtm[width=100]{sENTAILS (Theta p) (B_WORLD_i (R_gn p) (Theta A) (APPLYING x y)
+          {p | (∃q. p --> q ∈ w ∧ q ∉ z)\} ∪ {C\}) D}. 
+    \end{holmath}
+    Where \HOLtm{delta} is the list that satisfies the above \HOLtm{sENTAILS (Theta p)} relation; we know that because we have \HOLtm{CONJl δ --> B ∈ Theta A} then we also have \HOLtm{(B --> q) --> CONJl δ --> q ∈ Theta A}. We also note that we can derive a contradiction by showing that:
+    \begin{holmath}
+    	\HOLtm{q ∈ APPLYING w
+   (B_WORLD (Theta A) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\})}
+    \end{holmath}
+    Naturally the choice of subset that implies that \HOLtm{q} is the one that implies all of \HOLtm{delta}, so we choose \HOLtm{(FILTER (λx. x ≠ p) δ) ++ γ}. This choice of \HOLtm{(FILTER (λx. x ≠ p) δ) ++ γ} results in three subgoals, two of which are related to the membership of \HOLtm{(FILTER (λx. x ≠ p) δ) ++ γ} which is obviously in 
+    \begin{holmath}
+    	\HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}}
+    \end{holmath}
+    and are omitted. 
+    The other is whether \HOLtm{CONJl (FILTER (λx. x ≠ p) δ ⧺ γ) --> q ∈ w} but this should be obvious if tedious to show after stating that it follows immediately from showing 
+    \HOLtm{CONJl δ --> q ∈ w} so is also omitted.
 \end{proof}
-\fix{add proof}
 
 Looking at how \HOLtm{B_WORLD theta i r} has been constructed to exclude everything that could imply a proposition outside of \HOLtm{r} and it contains all other propositions, we can informally say that \HOLtm{B_WORLD theta i r} \emph{maximally excludes} \HOLtm{r}. 
 In this sense we will propose a variant of Lemma~\ref{lem:exists-theta-prop} that for our specific \HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}}. 
 
 \begin{prop}\label{prop:b-world-prop-exists}
-	Let \HOLtm{p} be a non-theorem, \HOLtm{x} be any set of Goldblatt Axioms, \HOLtm{z} be \HOLtm{Prime}, and \HOLtm{w} a \HOLtm{S_Theory (Theta p)}. Assume further that \HOLtm{B_WORLD (Theta p) x {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} is non-empty.
+	Let \HOLtm{p} be a non-theorem, \HOLtm{x} be any set of Goldblatt propositions, \HOLtm{z} be \HOLtm{Prime}, and \HOLtm{w} a \HOLtm{S_Theory (Theta p)}. Assume further that \HOLtm{B_WORLD (Theta p) x {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} is non-empty.
 
 	Whenever \HOLtm{C} is not in \HOLtm{B_WORLD (Theta p) x {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} then we know that there is a \HOLtm{D ∉ z} such that \HOLtm{d ∈ B_WORLD (Theta p) x {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} and \HOLtm{d & C --> D ∈ w}:
 	\begin{holmath}
@@ -566,8 +608,17 @@ In this sense we will propose a variant of Lemma~\ref{lem:exists-theta-prop} tha
 Naturally, like in the proof of the primality of \HOLtm{Theta p} we use the preceding proposition to show that \HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} is prime: 
 We will omit the proof as the argument follows similarly to that of Theorem~\ref{thm:theta-prime}, except that we use Proposition~\ref{prop:b-world-prop-exists} the regularity of \HOLtm{Theta p} to use the rules of the Goldblatt axioms, and that \HOLtm{z} is \HOLtm{Prime} to derive a contradiction.
 
-\begin{prop}label{prop:b-world-prime}
+\begin{prop}\label{prop:b-world-prime}
+	\HOLtm{B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} is \HOLtm{Prime} when the following four preconditions hold:
 	\begin{holmath}
+		\begin{matrix*}[l]
+			1. & \HOLtm{¬ |- p} \\ 
+			2. & \HOLtm{S_Theory (Theta p) w} \\
+			3. & \HOLtm{Prime z} \\ 
+			4. & \HOLtm{APPLYING w (B_WORLD (Theta p) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}) ⊆ z}
+		\end{matrix*} 	
+	\end{holmath} 
+	Or rather: 	\begin{holmath}
 		\HOLthm[p//A]{RMSemantics.Prime_B_WORLD}
 	\end{holmath}
 \end{prop}
@@ -596,7 +647,27 @@ Now we are able to show that \HOLtm{Canonical_Frame p} is an \HOLtm{R_Frame} in 
 		\item We need to show that \HOLtm{APPLYING x x ⊆ x}, so given \HOLtm{set gamma ⊆ x} and \HOLtm{CONJl gamma --> a ∈ x} show \HOLtm{a ∈ x}. 
 		But because \HOLtm{S_Theory (Theta p) x} and Proposition~\ref{prop:some-theorems-R-1}.8 the result follows from the regularity of \HOLtm{Theta p}.
 		\item Follows similarly to 7. but follows from Assertion instead of Proposition~\ref{prop:some-theorems-R-1}.8.  
-		\item \fix{finish this}
+		\item Last but not least we are required to show that for any choice of worlds \HOLtm{w}, \HOLtm{x}, \HOLtm{y}, \HOLtm{z}, and \HOLtm{a} where 
+		\HOLtm{APPLYING w x ⊆ a} and \HOLtm{APPLYING a y ⊆ z}. Then there exists a world \HOLtm{b} such that \HOLtm{APPLYING x y ⊆ b} and \HOLtm{APPLYING w b ⊆ z}. We choose 
+		\begin{holmath}
+			\HOLtm{b = B_WORLD (Theta A) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}}
+		\end{holmath}
+		\HOLtm{APPLYING x y ⊆ b} holds trivially. 
+		To show that \HOLtm{APPLYING w b ⊆ z} we let \HOLtm{gamma ⊆ b} and \HOLtm{CONJl gamma --> B ∈ w} with the the goal to show that \HOLtm{B ∈ z}. Using Proposition~\ref{prop:finite-subset-b-world} and the finiteness of \HOLtm{gamma} this is just the same as assuming that there exists an \HOLtm{n} such that 
+		\begin{holmath}
+			\HOLtm{gamma ⊆ B_WORLD_i n (Theta A) (APPLYING x y) {p | (∃q. p --> q ∈ w ∧ q ∉ z)\}} 
+		\end{holmath}
+		We then induct on \HOLtm{n}:
+		\begin{description}
+			\item[The base case] requires that we show that \HOLtm{set γ ⊆ APPLYING x y ⇒ β ∈ z}. By Proposition~\ref{prop:conjl-in-applied} this amounts to showing that it holds given that \HOLtm{CONJl γ ∈ APPLYING x y}. 
+			By \HOLtm{APPLYING a y ⊆ z} we have that we only need to show that there exists a \HOLtm{delta ⊆ y} such that \HOLtm{CONJl delta --> B ∈ a} but we know that there exists a \HOLtm{delta ⊆ y} such that \HOLtm{CONJl delta --> CONJl gamma ∈ x}.
+			
+			If we assume that these \HOLtm{delta} are the same and then all we need is that \HOLtm{CONJl δ --> B ∈ a}. 
+			But this is true if we show that \HOLtm{(CONJl δ --> CONJl γ) --> CONJl δ --> B ∈ w} as \HOLtm{APPLYING w x ⊆ a}, which of course holds because of permutation and that \HOLtm{w} is a \HOLtm{S_Theory (Theta p)}.
+			\item[The inductive step] follows immediately.
+		\end{description}
+	So to take stock, we have now that \HOLtm{APPLYING x y ⊆ b} and \HOLtm{APPLYING w b ⊆ z} but we don't have that \HOLtm{b ∈ (Canonical_Frame p).W}. But this is as simple as showing that \HOLtm{b} is a \HOLtm{S_Theory (Theta p)} and that is it \HOLtm{Prime}.
+	\HOLtm{S_Theory (Theta p)} holds immediately from Lemma~\ref{lem:S-Theory-B-WORLD} and \HOLtm{Prime} follows immediately from this fact and Proposition~\ref{prop:b-world-prime}.
 	\end{enumerate}
 \end{proof}
 \begin{thm}[]\label{thm:canonical-constuction-r-model}

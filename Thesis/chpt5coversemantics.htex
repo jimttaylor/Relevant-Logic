@@ -4,13 +4,22 @@
  \node[anchor=north,inner sep=0pt]at ([xshift=-0.5cm,yshift=-1.5cm]current page.north) {\includegraphics[width=4cm]{figures/Relevant-Star-chpt4.PNG}};
 \end{tikzpicture}
 
+In contrast to the Routley-Meyer's semantics being based off a worlds relationship to other worlds determining truth; 
+the Cover System Semantics described by \citet{GoldblattRobert2011Qpai} is a semantic system based off the idea that properties of \emph{worlds} are \emph{locally determined} rather than \emph{relationally determined}. 
+This notion is largely inspired from the field of topology in that we are able to take a point and construct a covering of that point using all open subsets about a point an use results on those open subsets to determine properties about that point. 
+In topology we say that a property is \emph{locally true} of a point \HOLtm{p} if it is true of all open subsets about that point; we also say that a property is \emph{locally determined} of a point \HOLtm{p} if the property holding at all open subsets about \HOLtm{p} implies that the property holds at \HOLtm{p} \citep{GoldblattRobert2011Qpai}.
 
-\fix{talk about, a flaw of the RM semantics, topology, the idea behind cover semantics}
+Inside the Cover Semantics there are two particularly important relationships that we should mention. The first is a binary relationship between worlds \HOLtm{$≼} and the second is a relationship between sets of worlds and a world \HOLtm{$▹}. 
+The natural reading of \HOLtm{x ≼ y}, as provided by \citet{GoldblattRobert2011Qpai}, is that if \HOLtm{x} contains some information, then \HOLtm{y} also contains that infomation; so we can think of \HOLtm{$≼} as a sort of refinement of information. 
+\HOLtm{Z ▹ x} on the otherhand operates differently its natural reading is that \HOLtm{x} consists of precisely the information that is shared between the members of \HOLtm{Z}, that is if \HOLtm{p} is a propostion that is true of all members in \HOLtm{Z} then it is true at \HOLtm{x}; that is, it is a \emph{locally determined} property.
 
+We should mention the Routley-Meyer system has one major perk over the Cover-Semantics: It is similar enough to the Kripke semantics for modal logic that adopters of Relevant Logics would be able to understand it without too much hassle. 
+This raises the question, why bother with Cover Semantics at all? 
+The answer is that \citet{Fine1989} showed that the expected extension of the Routley-Meyer Semantics to Quantified Relevant Logic was incomplete. 
+This meant that while a semantical system based off the Routley-Meyer semantics was eventually found, it gives an unintuitive meaning to the quantifiers. 
+Cover Semantics on the other has already been shown to be sound and complete with respect to the Quantified extention of \textbf{R}.   
 
-\fix{refs}
-
-This chapter introduces the Cover Semantics for unquantified relevant implication and establishes soundness and completeness results between the Goldblatt axioms and this system. In Section~\ref{sec:CSsystem} we present Cover Semantics as described by \citet{GoldblattRobert2011Qpai} adn we will also establish \emph{semantic soundness} between the Hilbert System is and this alternative semantic system. In Section~\ref{sec:CScompleteness} we will formalise \emph{semantic completeness} for relevant implication with respect to the cover semantics.
+This chapter introduces the Cover Semantics for unquantified relevant implication and establishes soundness and completeness results between the Goldblatt axioms and this system. In Section~\ref{sec:CSsystem} we present Cover Semantics as described by \citet{GoldblattRobert2011Qpai} and we will also establish \emph{semantic soundness} between the Hilbert System is and this alternative semantic system. In Section~\ref{sec:CSCompleteness} we will formalise \emph{semantic completeness} for relevant implication with respect to the cover semantics.
 
 \section{The Goldblatt System}\label{sec:CSsystem}
 
@@ -80,7 +89,7 @@ Now we are able to define a Cover System:
 \end{defn}
 As we now have the \HOLtm{PREORDER} condition on \HOLtm{CS} we can now claim that a set \emph{upset} and invariance under \emph{upward closure} are the same thing.
 \begin{prop}
-	A set \HOLtm{X} is an \HOLtm{Upset} with respect to a \HOLtm{Is_Cover_System} CS if and only if it is invarient under \emph{upward closure}. That is:
+	A set \HOLtm{X} is an \HOLtm{Upset (to_CS RCS)} with respect to a \HOLtm{Is_Cover_System} CS if and only if it is invarient under \emph{upward closure}. That is:
 	\begin{holmath}
 		\HOLthm{CoverSemantics.Upset_up}
 	\end{holmath}
@@ -97,7 +106,13 @@ In this sense \HOLtm{j CS X} can be considered the set of \emph{local members} o
 \begin{defn}[Localized]\label{def:localized}
 We say that a set \HOLtm{X} is \HOLtm{Localized} in a Cover System CS when all local members of \HOLtm{X} are in \HOLtm{X}
 	\begin{holmath}
-	\HOLthm{CoverSemantics.Localized_def}
+	\HOLthm[nostile]{CoverSemantics.Localized_def}
+	\end{holmath}
+\end{defn}
+\begin{defn}[\HOLtm{Is_Prop}]\label{defn:is-prop-def}
+	We say that a set is a \emph{Proposition} with respect to a \HOLtm{Is_Relevant_Cover_System RCS} if it is both \HOLtm{Localized} and an \HOLtm{Upset (to_CS RCS)} with respect to \HOLtm{RCS}.
+	\begin{holmath}
+		\HOLthm[nostile]{CoverSemantics.Is_Prop_def}
 	\end{holmath}
 \end{defn}
 
@@ -171,17 +186,17 @@ We also define the implication under \HOLtm{RCS} from \HOLtm{X} to \HOLtm{Y} as 
 	\HOLthm[def]{CoverSemantics.IMP_def}
 \end{holmath}
 \end{defn}
-We can show the following properties of any \HOLtm{RCS} that is a \HOLtm{Is_Relevant_Cover_System}:
-\begin{lem}\label{lem:lemma6-4-1}
+We can show the following properties of any \HOLtm{Is_Relevant_Cover_System}:
+\begin{lem}\label{lem:lemma6-4-1}$\,$
 \begin{enumerate}
 	\item \HOLtm{w ⊥ₐ u} is true if and only if \HOLtm{(w ⬝ₐ u)⊥ₐ RCS.E}.
-	\item \HOLtm{Perp RCS X} is \HOLtm{Localized} in, and an \HOLtm{Upset} of, \HOLtm{RCS}.
-	\item If \HOLtm{Y} is an \HOLtm{Upset} of \HOLtm{RCS} then so is \HOLtm{X ⟹ₐ Y}.
+	\item \HOLtm{Perp RCS X} is \HOLtm{Localized} in, and an \HOLtm{Upset (to_CS RCS)} of, \HOLtm{RCS}. Thus it is a proposition of \HOLtm{RCS} 
+	\item If \HOLtm{Y} is an \HOLtm{Upset (to_CS RCS)} of \HOLtm{RCS} then so is \HOLtm{X ⟹ₐ Y}.
 	\item If \HOLtm{Y} is \HOLtm{Localized} in \HOLtm{RCS} then so is \HOLtm{X ⟹ₐ Y}.
 	\item If \HOLtm{w ⊥ₐ X} then \HOLtm{a ⊥ₐ j X}. Or, \HOLtm{Perp X ⊆ Perp (j X)}
 	\item \HOLtm{(j X) ⊆ Perp (Perp (j X))} and \HOLtm{Perp (Perp (j X)) ⊆ Perp (Perp X)}
-	\item If \HOLtm{X} is an \HOLtm{Upset} of \HOLtm{RCS} then, \HOLtm{w ⊥ₐ u} if and only if \HOLtm{w ⊥ₐ j X}. Or, \HOLtm{Perp X = Perp (j X)}
-	\item If \HOLtm{X} is an \HOLtm{Upset} of \HOLtm{RCS} then: \HOLtm{X ⊆ j X}, \HOLtm{j X ⊆ j (Perp (Perp X))}, and \HOLtm{j (Perp (Perp X)) = Perp (Perp X)}
+	\item If \HOLtm{X} is an \HOLtm{Upset (to_CS RCS)} of \HOLtm{RCS} then, \HOLtm{w ⊥ₐ u} if and only if \HOLtm{w ⊥ₐ j X}. Or, \HOLtm{Perp X = Perp (j X)}
+	\item If \HOLtm{X} is an \HOLtm{Upset (to_CS RCS)} of \HOLtm{RCS} then: \HOLtm{X ⊆ j X}, \HOLtm{j X ⊆ j (Perp (Perp X))}, and \HOLtm{j (Perp (Perp X)) = Perp (Perp X)}
 \end{enumerate}
 \begin{holmath}
 		 \HOLthm{CoverSemantics.lemma6_4_1_1}\\
@@ -195,23 +210,36 @@ We can show the following properties of any \HOLtm{RCS} that is a \HOLtm{Is_Rele
 \end{holmath}
 \end{lem}
 \begin{proof}
+	\begin{enumerate}
+		\item
+		\item
+		\item
+		\item
+		\item
+		\item
+		\item
+		\item 
+	\end{enumerate}
 	\fix{add proof}
 \end{proof}
 
-It follows immediatly from Lemma~\ref{lem:lemma6-4-1} that
+It follows immediately from Lemma~\ref{lem:lemma6-4-1} that:
 \begin{cor}\label{lem:corollary6-4-2}
-	\begin{cor}
+	If \HOLtm{RCS} is a relevant cover system and \HOLtm{X} is an \HOLtm{Upset (to_CS RCS)} with respect to \HOLtm{RCS} then when \HOLtm{X = Perp (Perp X)} we have that \HOLtm{X} is a \emph{Proposition}. 
+	\begin{holmath}
 		\HOLthm{CoverSemantics.corollary6_4_2}
-	\end{cor}
+	\end{holmath}
 \end{cor}
 
 \subsection{Model Systems, Models, and Soundness}
+Now that we have thoroughly defined the Cover systems that we will be working with we should now define the systems that we use to establish validity. 
+In the Cover semantics, we augment the Cover-Semantics with a specific set of \emph{Propositions} and closed under $(\bot)$, \HOLtm{$∩}, \HOLtm{$⟹ₐ}, and $(+)$.
 \begin{defn}\label{def:model-system}
 	An \HOLtm{R_MODEL_SYSTEM} is a \HOLtm{Is_Relevant_Cover_System} together with a collection of subsets of \HOLtm{RCS.W} \HOLtm{Prop}, called the \emph{admissable propositions} of the 
 	such that for all \HOLtm{X} and \HOLtm{Y} in \HOLtm{Prop} we have that:
 	\begin{enumerate}
 		\item \HOLtm{Up (to_CS RCS) {RCS.E\} ∈ Prop}.
-		\item \HOLtm{X} is an \HOLtm{Upset}.
+		\item \HOLtm{X} is an \HOLtm{Upset (to_CS RCS)}.
 		\item \HOLtm{X = Perp (Perp X)} 
 		\item \HOLtm{Perp X ∈ Prop}
 		\item \HOLtm{X ∩ Y ∈ Ps}
@@ -222,9 +250,10 @@ It follows immediatly from Lemma~\ref{lem:lemma6-4-1} that
 		\HOLthm{CoverSemantics.R_MODEL_SYSTEM_def}
 	\end{holmath}
 \end{defn}
-
+We then assign a function \HOLtm{M} that takes propositions from the language of \textbf{R} and assigns them to \emph{Propositions} inside \HOLtm{Ps}.   
 \begin{defn}\label{def:model-function}
-	A Model Function \HOLtm{M} is a function that is inductively defined from \HOLty{:g_prop} into \HOLtm{Prop} such that each propositional variable is assigned a set inside \HOLtm{Prop}, \HOLtm{tau} is assigned \HOLtm{Up (to_CS RCS) {RCS.E\}}. Then \HOLtm{M (A & B)} goes to \HOLtm{M A ∩ M B}, \HOLtm{M (A --> B)} goes to \HOLtm{M A ⟹ M B}, and \HOLtm{M (~A)} goes to \HOLtm{Perp (M A)}:
+	A \emph{Model Function} \HOLtm{M} is a function that is inductively defined from \HOLty{:g_prop} into \HOLtm{Prop} such that each propositional variable is assigned a set inside \HOLtm{Prop}, \HOLtm{tau} is assigned \HOLtm{Up (to_CS RCS) {RCS.E\}}. 
+	Then \HOLtm{M (A & B)} goes to \HOLtm{M A ∩ M B}, \HOLtm{M (A --> B)} goes to \HOLtm{M A ⟹ M B}, and \HOLtm{M (~A)} goes to \HOLtm{Perp (M A)}:
 	\begin{holmath}
 		\HOLthm{CoverSemantics.Model_Function_def}
 	\end{holmath}
@@ -235,34 +264,60 @@ It follows immediatly from Lemma~\ref{lem:lemma6-4-1} that
 		\HOLthm{CoverSemantics.Model_Function_or}
 	\end{holmath}
 \end{cor}
-
-Using this we are able to determine ..  
+An \HOLtm{R_MODEL_SYSTEM} and \HOLtm{Model_Function} together form a \emph{Model} of the Cover semantics. We can then talk about how propositionsa are modeled  
 \begin{defn}\label{def:c-holds}
-	
+	A given an \HOLtm{R_MODEL_SYSTEM}, \HOLtm{RCS}, \HOLtm{Ps}, and a \HOLtm{Model_Function} \HOLtm{M} defined over \HOLtm{RCS} and \HOLtm{Ps}, as well as a world \HOLtm{w} inside \HOLtm{RCS.W}. Proposition \HOLtm{A} Holds at \HOLtm{w} when \HOLtm{w ∈ M A}:
 	\begin{holmath}
 		\HOLthm{CoverSemantics.C_Holds_def}
 	\end{holmath}
+	When this is the case we write \HOLtm{C_Holds RCS Ps M w A}. We also say that a proposition holds at a model, if and only if it holds at \HOLtm{RCS.E} and we write \HOLtm{C_Holds RCS Ps M RCS.E A}.
 \end{defn}
 
 \begin{cor}\label{def:holds-conditions}
-
+	We can establish the following conditions on Holds:
+	\begin{enumerate}
+		\item \HOLtm{C_Holds RCS Ps M w (g_VAR s)} if and only if \HOLtm{w ∈ M (g_VAR s)}
+		\item \HOLtm{C_Holds RCS Ps M w τ} if and only if \HOLtm{RCS.E ≼ w}
+		\item \HOLtm{C_Holds RCS Ps M w (~A)} if and only if \HOLtm{∀u. C_Holds RCS Ps M u A ⇒ w ⊥ u}
+		\item \HOLtm{C_Holds RCS Ps M w (A & B)} if and only if \HOLtm{C_Holds RCS Ps M w A ∧ C_Holds RCS Ps M w B}
+		\item \HOLtm{C_Holds RCS Ps M w (A --> B)} if and only if \HOLtm{∀u. C_Holds RCS Ps M u A ⇒ C_Holds RCS Ps M (w ⬝ u) B}
+	\end{enumerate}
+	In other words:
 	\begin{holmath}
 		\HOLthm{CoverSemantics.C_Holds_conditions}
 	\end{holmath}
 \end{cor}
-\begin{proof}
-	
-\end{proof}
 
-These condi
-\begin{thm}\label{thm:CSsoundness}
+With these conditions we are now able to the soundness result for the Cover Semantics. 
+\begin{thm}[Soundness]\label{thm:CSsoundness}
 	The Goldblatt Axioms are \emph{sound} with respect to the Cover Semantics:
 	\begin{holmath}
 		\HOLthm[]{CoverSemantics.soundness}
 	\end{holmath}
 \end{thm}
 \begin{proof}
-	
+	First we will induct on \HOLtm{$|-}. Most of these cases we will omit for brevity as they are largely routine, but we will look at a couple of the more interesting cases:
+	\begin{description}
+		\item[Suffixing:] After simplifying with Definitions~\ref{def:model-function} and \ref{def:orthcomp-orthjoin-imp} we are required to show that \HOLtm{RCS.E ⬝ x ∈ RCS.W} and \HOLtm{((RCS.E ⬝ x) ⬝ y) ∈ RCS.W} for \HOLtm{x} and \HOLtm{y} in \HOLtm{RCS.W} all of which hold because of the properties of \HOLtm{Is_Relevant_Cover_System}. Then we have to show that \HOLtm{((RCS.E ⬝ x) ⬝ y) ⬝ z ∈ M C} for \HOLtm{z ∈ M A} while assuming both: 
+		\begin{holmath}
+		\begin{matrix*}[l]
+			1. & \HOLtm{∀x'. (∃x. (x' = (y ⬝ x)) ∧ x ∈ M B) ⇒ (x' ∈ M C)} \\
+			2. & \HOLtm{∀x'. (∃x''. (x' = (x ⬝ x'')) ∧ x'' ∈ M A) ⇒ x' ∈ M B}
+		\end{matrix*}
+		\end{holmath}
+		By 1. we only need to produce a \HOLtm{x'} that satisfies \HOLtm{((((RCS.E ⬝ x) ⬝ y) ⬝ z) = (y ⬝ x')) ∧ x' ∈ M B} which is of course \HOLtm{x' = (x ⬝ z)}. We get \HOLtm{ (((RCS.E ⬝ x) ⬝ y) ⬝ z) = (y ⬝ (x ⬝ z))} by the conditions on Fusion and we get \HOLtm{ x ⬝ z ∈ M B} immediately.
+		\item[Contraction:] After simplifying with Definitions~\ref{def:model-function} and \ref{def:orthcomp-orthjoin-imp}, and resolving the trivial cases, we are required to show that \HOLtm{x ⬝ y ∈ M B} given \HOLtm{x ∈ RCS.W} and \HOLtm{y ∈ M A}. 
+
+		We note that \HOLtm{Upset (M B)} which means that it suffices to show that 
+		\HOLtm{x ⬝ y ∈ (to_CS RCS).W} and that there exists a \HOLtm{d} such that \HOLtm{d ∈ M B ∧ (to_CS RCS).REF d (x ⬝ y)}. The first condition is immediate and setting \HOLtm{d = (x ⬝ y) ⬝ y} makes \HOLtm{RCS.REF ((x ⬝ y) ⬝ y) (x ⬝ y)} obvious due to the conditions of how Fusion interacts with \HOLtm{$≼ₐ}.
+		\item[Contradiction:] After simplifying with Definitions~\ref{def:model-function} and \ref{def:orthcomp-orthjoin-imp}, and resolving the trivial cases, we get that we need to show that \HOLtm{ (x ⬝ y) ⊥ z} given that \HOLtm{x ∈ RCS.W} and \HOLtm{y ∈ M B} and \HOLtm{z ∈ M A} While also assuming:
+		\begin{holmath}
+		\begin{matrix*}[l]
+			1. & \HOLtm{∀x''. x'' ∈ M A ⇒ x ⬝ x'' ∈ RCS.W ∧ ∀x'. x' ∈ M B ⇒ (x ⬝ x'') ⊥ x'}
+		\end{matrix*}
+		\end{holmath}
+		We then specialise 1. with \HOLtm{z} and the result then follow from the conditions on \HOLtm{$⊥}.
+	\end{description}
 \end{proof}
 
 \section{Completeness}\label{sec:CSCompleteness}
@@ -380,8 +435,8 @@ Now we are able to define the relations we will use for Fusion and Orthogonality
 	\end{holmath}
 \end{defn}
 
-When \citep{GoldblattRobert2011Qpai} defined fusion and orthogonality for the canonical system, he only defined it over the canonical frame's set of worlds which was the set of all sets which were theories. In HOL we aren't able to do this, so we proposed \HOLtm{$⬝ₘ} and \HOLtm{$⊥ₘ} as above and an operator and relation over all sets of propositions. We can show that these agree with Goldblatt's definitions below:
-\begin{thm}
+When \citet{GoldblattRobert2011Qpai} defined fusion and orthogonality for the canonical system, he only defined it over the canonical frame's set of worlds which was the set of all sets which were theories. In HOL we aren't able to do this, so we proposed \HOLtm{$⬝ₘ} and \HOLtm{$⊥ₘ} as above and an operator and relation over all sets of propositions. We can show that these agree with Goldblatt's definitions below:
+\begin{thm}\label{thm:can-fuse-alt}
 	Where \HOLtm{A} and \HOLtm{B} are Goldblatt propositions then:
 	\begin{holmath}
 		\HOLthm[nostile]{CoverSemantics.CAN_FUSION_alt}
@@ -391,7 +446,7 @@ When \citep{GoldblattRobert2011Qpai} defined fusion and orthogonality for the ca
 	\fix{add proof}
 \end{proof}
 
-\begin{thm}
+\begin{thm}\label{thm:can-orth-alt}
 	Where \HOLtm{A} and \HOLtm{B} are Goldblatt propositions then:
 	\begin{holmath}
 		\HOLthm[nostile]{CoverSemantics.CAN_ORTH_alt}
@@ -412,18 +467,35 @@ Now that we have all the underlying stuctures defined will now move onto constru
 \end{defn}
 
 Now that we have our choice of Canonical System, before we go any further we should make sure that actually a Relevant Cover System:
-\begin{thm}[]
+\begin{thm}[]\label{thm:cs-is-rcs}
 	\HOLtm{Canonical_System} is a \emph{Relevant Cover System}:
 	\begin{holmath}
 		\HOLthm{CoverSemantics.Canonical_System_is_RCS}
 	\end{holmath}
 \end{thm}
 \begin{proof}
-	\fix{add proof}
+	Most of the 19 cases needed to show this result are immediate given the definition of \HOLtm{Canonical_System} and Proposition~\ref{prop:entails-results} the two exceptions are as follows:
+
+	The first exception is: given \HOLtm{Z ▹ₘ x} and \HOLtm{y ∈ Canonical_System.W} then show \HOLtm{(Z ⬝ₘ y) ▹ₘ (x ⬝ₘ y)}. We need to show first that \HOLtm{CAN_FUSION (Theory A) (Theory B)} and  \HOLtm{CAN_FUSION Z (Theory B)} are well formed, both of which are a result of Theorem~\ref{thm:can-fuse-alt}. 
+	Then we have to show that \HOLtm{BIGINTER (op_Lift_1 CAN_FUSION Z (Theory B)) =
+        CAN_FUSION (Theory A) (Theory B)} which we will do by using the 
+	anti-symmetry of \HOLtm{$⊆}
+		\begin{itemize}
+		\item[$\supseteq$:] Let \HOLtm{x ∈ CAN_FUSION (Theory A) (Theory B)} and \HOLtm{BIGINTER Z = Theory A}, then given \HOLtm{Theory C ∈ Z} show that \HOLtm{x ∈ CAN_FUSION (Theory C) (Theory B)}. Using Theorem~\ref{thm:can-fuse-alt} we have that this is the same as saying that given \HOLtm{x ∈ Theory (A ∘ᵣ B)} show \HOLtm{x ∈ Theory (C ∘ᵣ B)}. It then suffices to show that \HOLtm{C |-^ A} which follows from \HOLtm{BIGINTER Z = Theory A}.
+		\item[$\subseteq$:] Let \HOLtm{BIGINTER Z = Theory A} and assume:
+			\begin{holmath}
+				\HOLtm{∀x. x ∈ Z ⇒ D ∈ CAN_FUSION x (Theory B)}
+			\end{holmath}
+		This simplifies down to showing \HOLtm{D ∈ Theory (A ∘ᵣ B)}. We are able to show that for all propositions \HOLtm{C} in \HOLtm{Z} then \HOLtm{B --> D ∈ Theory C} and that it suffices to show that \HOLtm{B --> D ∈ Theory A} by using Proposition~\ref{prop:entails-results}. The result then follows straightforwardly.  
+	\end{itemize}
+
+	The second exception is: given \HOLtm{Z ▹ₘ x} and \HOLtm{Z ⊥ₘ Canonical_System.E} then show \HOLtm{x ⊥ₘ Canonical_System.E}. 
+	From this we have that \HOLtm{∀C. Theory C ∈ Z ⇒ CAN_ORTH (Theory C) (Theory τ)} and that \HOLtm{BIGINTER Z = Theory A} and we need to show that \HOLtm{CAN_ORTH (Theory A) (Theory τ)}. 
+	We note that it suffices to show that \HOLtm{~τ ∈ BIGINTER Z} because of Theorem~\ref{thm:can-orth-alt} but we note again that we have \HOLtm{∀C. Theory C ∈ Z ⇒ C |-^ ~τ} due to Theorem~\ref{thm:can-orth-alt}. The result then follows immediately. 
 \end{proof}
 
 We will also simultaniously define the set of \emph{Propositions} that we will use as the basis for an \HOLtm{R_MODEL_SYSTEM}:
-\begin{defn}
+\begin{defn}\label{def:Canonical-System-Ps}
 	Where \HOLtm{EQUIV_W A} denotes the set of worlds in \HOLtm{Canonical_System.W} which contain \HOLtm{A} 
 	\begin{holmath}
 	\HOLthm[def]{CoverSemantics.EQUIV_W_def}
@@ -434,7 +506,7 @@ We will also simultaniously define the set of \emph{Propositions} that we will u
 	\end{holmath}
 \end{defn}
 There is also an equivalence between the Goldblatt Propositions and the structure of our set of admissable propoistions \HOLtm{Canonical_System_Ps}. 
-\begin{lem}[Properties of \HOLtm{EQUIV_W bullet}]
+\begin{lem}[Properties of \HOLtm{EQUIV_W bullet}]\label{lem:lemma6-5-3}
 	\begin{holmath}
 		\begin{matrix*}[l]
 			1. & \HOLthm[nostile]{CoverSemantics.lemma6_5_3_1}\\
@@ -447,6 +519,13 @@ There is also an equivalence between the Goldblatt Propositions and the structur
 \end{lem}
 \begin{proof}
 	\fix{add proof}
+	\begin{enumerate}
+		\item 
+		\item 
+		\item 
+		\item 
+		\item 
+	\end{enumerate}
 \end{proof}
 
 \begin{thm}[]\label{thm:CanS-r-model-system}
@@ -456,13 +535,31 @@ There is also an equivalence between the Goldblatt Propositions and the structur
 	\end{holmath}
 \end{thm}
 \begin{proof}
-	\fix{add proof - only last postulate though}
+	Most of the cases are immediate from the definitions of \HOLtm{Canonical_System} and \HOLtm{Canonical_System_Ps} given Lemma~\ref{lem:lemma6_5_3}. The only case that isn't immediate is showing that \HOLtm{Orthojoin X Y = j (X ∪ Y)}.
+
+	As \HOLtm{X} and \HOLtm{Y} are in \HOLtm{Canonical_System_Ps} then they are of the form \HOLtm{EQUIV_W A} and \HOLtm{EQUIV_W B} for some propositions \HOLtm{A} and \HOLtm{B}. We will show the required equality though the anti-symmetry of \HOLtm{$⊆}.
+	\begin{itemize}
+		\item[$\supseteq$:] By Definition~\ref{def:orthcomp-orthjoin-imp} we have that we need to show \HOLtm{j (EQUIV_W A ∪ EQUIV_W B) ⊆ Perp (Perp (EQUIV_W A ∪ EQUIV_W B))} and this follows straightforwardly from Theorem~\ref{thm:cs-is-rcs} and Lemma~\ref{lem:lemma6-4-1}.6.
+		\item[$\subseteq$:] It suffices to show that there exists a \HOLtm{C} such that when \HOLtm{Theory C ∈ EQUIV_W (A V B)} then \HOLtm{Theory C ∈ j (EQUIV_W A ∪ EQUIV_W B)}. It is also the case that:
+		\begin{holmath}
+			\HOLtm{Up (to_CS Canonical_System) {Theory C\} = EQUIV_W C}
+		\end{holmath}
+		We then need to show that there exists a cover \HOLtm{Z ▹ₘ Theory C} such that \HOLtm{Z ⊆ EQUIV_W A ∪ EQUIV_W B} and we naturally pick. 
+		\begin{holmath}
+		 	\HOLtm{Z = EQUIV_W C ∩ EQUIV_W A ∪ EQUIV_W C ∩ EQUIV_W B}
+		\end{holmath} 
+		This means that we need to show that \HOLtm{BIGINTER Z = Theory C} which we will again show by anti-symmetry. 
+
+		The backwards direction relies on \HOLtm{Z ⊆ EQUIV_W C}, and Propostion~\ref{prop:entails-results}.3.	
+  
+		The forwards direction relies Lemma~\ref{lem:lemma6-5-3}.2 and on the fact that if \HOLtm{x} is a proposition and \HOLtm{x ∈ Theory (C & A)} as well as \HOLtm{x ∈ Theory (C & B)} then it must be in \HOLtm{Theory C}.
+	\end{itemize}
 \end{proof}
 
 Now that we actually have that \HOLtm{Canonical_System} and \HOLtm{Canonical_System_Ps} together set up a \HOLtm{R_MODEL_SYSTEM} we have everything we need to show completeness, which we will show by way of a chain of implications. 
 \begin{thm}[Model System Characterisation of $\bm{R}$]
 	For any formula \HOLtm{p} the following are equivalent:
-z	\begin{enumerate}
+	\begin{enumerate}
 		\item \HOLtm{|- p}
 		\item \HOLtm{(∀RCS Ps M. R_MODEL_SYSTEM RCS Ps ∧ Model_Function RCS Ps M ⇒ C_Holds RCS Ps M RCS.E p)}
 		\item \HOLtm{∀M. Model_Function Canonical_System Canonical_System_Ps M ⇒
@@ -476,10 +573,14 @@ z	\begin{enumerate}
 	\begin{description} 
 		\item[$1 \Rightarrow 2$:] See Theorem~\ref{thm:CSsoundness}.
 		\item[$2 \Rightarrow 3$:] Follows as an immediate consequence of Theorem~\ref{thm:CanS-r-model-system}.
-		\item[$3 \Rightarrow 1$:]
+		\item[$3 \Rightarrow 1$:] We choose our \HOLtm{M = λx. EQUIV_W x}. 
+		Then we are required to show that this is a \HOLtm{Model_Function} with respect to the \HOLtm{Canonical_System} and \HOLtm{Canonical_System_Ps}. The \HOLtm{g_VAR} case follows from Definition~\ref{def:Canonical-System-Ps}. The
+		\HOLtm{$&}, \HOLtm{$-->}, and \HOLtm{$~} cases follow from Lemma~\ref{lem:lemma6-5-3}.2, .4, and .3 respectively. And the \HOLtm{tau} case follows from the definition of \HOLtm{Canonical_System.E} and Lemma~\ref{lem:lemma6_5_3}.4.
+
+		Now that we have our model dunction, we only need to show that when \HOLtm{C_Holds Canonical_System Canonical_System_Ps (λx. EQUIV_W x)
+          Canonical_System.E p} then \HOLtm{p} which, when unpacking the definitions for \HOLtm{Canonical_System}, \HOLtm{Canonical_System_Ps}, \HOLtm{EQUIV_W}, and $(\models)$ gives us that we only need to show that \HOLtm{|- p} given \HOLtm{tau |-^ p} which follows immediately. 
 	\end{description}
 	}
-	\fix{finish proof}
 \end{proof}
 Which yields the completeness result:
 \begin{cor}[Completeness]\label{cor:CScompleteness}
@@ -490,3 +591,6 @@ Which yields the completeness result:
 \end{cor}
 
 \section{Summary}
+This chapter introduced the Goldblatt Cover semantics for Relevant Implication
+and formalised both semantic soundness and completeness between the Goldblatt axiomatisation and the Goldblatt Cover semantics. Inside the HOL development, this required
+2211\fix{fix at end of chapter proofs} lines of source code contained entirely inside \texttt{CoverSemanticsScript.sml} and completes our investigation opn Relevant Implication. 

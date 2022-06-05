@@ -28,6 +28,13 @@ val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 Overload "cfuse" = “λx y. CAN_FUSION x y”
 Overload "corth" = “λx y. CAN_ORTH x y”
 
+Overload "cfuse" = “λx y. op_Lift_1 CAN_FUSION x y”
+Overload "cfuse" = “λx y. op_Lift_2 CAN_FUSION x y”
+
+Overload "corth" = “λx y. rel_Lift_1 CAN_ORTH x y”
+Overload "corth" = “λx y. rel_Lift_2 CAN_ORTH x y”
+
+
 val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 			paren_style = OnlyIfNecessary,
 			fixity = Infixr 400,
@@ -53,6 +60,7 @@ val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 			term_name = "EQUIV_W",
 			pp_elements = [TOK "(EQUIV_W1)", TM, TOK "(EQUIV_W2)"]}
 
+Overload "(Perp)" = “Perp”
 Overload "Perps" = “λx. Perp x”
 Overload "dPerp" = “λx. Perp (Perp x)”
 Overload "tPerp" = “λx. Perp (Perp (Perp x))”
@@ -81,6 +89,9 @@ Overload "upfunc" = “λcs X. Up cs X”
 Overload "up_set" = “Upset (to_CS RCS)”
 Overload "up_set" = “Upset (to_CS Canonical_System)”
 
+Overload "Localized" = “Localized CS”
+Overload "Localized" = “Localized (to_CS RCS)”
+Overload "Localized" = “Localized (to_CS Canonical_System)”
 
 val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
             fixity = Prefix 2300, pp_elements = [TOK "(upfunc1)", TM, TOK "(upfunc2)"],

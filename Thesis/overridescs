@@ -65,7 +65,7 @@ R_MODEL_SYSTEM 12 Model_System
 
 bullet 3 \,\cdot\,
 (orthojoin) 1 +
-
+Orthojoin 3 (+)
 up_set 5 Upset
 
 (Perps) 1 \ensuremath{\sp{\bot}}
