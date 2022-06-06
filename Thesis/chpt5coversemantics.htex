@@ -524,8 +524,8 @@ There is also an equivalence between the Goldblatt Propositions and the structur
 			\item[$\supseteq$:] We are required to show that given \HOLtm{x ∈ Canonical_System.W} and \begin{holmath}
 				\HOLtm{∀y. A ∈ y ∧ y ∈ Canonical_System.W ⇒ x ⊥ₘ y}
 			\end{holmath}
-			That we can show \HOLtm{~A ∈ x}. We first specialise the above statement with \HOLtm{Theory A} and then simpilfying against Theorem~\ref{thm:canorth}. The result then follows straighforwardly from the definition of \HOLtm{Canonical_System}.
-			\item[$\subseteq$:] Follows straightforwardly using Theorem~\ref{thm:canorth} and Propositions~\ref{prop:entails-results}.3 and \ref{prop:entails-results}.6.
+			That we can show \HOLtm{~A ∈ x}. We first specialise the above statement with \HOLtm{Theory A} and then simpilfying against Theorem~\ref{thm:can-orth-alt}. The result then follows straighforwardly from the definition of \HOLtm{Canonical_System}.
+			\item[$\subseteq$:] Follows straightforwardly using Theorem~\ref{thm:can-orth-alt} and Propositions~\ref{prop:entails-results}.3 and \ref{prop:entails-results}.6.
 		\end{itemize}
 		\item[4.] We show equality though the anti-symmetry of \HOLtm{$⊆}:
 		\begin{itemize}

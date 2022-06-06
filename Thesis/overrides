@@ -9,6 +9,9 @@ V 2 \ensuremath{\bm{\lor}}
 tau 1 \ensuremath{\tau}
 
 
+n|- 2 \ensuremath{\not\vdash\sb{\bm{R}}}
+(n|-^) 2 \ensuremath{\not\vdash^{\&}\sb{\bm{R}}}
+
 |-^ 2 \ensuremath{\vdash^{\&}\sb{\bm{R}}}
 
 -> 1 \ensuremath{\rightarrow}

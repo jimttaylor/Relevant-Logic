@@ -296,4 +296,31 @@ val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 			term_name = "filt",
 			pp_elements = [TOK "(filt)"]}
 
+Overload "n|-" = “λ p. ¬( |- p)”
+Overload "n|-^" = “λ g p. ¬(g |-^ p)”
+
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+			paren_style = OnlyIfNecessary,
+			fixity = Infixl 130,
+			term_name = "n|-^",
+			pp_elements = [TOK "(n|-^)"]}
+
+Overload "nHolds" = “λ RM a. ¬(Holds RM RM.RF.Z a)”
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+			paren_style = OnlyIfNecessary,
+			fixity = Suffix 2100,
+			term_name = "nHolds",
+			pp_elements = [TOK "(nHOLDS1)", TM, TOK "(nHOLDS2)"]}
+
+Overload "nMHolds" = “λ RM a. ¬(Holds RM RM.RF.Z a)”
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+			paren_style = OnlyIfNecessary,
+			fixity = Suffix 2100,
+			term_name = "nMHolds",
+			pp_elements = [TOK "(nMHOLDS1)"]}
+
+
+
+
+
 val _ = export_theory()

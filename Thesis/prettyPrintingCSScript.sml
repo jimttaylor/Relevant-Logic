@@ -113,6 +113,14 @@ val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 			term_name = "MHolds",
 			pp_elements = [TOK "(MHolds1)", TM, TOK "(MHolds2)", TM, TOK "(MHolds3)", TM, TOK "(MHolds4)"]}
 
+Overload "nMHolds" = “λ rcs prop m p . ¬(C_Holds rcs prop m rcs.E p)”
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+			paren_style = OnlyIfNecessary,
+			fixity = Prefix 2300,
+			term_name = "nMHolds",
+			pp_elements = [TOK "(nMHolds1)", TM, TOK "(nMHolds2)", TM, TOK "(nMHolds3)", TM, TOK "(nMHolds4)"]}
+
+
 val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 			paren_style = OnlyIfNecessary,
 			fixity = Suffix 2100,
@@ -120,4 +128,46 @@ val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 			pp_elements = [TOK "(theory)"]}
 
 
+Overload "(RCS)" = “to_CS RCS”
+Overload "(Canonical_System)" = “to_CS RCS”
+
+Overload "n|-" = “λ p. ¬( |- p)”
+Overload "n|-^" = “λ g p. ¬(g |-^ p)”
+
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+			paren_style = OnlyIfNecessary,
+			fixity = Infixl 130,
+			term_name = "n|-^",
+			pp_elements = [TOK "(n|-^)"]}
+
+Overload "nC_Holds" = “λ rcs prop m w p . ¬(C_Holds rcs prop m w p)”
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+			paren_style = OnlyIfNecessary,
+			fixity = Prefix 2300,
+			term_name = "nC_Holds",
+			pp_elements = [TOK "(nC_Holds1)", TM, TOK "(nC_Holds2)", TM, TOK "(nC_Holds3)", TM, TOK "(nC_Holds4)", TM, TOK "(nC_Holds5)"]}
+
+Overload "E" = “RCS.E”
+Overload "E" = “Canonical_System.E”
+Overload "≼ₘ" = “Canonical_System.REF”
+
+Overload "(CSw)" = “CS.W”
+Overload "(RCSw)" = “RCS.W”
+Overload "(CANw)" = “Canonical_System.W”
+
+
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+			paren_style = OnlyIfNecessary,
+			fixity = Closefix,
+			term_name = "EQUIV",
+			pp_elements = [TOK "([)", TM, TOK "(])"]} 
+
+(*
+Overload "Mp" = “λ(p :g_prop). M p”
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+			paren_style = OnlyIfNecessary,
+			fixity = Closefix,
+			term_name = "Mp",
+			pp_elements = [TOK "(M_fun1)", TM, TOK "(M_fun2)"]}
+*)
 val _ = export_theory()

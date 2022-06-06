@@ -12,14 +12,22 @@ alpha 1 \ensuremath{\alpha}
 <| 1 \ensuremath{\langle}
 |> 1 \ensuremath{\rangle}
 
+CS 1 \ensuremath{\mathcal{C}}
 RCS 1 \ensuremath{\mathcal{S}}
+(RCS) 1 \ensuremath{\mathcal{S}}
+(RCSw) 2 \ensuremath{\mathcal{S}\sp{W}}
+(CSw) 2 \ensuremath{\mathcal{C}\sp{W}}
 
 |-^ 1 \ensuremath{\vdash\sb{\bm{R}}}
+
+n|- 2 \ensuremath{\not\vdash\sb{\bm{R}}}
+(n|-^) 2 \ensuremath{\not\vdash\sb{\bm{R}}}
 
 -> 1 \ensuremath{\rightarrow}
 $Turnstile$ 4 \HOLTokenTurnstile{}
 
- 
+Theory_union 8 Theory_\ensuremath{\bigcup}
+
 ⬝ₐ 1 \ensuremath{\cdot}
 ⊥ₐ 1 \ensuremath{\bot}
 ≼ₐ 1 \ensuremath{\leqslant}
@@ -56,6 +64,10 @@ CAN_ORTH 2 \ensuremath{\bot\sb{\mathfrak{C}}}
 
 Canonical_System_Ps 5 \ensuremath{Prop\sb{\mathfrak{C}}}
 Canonical_System 1 \ensuremath{\mathfrak{C}}
+(Canonical_System) 1 \ensuremath{\mathfrak{C}}
+(CANw) 2 \ensuremath{\mathfrak{C}\sp{W}}
+
+
 Is_Relevant_Cover_System 11 Relevant_CS
 Is_Cover_System 12 Cover_System
 R_MODEL_SYSTEM 12 Model_System 
@@ -86,9 +98,26 @@ up_set 5 Upset
 (MHolds3) 2 ,\,
 (MHolds4) 2 )\, \models}
 
+(nC_Holds1) 1 \ensuremath{(
+(nC_Holds2) 2 ,\,
+(nC_Holds3) 2 ,\,
+(nC_Holds4) 2 )\, 
+(nC_Holds5) 1 \not\models}
+
+(nMHolds1) 1 \ensuremath{(
+(nMHolds2) 2 ,\,
+(nMHolds3) 2 ,\,
+(nMHolds4) 2 )\, \not\models}
+
+(M_fun1) 1 \ensuremath{|
+(M_fun2) 2 |^\mathcal{M}}
+
 Ps 4 Prop
 
 E 1 \ensuremath{\varepsilon}
 (theory) 1 \ensuremath{\sp{\vdash}}
 
 PREORDER 8 Preorder
+
+([) 1 \ensuremath{[
+(]) 1 ]}
