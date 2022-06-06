@@ -7,20 +7,20 @@ val _ = new_theory "RLRules";
 val _ = set_fixity "-->" (Infixr 490);
 val _ = overload_on ("-->", “g_IMP”);
 
-val _ = set_fixity "&" (Infixr 490); 
+val _ = set_fixity "&" (Infixl 600); 
 val _ = overload_on ("&", “g_AND”);
 
 val _ = overload_on ("~", “g_NOT”);
     
 val _ = overload_on ("τ", “g_tt”);
 
-val _ = set_fixity "V" (Infixr 490);
+val _ = set_fixity "V" (Infixl 500);
 val _ = overload_on ("V", “g_OR”);
     
-val _ = set_fixity "<->" (Infixr 490);
+val _ = set_fixity "<->" (Infix (NONASSOC, 491));
 val _ = overload_on ("<->", “g_DIMP”);
  
-val _ = set_fixity "∘ᵣ" (Infixr 490);
+val _ = set_fixity "∘ᵣ" (Infixl 49600);
 val _ = overload_on ("∘ᵣ", “g_ICONJ”);
 
 val _ = overload_on ("|-", “goldblatt_provable”);
@@ -199,7 +199,7 @@ Theorem g_io_distribution_equiv:
   ∀A B C. |- ((A ∘ᵣ (B V C)) <-> ((A ∘ᵣ B) V (A ∘ᵣ C)))
 Proof
   rw[g_DIMP_def] >> irule g_adjunction_rule >> rw[g_ICONJ_def, g_OR_def] >> 
-  ‘|- (( A --> ~~(~B & ~C)) <-> A --> (~B & ~C))’ by
+  ‘|- (( A --> ~~(~B & ~C)) <-> (A --> (~B & ~C)))’ by
     metis_tac[g_double_negative_implication_equiv, g_equiv_replacement] >>
   ‘|- ((~~(A --> ~B) & ~~(A --> ~C)) <->  ((A --> ~B) & (A --> ~C)))’ by (
     simp[g_DIMP_def] >> irule g_adjunction_rule >> rw[]
@@ -209,16 +209,16 @@ Proof
           by metis_tac[g_conjunction_r, g_equiv_replacement, g_double_negative_equiv] >>
         metis_tac[goldblatt_provable_rules]
        )
-    >-(‘|- (((A --> ~B) & A --> ~C) --> ~~(A --> ~B))’
+    >-(‘|- (((A --> ~B) & (A --> ~C)) --> ~~(A --> ~B))’
          by metis_tac[g_conjunction_l, g_equiv_replacement, g_double_negative_equiv] >>
-       ‘|- (((A --> ~B) & A --> ~C) --> ~~(A --> ~C))’
+       ‘|- (((A --> ~B) & (A --> ~C)) --> ~~(A --> ~C))’
          by metis_tac[g_conjunction_r, g_equiv_replacement, g_double_negative_equiv] >>
        metis_tac[goldblatt_provable_rules]
       )
     )
   >- (‘|- ((~~(A --> ~B) & ~~(A --> ~C)) --> (A --> ~~(~B & ~C)))’
         suffices_by metis_tac[g_contrapositive_alt, g_equiv_replacement] >>
-      ‘ |- (((A --> ~B) & A --> ~C) --> A --> (~B & ~C))’ suffices_by
+      ‘ |- (((A --> ~B) & (A --> ~C)) --> A --> (~B & ~C))’ suffices_by
         metis_tac[g_equiv_replacement] >> 
       metis_tac[goldblatt_provable_rules]
      )
@@ -229,7 +229,7 @@ Proof
       ‘|- ((A --> ~B & ~C) --> (A --> ~B))’ by metis_tac[g_conj_elim_l] >> 
       ‘|- ((A --> ~B & ~C) --> (A --> ~C))’ by metis_tac[g_conj_elim_r] >> 
       metis_tac[goldblatt_provable_rules]
-  )
+     )
 QED
 
 Theorem  g_io_distribution_lr:

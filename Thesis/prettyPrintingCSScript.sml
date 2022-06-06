@@ -60,7 +60,6 @@ val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
 			term_name = "EQUIV_W",
 			pp_elements = [TOK "(EQUIV_W1)", TM, TOK "(EQUIV_W2)"]}
 
-Overload "(Perp)" = “Perp”
 Overload "Perps" = “λx. Perp x”
 Overload "dPerp" = “λx. Perp (Perp x)”
 Overload "tPerp" = “λx. Perp (Perp (Perp x))”
@@ -68,6 +67,10 @@ Overload "tPerp" = “λx. Perp (Perp (Perp x))”
 Overload "Perps" = “λx. Perp RCS x”
 Overload "dPerp" = “λx. Perp RCS (Perp RCS x)”
 Overload "tPerp" = “λx. Perp RCS (Perp RCS (Perp RCS x))”
+
+val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
+            fixity = Suffix 2100, pp_elements = [TOK "(Perps)"],
+            term_name = "Perp", paren_style = OnlyIfNecessary}
 
 val _ = add_rule {block_style = (AroundEachPhrase, (PP.CONSISTENT, 0)),
             fixity = Suffix 2100, pp_elements = [TOK "(Perps)"],

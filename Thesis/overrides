@@ -31,7 +31,7 @@ Z 1 0
 STAR 1 \ensuremath{\ast}
 
 (Mw) 1 \ensuremath{\sp{W}}
-Mz 2 \ensuremath{0\sb{\mathcal{M}}}
+Mz 2 \ensuremath{0}
 (Mr) 1 \ensuremath{R\sb}
 (Ms) 1 \ensuremath{\sp{\ast}}
 (Mss) 2 \ensuremath{\sp{\ast\ast}}
@@ -43,7 +43,7 @@ Mz 2 \ensuremath{0\sb{\mathcal{M}}}
 (Mf) 1 \ensuremath{\sp{\mathcal{F}}}
 
 (Fw) 1 \ensuremath{\sp{W}}
-Fz 2 \ensuremath{0\sb{\mathcal{F}}}
+Fz 2 \ensuremath{0}
 (Fr1) 1 \ensuremath{R\sb{
 (Fr2) 0 }}
 (Fs) 1 \ensuremath{\sp{\ast}}

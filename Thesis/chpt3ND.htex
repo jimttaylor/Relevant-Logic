@@ -1,13 +1,13 @@
 \section{A Natural Deduction System}
 \label{sec:nd-system}
 
-While Hilbert systems presents a theory of logic as a collection of axioms and ways to transform propositions using rules of inference, it is not the only way that we could present a logic. 
+While Hilbert system presents a theory of logic as a collection of axioms and ways to transform propositions using rules of inference, it is not the only way that we could present a logic. 
 A \emph{Natural Deduction} system has very few `axioms' (if any) and instead encodes the structure of the logic inside many different rules that govern how connectives behave under certain conditions.
-It should be noted that Natural Deduction operates using \emph{sequents}, or \emph{assumption}-\emph{conclusion} pairs where the conclusion is a result of the assumption, rather than propositions by themselves like seen in Hilbert systems. 
-An \emph{assumption} is generally a structured collection of propositions while a conclusion is just a proposition by itself . 
+It should be noted that Natural Deduction operates using \emph{sequents}, or \emph{assumption}-\emph{conclusion} pairs where the conclusion is a result of the assumption, rather than propositions by themselves, like seen in Hilbert systems. 
+An \emph{assumption} is generally a structured collection of propositions while a conclusion is just a proposition by itself. 
 
 Just as we demonstrated an equivalent Hilbert system in the previous section, we shall consider a Natural Deduction system for Relevant Implication and show that it is equivalent to the previous Hilbert systems. 
-From here on, we will be using the Goldblatt Axiomatization and language, and as such will be dropping all of the subscripts for the language, that is 
+From here on, we will be using the Goldblatt Axiomatization and language and as such, will be dropping all of the subscripts for the language, that is 
  \HOLtm[\rightarrow_g//-->]{$-->} becomes \HOLtm{$-->} and so on. 
 
 \subsection{Natural Deduction for Relevant Logic}\label{subsec:ND}
@@ -22,7 +22,7 @@ But the comma $(\bm{,})$ could also be read as the conjunction $(\bm{\land})$ be
 \UnaryInfC{$\Gamma\bm{,} a \Vdash c$}
 \UnaryInfC{$\Gamma\Vdash a \rightarrow c$}
 \end{prooftree}
-This poses a problem for the creation of a Natural Deduction system for relevant implication where we are still able to weaken assumptions and shift assumptions into the conclusion while also maintaining the desirable characteristics of \HOLtm{$-->}. That being that we cannot introduce irrelevant antecedents given a known conclusion. 
+This poses a problem for the creation of a Natural Deduction system for relevant implication where we are still able to weaken assumptions and shift assumptions into the conclusion while also maintaining the desirable characteristics of \HOLtm{$-->}:  being that we cannot introduce extra antecedents given that a known conclusion already holds from an assumption. 
 
 Luckily \citet{slaney1990ND} gives us a solution by structuring our assumption with not one, but two different connectives: The first \HOLtm{$，} is coupled with conjunction, while the second \HOLtm{$；} is associated with implication. 
 Of course, in HOL this means that we will need a new data-type for these connectives and, taking inspiration from \citet{slaney1990ND}, we will also call these bunches. 
@@ -33,7 +33,7 @@ Of course, in HOL this means that we will need a new data-type for these connect
 	\end{holmath}
 	We drop \HOLtm{PROP} for clarity whenever \HOLty{:g_prop} appears explicitly in a bunch. 
 \end{defn}  
-\citet{slaney1990ND} also introduces a way for us to access a privileged position inside a bunch which can be manipulated while keeping the rest of the structure as it is. 
+\citet{slaney1990ND} also introduces a way for us to access a privileged position inside a bunch, which can be manipulated while keeping the rest of the structure as it is. 
 In our formalisation, we will take this to be a sort of context with a hole and a replacement function that takes both a bunch and a context and produces a new bunch by filling the hole in the context with the bunch:
 \begin{defn}[B Contexts]\label{defn:b-context}
 	A \HOLty{:B_Context} is formalised in HOL as an inductive type: 
@@ -48,8 +48,8 @@ In our formalisation, we will take this to be a sort of context with a hole and 
 		\HOLthm[def,B//b]{NaturalDeduction.REPLACE_def}
 	\end{holmath}
 \end{defn}
-While \HOLtm{$，} and \HOLtm{$；} in Definition~\ref{defn:b-context} are the same symbols as seen in Definition~\ref{def:bunch} they are not the same object. 
-We only use these symbols in this context as when a \HOLty{:B_Context} is taken, together with Definition~\ref{def:replace} these symbols effectively have the same meaning as their \HOLty{:Bunch} counterparts.
+While \HOLtm{$，} and \HOLtm{$；} in Definition~\ref{defn:b-context} are the same symbols as seen in Definition~\ref{def:bunch}, they are not the same object. 
+We only use these symbols in this datatype because we take a \HOLty{:B_Context} together with Definition~\ref{def:replace} these symbols effectively have the same meaning as their \HOLty{:Bunch} counterparts.
 
 With these definitions in place we can now consider the rules of the Natural Deduction system.
 \begin{defn}[Natural Deduction]\label{defn:natural-deduction}
@@ -101,9 +101,9 @@ With these definitions in place we can now consider the rules of the Natural Ded
   	\end{matrix*}
   	\end{holmath}
 \end{defn}
-Clarification should be made here regarding the system presented in \citet{slaney1990ND} and Definition \ref{defn:natural-deduction}. \citet{slaney1990ND} uses what he calls the 0\textsuperscript{th} assumption and assigns an identity like behaviour with \HOLtm{$；}. 
-\citet{slaney1990ND} states that this 0\textsuperscript{th} assumption is the set of all logical truths; we, on the other hand, have defined our Bunches in terms of propositions so we can't use this set in our Bunches. 
-We instead give the properties of 0 to \HOLtm{τ} as we hope that we can use use \HOLtm{τ} to derive any logical truth that we would need in a given proof (we show this in the next subsection \ref{subsec:ND-equiv}). 
+Clarification should be made here regarding the system presented in \citet{slaney1990ND} and Definition \ref{defn:natural-deduction}. \citet{slaney1990ND} uses what he calls the 0\textsuperscript{th} assumption and assigns an identity-like behaviour with \HOLtm{$；}. 
+\citet{slaney1990ND} states that this 0\textsuperscript{th} assumption is the set of all logical truths. We, on the other hand, have defined our Bunches in terms of propositions so we can't use this set in our Bunches. 
+We instead give the properties of the 0\textsuperscript{th} to \HOLtm{τ} as we hope that we can use  \HOLtm{τ} to derive any logical truth that we would need in a given proof (we show this in the next subsection \ref{subsec:ND-equiv}). 
 
 We can now work our way through a couple of propositions that we can produce within this natural deduction system. 
 \begin{prop}[\HOLtm{$；}\textsf{ Assoc. RL}]
@@ -130,7 +130,7 @@ There are also a number of useful results that we derive from the definition of 
 \end{prop}
 \subsection{From the Hilbert System to Natural Deduction and Back Again}\label{subsec:ND-equiv}
 
-We claimed in the last chapter that the reason that we to give the identity behaviour with the \HOLtm{$；} to \HOLtm{τ} was because we hoped that we would be able to derive any logical truth from it using the Natural Deduction rules; we shall show that now.
+In the last chapter we claimed that the reason that we give the identity behaviour, with respect to \HOLtm{$；}, to \HOLtm{τ} was because we hoped that we would be able to derive any logical truth from it using the Natural Deduction rules. We shall show that now:
 \begin{thm}\label{thm:hil-to-ND}
 	If \HOLtm{A} is Goldblatt Provable, then \HOLtm{(PROP τ) ||- A} is a valid sequent of the Natural Deduction system, that is:
 	\begin{holmath}
@@ -173,11 +173,11 @@ We claimed in the last chapter that the reason that we to give the identity beha
 		\HOLtm{(PROP  (A & (B V C)) ， PROP B ) ||- ((A & B) V (A & C))}\\
 		\HOLtm{(PROP  (A & (B V C)) ， PROP C ) ||- ((A & B) V (A & C))} 
 		\end{holmath}
-		By using \HOLtm{$&}\textbf{I} and Proposition \ref{prop:nd-or-I-alt}. The result then follows from \HOLtm{$V}\textbf{E} and \HOLtm{$，}\textsf{ Idem. LR}.
+		By using \HOLtm{$&}\textbf{I} and \HOLtm{$V}\textbf{I}. The result then follows from \HOLtm{$V}\textbf{E} and \HOLtm{$，}\textsf{ Idem. LR}.
 		\item [Contraposition:] It suffices to show \HOLtm{((PROP (A --> ~B)) ； PROP (B)) ||- (~A)}. Then we then get the result from \textbf{RAA} and \HOLtm{$-->}\textbf{E}.
 	\end{description}
 \end{proof}
-After this result we may wonder if every valid sequent can be taken to a proposition, and further, if the sequent can be reconstructed from that proposition. 
+After this result we may wonder if every valid sequent can be taken to a proposition and furthermore, if the original sequent can be reconstructed from that proposition. 
 To show this we need a function that takes bunches to propositions. 
 \begin{defn}\label{defn:bg}
 	\HOLtm{bg} is a function of type \HOLty[of]{bg} given by:
@@ -226,7 +226,7 @@ In order to show this we need the following lemmata:
 	Then, by the Goldblatt Axioms, it suffices to show \HOLtm{|- (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)) --> C)}.
 	by specializing Lemma~\ref{lem:CONTEXT-IMP} appropriately we get that this follows from Lemma~\ref{lem:OR-bunch-rule}, Suffixing and Modus Ponens.
 \end{proof}
-Theorem~\ref{thm:ND-to-hil} gives us that we can take sequents to Goldblatt provable proposition, but not that the original sequent is recoverable from the Goldblatt proposition, though this is definitely the case:
+Theorem~\ref{thm:ND-to-hil} shows that we can take sequents to Goldblatt provable proposition, but not that the original sequent is recoverable from the Goldblatt proposition, though this is definitely the case:
 \begin{thm}\label{thm:bg-trans}
 	If \HOLtm{bg(X) --> A} is Goldblatt Provable, then \HOLtm{(X) ||- A} is a valid sequent inside the Natural Deduction system.
 	\begin{holmath}
@@ -248,11 +248,12 @@ We will need the following lemma to show this:
 \end{proof}
 
 \subsection{Summary}
+\begin{sloppypar}
 This chapter introduced, formalised, and showed the equivalence of two different Hilbert systems and a Natural Deduction system for relevance logic. 
 Inside the HOL4 development: the introduction of the Goldblatt System (in \texttt{GoldblattRLScript.sml}) consists of 146 lines of source code; 
 the introduction of the Slaney system (in \texttt{SlaneyRLScript.sml}) consists of 244 lines of source code; 
 showing the equivalence between the Goldblatt and Slaney systems requires a further 102 lines of source code in \texttt{GoldblattSlaneyEquivScript.sml}; 
 and the introduction and equivalence results of the Natural Deduction system consists of 435 lines of HOL4 in \texttt{NaturalDeductionScript.sml}; for a total of 927 lines of HOL4.
 There was also further work done in support of this chapter in the \texttt{RLRulesScript.sml} notably Propositions~\ref{prop:some-theorems-R-1}.6 and \ref{prop:some-theorems-R-1}.7.
-
 Now that we have thoroughly explored our \emph{syntactic} systems, it follows that we should now consider our first \emph{semantic} one. 
+\end{sloppypar}

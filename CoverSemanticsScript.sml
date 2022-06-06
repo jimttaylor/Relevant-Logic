@@ -219,7 +219,7 @@ Proof
 QED
         
 Theorem lemma6_4_1_2:
-  ∀X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ⇒
+  ∀RCS X. Is_Relevant_Cover_System RCS ∧ X ⊆ RCS.W ⇒
           Is_Prop RCS (Perp RCS X)
 Proof
   reverse $ rw[Is_Prop_def, Localized_def, Perp_def] 
@@ -533,7 +533,7 @@ Proof
       >- (rename[‘((RCS.E ⬝ x) ⬝ y) ⬝ z ∈ M C’] >>
           ‘(RCS.E ⬝ x) = x’ by metis_tac[E_x_is_x] >>
           last_x_assum irule >>
-          qexists_tac ‘(x ⬝ z)’ >> rw[]
+          qexists_tac ‘(x ⬝ z)’ >> rw[] 
           >- (‘((y ⬝ x) ⬝ z) = (y ⬝ (x ⬝ z))’ suffices_by
                 metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_FUSION_COMM, RCS_FUSION_ASSOC_LR] >>
               ‘z ∈ RCS.W’ by metis_tac[M_SUBSET_RCS_W, SUBSET_DEF] >> 
@@ -561,24 +561,20 @@ Proof
           gs[])
       >- (rename[‘(RCS.E ⬝ x) ⬝ y ∈ M B’] >>
           ‘(RCS.E ⬝ x) = x’ by metis_tac[E_x_is_x] >> 
-          gs[] >>
+          gs[PULL_EXISTS] >>
           ‘Upset (M B)’ by
             metis_tac[R_MODEL_SYSTEM_PS_UPSET, M_IN_Ps_W] >>
           gs[Upset_def] >> pop_assum irule >> rw[] 
           >- (‘x ⬝ y ∈ RCS.W’ suffices_by rw[to_CS_def] >>
               metis_tac[M_SUBSET_RCS_W, SUBSET_DEF, RCS_FUSION_CLOSURE])
-          >- (qexists_tac ‘(x ⬝ y) ⬝ y’ >> reverse $ rw[]
-              >- (‘((x ⬝ y) ⬝ y) ≼ (x ⬝ y)’ suffices_by rw[to_CS_def] >>
-                  ‘((x ⬝ y) ⬝ y) = (x ⬝ (y ⬝ y))’ by
-                    (irule (GSYM RCS_FUSION_ASSOC_LR) >>
-                     metis_tac [M_SUBSET_RCS_W, SUBSET_DEF, R_MODEL_SYSTEM_R_COVER_SYSTEM]) >> 
-                  gs[] >> irule RCS_FUSION_MONO_REFINEMENT >> rw[] >> 
-                  metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_FUSION_SQUARE_DECREASE,
-                            M_SUBSET_RCS_W, SUBSET_DEF, RCS_PREORDER, PREORDER_def])
-              >- (last_x_assum $ qspec_then ‘x ⬝ y’ strip_assume_tac >>
-                  ‘∀x'. (∃x''. x' = ((x ⬝ y) ⬝ x'') ∧ x'' ∈ M A) ⇒ x' ∈ M B’ by metis_tac[] >>
-                  last_x_assum irule >> metis_tac[]
-                 )
+          >- (qexists_tac ‘(x ⬝ y) ⬝ y’ >> reverse $ rw[] >> 
+              ‘((x ⬝ y) ⬝ y) ≼ (x ⬝ y)’ suffices_by rw[to_CS_def] >>
+              ‘((x ⬝ y) ⬝ y) = (x ⬝ (y ⬝ y))’ by
+                (irule (GSYM RCS_FUSION_ASSOC_LR) >>
+                 metis_tac [M_SUBSET_RCS_W, SUBSET_DEF, R_MODEL_SYSTEM_R_COVER_SYSTEM]) >> 
+              gs[] >> irule RCS_FUSION_MONO_REFINEMENT >> rw[] >> 
+              metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_FUSION_SQUARE_DECREASE,
+                        M_SUBSET_RCS_W, SUBSET_DEF, RCS_PREORDER, PREORDER_def]
              )
          )
      )
@@ -714,10 +710,10 @@ Proof
           ‘(RCS.E ⬝ x) = x’ by metis_tac[E_x_is_x] >> 
           gs[])
       >- (rename[‘(RCS.E ⬝ x) ⬝ y ∈ Perp (M A)’] >>
-          ‘(RCS.E ⬝ x) = x’ by metis_tac[E_x_is_x] >> 
-          gs[Perp_def] >> rpt strip_tac
+          ‘(RCS.E ⬝ x) = x’ by metis_tac[E_x_is_x] >> simp[] >> 
+          gs[Perp_def, PULL_EXISTS] >> rpt strip_tac
           >- metis_tac[M_SUBSET_RCS_W, SUBSET_DEF, R_MODEL_SYSTEM_R_COVER_SYSTEM, RCS_FUSION_CLOSURE]
-          >- (rename[‘(x ⬝ y) ⊥ z’] >> last_x_assum $ qspec_then ‘x ⬝ z’ strip_assume_tac >>
+          >- (rename[‘(x ⬝ y) ⊥ z’] >> last_x_assum $ qspec_then ‘z’ strip_assume_tac >>
               ‘∀x'. x' ∈ M B ⇒ (x ⬝ z) ⊥ x'’ by metis_tac[M_SUBSET_RCS_W, SUBSET_DEF] >>
               irule RCS_CONTRAPOSITION >>
               metis_tac[R_MODEL_SYSTEM_R_COVER_SYSTEM, M_SUBSET_RCS_W, SUBSET_DEF]
@@ -1081,9 +1077,9 @@ Proof
               ‘C |-^ A’ suffices_by 
                 metis_tac[ENTAILS_ICONJ_MONOTONE, ENTAILS_TRANS] >>
               gs[BIGINTER, Theory_def, EXTENSION] >>
-                 last_x_assum $ qspec_then ‘A’ strip_assume_tac >>
-                 gs[ENTAILS_REFL] >> last_x_assum $ qspec_then ‘{B | C |-^ B}’ strip_assume_tac >> 
-                 gs[])
+              last_x_assum $ qspec_then ‘A’ strip_assume_tac >>
+              gs[ENTAILS_REFL] >> last_x_assum $ qspec_then ‘{B | C |-^ B}’ strip_assume_tac >> 
+              gs[])
           >- (rw[SUBSET_DEF, op_Lift_1] >>
               rename[‘D ∈ CAN_FUSION (Theory A) (Theory B)’] >>
               gs[CAN_FUSION_alt, PULL_EXISTS, SUBSET_DEF] >>
@@ -1198,7 +1194,7 @@ Proof
       irule SUBSET_ANTISYM >> reverse $ rw[]
       >- (simp[Orthojoin_def] >> assume_tac Canonical_System_is_RCS >>
           drule_then strip_assume_tac lemma6_4_1_6 >>
-          pop_assum $ qspec_then ‘EQUIV_W A ∪ EQUIV_W B’ strip_assume_tac >>
+          pop_assum $ qspec_then ‘EQUIV_W A ∪ EQUIV_W B’ strip_assume_tac >>   
           ‘EQUIV_W A ∪ EQUIV_W B ⊆ Canonical_System.W’ by
             simp[SUBSET_DEF, EQUIV_W_def] >>
           metis_tac[SUBSET_TRANS])
@@ -1230,10 +1226,11 @@ Proof
                          simp[EQUIV_W_def, Canonical_System_def, Theory_def] >> 
                           metis_tac[ENTAILS_REFL]) >>
                       gs[Theory_def, EQUIV_W_def] >>
-                      ‘(C & A V B) |-^ ((C & A) V C & B)’ by metis_tac[ENTAILS_def, g_distribution] >> 
+                      ‘(C & (A V B)) |-^ ((C & A) V C & B)’ by metis_tac[ENTAILS_def, g_distribution] >> 
                       ‘C |-^ (C & A) V C & B’ by 
                         metis_tac[OR_ENTAILS, ENTAILS_TRANS, ENTAILS_AND, ENTAILS_REFL] >> 
-                      metis_tac[OR_ENTAILS, ENTAILS_TRANS])
+                      metis_tac[OR_ENTAILS, ENTAILS_TRANS]
+                     )
                  )
              )
          )
