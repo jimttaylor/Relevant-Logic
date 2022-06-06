@@ -5,25 +5,25 @@
 \end{tikzpicture}
 
 
-While \emph{syntactic} systems are primarily concerned with transforming expressions to determine is a theorem of the system, \emph{semantic} systems gives us an alternative way of looking at logic by providing \emph{meaning} (In our case, truth) to statements. 
+While \emph{syntactic} systems are primarily concerned with transforming expressions to determine what is a theorem of the system, \emph{semantic} systems gives us an alternative way of looking at logic by providing \emph{meaning} (in our case, truth) to statements. 
 
-One method of ascribing meaning is to propositions is through the consideration of \emph{possible worlds} which is the idea is that something must be true only if we can show it is necessarily true in all alternative realities that are consistent with what we already know. 
+One method of ascribing meaning to propositions is through the consideration of \emph{possible worlds}, which is the idea that something must be true only if we can show it is necessarily true in all alternative realities that are consistent with what we already know. 
 By way of example: 
-Suppose you have an opaque bottle on your desk and picked it up  only to find that it was heavier than it should be. You would have to conclude that the bottle contained something as you cannot conceive of a world whereby the bottle is both empty and weighs more that it ought. 
-However you wouldn't know what was in the bottle as you could conceive both a reality where the bottle is full of cursed treasure and another where the bottle contains a live squid. 
+Suppose you have an opaque bottle on your desk and picked it up  only to find that it was heavier than it should be. You would have to conclude that the bottle contained something as you cannot conceive of a world whereby the bottle is both empty and weighs more than it ought. 
+However you would not know what was in the bottle as you could conceive both a reality where the bottle is full of cursed treasure and another where the bottle contains a live squid. 
 
-The \emph{possible worlds} semantics saw massive success throughout the 1960s with its application to the modal logics due to the introduction of a binary relation over a set of worlds. Each world in this case is considered to be a place where propositions hold. In modal logic this relationship ($R$) denotes \emph{accessibility}, this means that when we have $R\,x\,y$ for worlds $x$ and $y$ then we consider $y$ to be accessible from $x$; or rather if we find ourselves in the world $x$ (though we wouldn't know we were in $x$) then we would consider $y$ to be a \emph{possible world} \citep{Blackburn2002-BLAML-2}. 
+The \emph{possible worlds} semantics saw massive success throughout the 1960s with its application to the modal logics due to the introduction of a binary relation over a set of worlds \citep{Blackburn2002-BLAML-2}. Each world in this case is considered to be a place where propositions hold. In modal logic this relationship ($R$) denotes \emph{accessibility}, this means that when we have $R\,x\,y$ for worlds $x$ and $y$ then we consider $y$ to be accessible from $x$; or rather if we find ourselves in the world $x$ (though we wouldn't know we were in $x$) then we would consider $y$ to be a \emph{possible world} \citep{Blackburn2002-BLAML-2}. 
 
-In 1973 Richard Routley (later Svlvan) and Robert Meyer introduced a possible world semantic that extended some of the advances made in modal logic by using a ternary relation \HOLtm{R} over the set of worlds as well as a dual operator over worlds, \HOLtm{STAR} \citep{ROUTLEY1973199}. 
+In 1973 Richard Routley (later Sylvan) and Robert Meyer introduced a possible world semantic that extended some of the advances made in modal logic by using a ternary relation \HOLtm{R} over the set of worlds as well as a dual operator over worlds, \HOLtm{STAR} \citep{ROUTLEY1973199}. 
 \citet{ROUTLEY1973199} propose a reading of \HOLtm{R w x y} that states: the world \HOLtm{y} is compatible relative to \HOLtm{w} and \HOLtm{x} together. 
 It is natural then that the \emph{rules} of \HOLtm{w} are just propositions of the form \HOLtm{A --> B} that \HOLtm{w} asserts to be true. 
 Then if \HOLtm{x} asserts \HOLtm{A}, then \HOLtm{B} is just a result of applying the rules of \HOLtm{w} to \HOLtm{x}, and as such \HOLtm{y} asserts \HOLtm{B}.  
-For example, if we had a rule that holds at world such as \HOLtm{w} that says: If your bottle is heavier than normal, then it contains a squid. And in the world \HOLtm{x} we had that the bottle was heavier than it should be, then the world \HOLtm{y} is compatible with the infomation that your bottle contains a squid.  
+For example, if we had a rule that holds at world such as \HOLtm{w} that says: If your bottle is heavier than normal, then it contains a squid. And in the world \HOLtm{x} we had that the bottle was heavier than it should be, then the world \HOLtm{y} is compatible with the information that your bottle contains a squid.  
 \HOLtm{RF.STAR x} on the other hand acts as a dual world to \HOLtm{x}.
-In this, we mean that if there exists a \emph{possible world} that does not explicitly reject a set of statements then there must exist a \emph{possible world} that asserts that all of these statements are true, Ergo if there is a world that does not explicately state that there isn't a squid in the bottle, then there is a world that asserts that there is a squid in your bottle. 
+In this, we mean that if there exists a \emph{possible world} that does not explicitly reject a set of statements then there must exist a \emph{possible world} that asserts that all of these statements are true, ergo if there is a world that does not explicately state that there isn't a squid in the bottle, then there is a world that asserts that there is a squid in your bottle. 
 We also choose a world that we read as the \emph{logical world} and it is where we evaluate truth for the whole model.   
 
-An important note to make is that quite unlike semantics for modal logic, we also do not require that worlds be \emph{consistent}. In some cases it is necessary that some worlds be inconsistent otherwise we could show that \HOLtm{A & ~A --> B} is a rule of all possible worlds, including the \emph{logical world} for any choice of \HOLtm{A} and \HOLtm{B} that this shouldn't be derivable.  
+An important note to make is that quite unlike semantics for modal logic, we also do not require that worlds be \emph{consistent}. In some cases it is necessary that some worlds be inconsistent otherwise we could show that \HOLtm{A & ~A --> B} is a rule of all possible worlds, including the \emph{logical world} for any choice of \HOLtm{A} and \HOLtm{B} that this should not be derivable.  
 
 The connection between semantic and syntactic systems are two metatheorems called \emph{soundness} and \emph{completeness} results. 
 A \emph{soundness} result between a syntactic theory and a semantic theory states that if proposition \HOLtm{p} is a theorem of the syntactic theory, then \HOLtm{p} holds in every model of the semantic theory. We may also say that the syntactic theory is \emph{sound} with respect to the semantic theory.
@@ -198,8 +198,8 @@ We utilise the HOL list type, given by type \HOLty[of]{[]}, extensively througho
 	\item \textbf{Filter} is a function that a function \HOLtm{f} from elements of the list to \HOLty{:bool} and a list \HOLtm{l}. 
 	It returns another list \HOLtm{l'} which is precisely the list containing elements of \HOLtm{l} that satisfy \HOLtm{f}.
 	We only use the case where \HOLtm{f = λx. x ≠ a} for some predefined \HOLtm{a} and as such we use the statement \HOLtm{FILTER (λx. x ≠ a) l} to mean: remove all elements of \HOLtm{a} from \HOLtm{l}.
-	\item \HOLtm[set//set]{set} is a function that takes a list \HOLtm{l} to the set of all of its elements. 
-	We omit expliciately showing this function, prefering to use statements such as \HOLtm{set l ⊆ L} to mean that all the elements of \HOLtm{l} are in \HOLtm{L}
+	\item $(\HOLtm[set//set]{set})$ is a function that takes a list \HOLtm{l} to the set of all of its elements. 
+	We omit explicitly showing this function, prefering to use statements such as \HOLtm{set l ⊆ L} to mean that all the elements of \HOLtm{l} are in \HOLtm{L}
 \end{itemize}
 
 \begin{defn}[List Conjunction]\label{def:CONJl-def}
@@ -413,7 +413,7 @@ This may seem like an obvious restatement of Lemma~\ref{lem:theta-maximal-reject
 		\HOLthm[p//A, q//a]{RMSemantics.Exists_Theta_prop}
 	\end{holmath}	
 \end{lem}
-We omit the full  proof due to it being case heavy:
+We omit the full proof due to it being case heavy:
 \begin{proof}[Sketch]
 	If \HOLtm{|- (CONJl gamma --> p)} where \HOLtm{set gamma ⊆ Theta p ∪ ss q}, then the \HOLtm{c} we want is \HOLtm{CONJl (FILTER (λx. x ≠ q) γ)}.
 \end{proof}
@@ -503,7 +503,7 @@ Showing the first eight postulates of \HOLtm{R_Frame} are relatively straightfor
 	Given that \HOLtm{set γ ⊆ Theta p} and \HOLtm{CONJl γ --> q ∈ Theta p} we are required to show that \HOLtm{q ∈ Theta p}. We get that because \HOLtm{Theta p} is an \HOLtm{R_Theory} that \HOLtm{CONJl γ ∈ Theta p}. From here we then use \HOLtm{R_Theory} along with Proposition~\ref{prop:some-theorems-R-1}.8 to show the result.
 \end{proof}
 Together with Theorem~\ref{thm:theta-prime} gives us that \HOLtm{Theta p} is in fact inside \HOLtm{(Canonical_Frame p).W}. 
-We also need that \HOLtm{STAR} is its own inverse (or equivalently is of order 2), note that we don't need \HOLtm{p} to be a non-theorem for this case:
+We also need that \HOLtm{STAR} is its own inverse (or equivalently is of order 2), note that we do not need \HOLtm{p} to be a non-theorem for this case:
 \begin{lem}\label{lem:Canonical-Frame-STAR-STAR}
 	\begin{holmath}
 		\HOLthm[p//A]{RMSemantics.Canonical_Frame_STAR_STAR}
@@ -675,7 +675,7 @@ Now we are able to show that \HOLtm{Canonical_Frame p} is an \HOLtm{R_Frame} in 
 			But this is true if we show that \HOLtm{(CONJl δ --> CONJl γ) --> CONJl δ --> B ∈ w} as \HOLtm{APPLYING w x ⊆ a}, which of course holds because of permutation and that \HOLtm{w} is a \HOLtm{S_Theory (Theta p)}.
 			\item[The inductive step] follows immediately.
 		\end{description}
-	So to take stock, we have now that \HOLtm{APPLYING x y ⊆ b} and \HOLtm{APPLYING w b ⊆ z} but we don't have that \HOLtm{b ∈ (Canonical_Frame p).W}. But this is as simple as showing that \HOLtm{b} is a \HOLtm{S_Theory (Theta p)} and that is it \HOLtm{Prime}.
+	So to take stock, we have now that \HOLtm{APPLYING x y ⊆ b} and \HOLtm{APPLYING w b ⊆ z} but we do not have that \HOLtm{b ∈ (Canonical_Frame p).W}. But this is as simple as showing that \HOLtm{b} is a \HOLtm{S_Theory (Theta p)} and that is it \HOLtm{Prime}.
 	\HOLtm{S_Theory (Theta p)} holds immediately from Lemma~\ref{lem:S-Theory-B-WORLD} and \HOLtm{Prime} follows immediately from this fact and Proposition~\ref{prop:b-world-prime}.
 	\end{enumerate}
 \end{proof}
@@ -743,7 +743,7 @@ Just like with our treatment of \HOLtm{B_WORLD ThetaSym i r} in Definition~\ref{
 	\end{holmath}
 \end{prop}
 
-And similarly they are both \HOLtm{Prime}:\footnote{We show formalised primality here by showing similar Proposition to \ref{lem:exists-theta-prop} and \ref{prop:b-world-prop-exists} for each construction.}
+And similarly they are both \HOLtm{Prime}:\footnote{We formalised primality here by first showing similar Proposition to \ref{lem:exists-theta-prop} and \ref{prop:b-world-prop-exists} for each construction.}
 
 \begin{prop}\label{prop:x-world-prime}
 	When \HOLtm{p} is a non-theorem, \HOLtm{w} is a \HOLtm{Prime} \HOLtm{S_Theory (Theta p)}, and \HOLtm{A --> B ∉ w} we have that \HOLtm{X_WORLD (Theta p) {A\} {B\} w} is \HOLtm{Prime}:

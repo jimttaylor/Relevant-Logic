@@ -8,47 +8,47 @@ This thesis uses HOL4 to mechanise two Hilbert-style proof systems and a Natural
 Furthermore it also mechanises the Routley-Meyer semantics and Goldblatt Cover semantics for \textbf{R} and uses HOL4 to produce machine checked proofs for soundness and completeness. 
 
 In this chapter, Section~\ref{sec:problemstatement} provides a brief introduction to Relevant Implication,  HOL4, and motivates the study of this topic. 
-Section~\ref{sec:related-work} outlines the motivating texts  thesis while Section~\ref{sec:outline} describes the work done inside this thesis. 
+Section~\ref{sec:related-work} outlines the motivating texts for this thesis while Section~\ref{sec:outline} describes the work done inside this thesis. 
 Finally, Section~\ref{sec:reading} contains information on how to read this thesis.
 
 \section{Introduction}
 \label{sec:problemstatement}
 
 \subsection{Relevant Implication}
-Relevant Implication arose in response to a number of philosophical concerns with the standard propositional logic of the time know as classical logic. The development of Relevant Implication equally an attempt to ascribe a more human version of the meaning $A$~\emph{implies}~$B$ onto the $(\rightarrow)$.  
+Relevant Implication arose in response to a number of philosophical concerns with the standard propositional logic of the time known as classical logic. The development of Relevant Implication is equally an attempt to ascribe a more human version of the meaning $A$~\emph{implies}~$B$ onto the $(\rightarrow)$.  
 
 Despite being the basis of reasoning in many fields, classical logic has some major flaws when we reflect the formalisation back onto human argument; first and formost amoung these flaws are the \emph{paradoxes of material entailment} which we introduce by way of example: 
 
 \textit{The bottle on my desk has a squid in it and it also does not have a squid in it; therefore the earth orbits the moon}
 
-In our natural use of language an argument of this form invalid and would not be accepted as a valid argument as a reasonable person might question why a squid in a water bottle on anyone's desk could be used to determine how the cosmos operates. 
-However in classical logic, when we represent \textit{there is a squid in a bottle on my desk} as $A$, and \emph{the earth orbits the moon} as $B$ and then the argument above becomes:
+In our natural use of language, an argument of this form is invalid and would not be accepted as a valid argument as a reasonable person might question why a squid in a water bottle on anyone's desk could be used to determine how the cosmos operates. 
+However in classical logic, when we represent \textit{there is a squid in a bottle on my desk} as $A$, and \emph{the earth orbits the moon} as $B$, and then the argument above becomes:
 $$(A \land \lnot A)\Rightarrow B$$
 which is valid in classical logic. There are a number of these paradoxes that arise from classical logic generally, around how we read the implication symbol $(\rightarrow)$. 
 
 One way to come to terms with these paradoxes is to claim that \emph{formal logic} has little to do with natural argumentation and that drawing an analogy between them is not the point. 
-A second view is to accept that the above argument is naturally valid and rejecting the premise that these are paradoxes in the first place. 
+A second view is to accept that the above argument is naturally valid and reject the premise that these are paradoxes in the first place. 
 \emph{Relevant Logics} (or \emph{Relevance Logic} in the U.S.A.) were the result of taking a third way and saying that Logic should remain a model for how we naturally reason about the world; and if we are unable to prevent paradoxes like the \emph{paradoxes of material entailment} then our current logic is inherently flawed and we need a better system.  
 
 \emph{Relevant Implication} (also known as \textbf{R}) is one of these \emph{Relevant Logic}s and was designed in the later half of the 20\textsuperscript{th} century. 
-It is the oldest known system of \emph{Relevant Logic} and according to \citet[p.349]{Anderson1975-ANDETL-2} the implicational fragment was independantly forumlated by both Moh and Church in 1950 and 1951. 
+It is the oldest known system of \emph{Relevant Logic} and according to \citet[p.349]{Anderson1975-ANDETL-2} the implicational fragment was independantly forumlated by both Moh in 1950 and Church in 1951. 
 \subsection{Metatheory}
-\emph{Metalogic} is the study of different systems of logic and their properties by formally defining the system in terms of another logical system (Called the \emph{metasystem}). The \emph{Metatheory} of a logic then is then just those properties that can be shown about, or between, systems; these are known as \emph{metatheorems}. In the case of this thesis we will be looking a two different types of system using our \emph{metasystem}, these are \emph{syntactic} systems and \emph{semantic systems}. Given some underlying language $\mathcal{L}$:
+\emph{Metalogic} is the study of different systems of logic and their properties by formally defining the system in terms of another logical system (called the \emph{metasystem}). The \emph{Metatheory} of a logic then is then just those properties that can be shown about, or between, systems; these are known as \emph{metatheorems}. In the case of this thesis we will be looking a two different types of system using our \emph{metasystem}; these are \emph{syntactic} systems and \emph{semantic systems}. Given some underlying language $\mathcal{L}$:
 \begin{description}
-    \item[Syntactic systems] are sets of rules that govern how we are able to manipulate expressions in $\mathcal{L}$. The set of all expressions that a syntactic system can produce is call the \emph{theory} of that particular system.
+    \item[Syntactic systems] are sets of rules that govern how we are able to manipulate expressions in $\mathcal{L}$. The set of all expressions that a syntactic system can produce is called the \emph{theory} of that particular system.
     \item[Semantic systems] on the other hand ascribe meaning (truth) to expressions. There exist many different types of semantic systems, but in the case of Relevant Implication, the semantics we will be looking at is with respect to model theory. Each model has a number of statements in the underlying language that are true, and others that are false.
 \end{description}
 The connection between these different types of systems are two \emph{metatheorems} that are known as \emph{soundness} and \emph{completeness}. In the case of model theory the \emph{soundness} result states that: All theorems $p$ of the syntactic theory are true in every model in the semantic theory. The completeness result is the converse: If a proposition $p$ is true in every model of the semantic theory, then it can be proved in the syntactic one. 
 \subsection{HOL}
-\emph{HOL} standing for \emph{Higher Order Logic} is an interactive theorem prover based on Church's simple type theory \citep{SlindNorrish2008}. 
+\emph{HOL}, standing for \emph{Higher Order Logic}, is an interactive theorem prover based on Church's simple type theory \citep{SlindNorrish2008}. 
 \emph{Interactive} theorem proving (ITP), as distinct from automated theorem proving, usually requires some level of human interaction to prove results and is not expected to prove results on its own. 
-Guiding the machine through the proof has a number of benefits, but there are two major benefits to this project that this control provides: 
-the first is that a successful proof results in knowing that the theorem that was proved was proved ultimately from the underlying axioms of the theorem prover, thus verifying the result (we say then that the proof has been mechanised, or mechanically checked). 
+Guiding the machine through the proof has a number of benefits, but there are two major benefits to this project that this control provides. 
+The first is that a successful proof results in knowing that the theorem that was proved, was proved ultimately from the underlying axioms of the theorem prover, thus verifying the result (we say then that the proof has been mechanised, or mechanically checked). 
 The second benefit is that it enables the programmer to follow already known proofs to the letter and note any deviations from preciously accepted proofs. 
 
-While we will introduce some HOL4 methods and functions throughout this thesis as we need them, it is imporant to talk about some of the syntax at all stages throughout this thesis here:
+While we will introduce some HOL4 methods and functions throughout this thesis as we need them, it is imporant to talk about some of the basic syntax here:
 \begin{itemize}
-    \item \textbf{Record types} are types that can have many subfield of diffferent types. For example, we may have a record type 
+    \item \textbf{Record types} are types that can have many subfields of diffferent types. For example, we may have a record type 
     \begin{holmath}
     \HOLTyOp{animal} = \langle species: string; class: string; hungry: bool \rangle 
     \end{holmath}
@@ -64,20 +64,20 @@ While we will introduce some HOL4 methods and functions throughout this thesis a
 
 \subsection{But why mechanise \textbf{R}?}
 Relevant Logic is a well studied field from both mathematical and philosophical perspectives, yet the focus of mechanisation of proofs related to it are only with respect to the decidability and undecidability results of different logics~\citep{larchey2020constructive,undecidabilityCoq,DawsonGore2017}. 
-To date we have been unable to show mechanisations of any other metatheoretic results for Relevant Logics which is an oversight from the perspective of philosophical logic and also. 
+To date we have been unable to show mechanisations of any other metatheoretic results for Relevant Logics which is an oversight from the perspective of philosophical logic. 
 We seek to provide an underlying syntactic and semantic basis from which further mechanisations of different extensions of \textbf{R} can be launched.
 \section{Motivating Texts}
 \label{sec:related-work}
-This thesis mechanises a number of different proofs from different texts each of which is mentioned below:
+This thesis mechanises a number of different proofs from different texts, each of which are mentioned below:
 \begin{description}
-    \item[Quantifiers, Propositions, and Identity] by \citet{GoldblattRobert2011Qpai}\footnote{This is where the definitions for Goldblatt Proposition and Goldblatt Provable (see Definitions~\ref{def:gprops} and \ref{def:hilbert-provable} in Chapter~\ref{cha:proof-systems}). 
+    \item[Quantifiers, Propositions, and Identity] by \citet{GoldblattRobert2011Qpai}\footnote{This is where the definitions for Goldblatt Proposition and Goldblatt Provable (which can be found at  Definitions~\ref{def:gprops} and \ref{def:hilbert-provable} in Chapter~\ref{cha:proof-systems}). 
     While it should be noted that these are not the proper names for these constructs and they are not named as such in the text, they denote where these definitions come from.}
     is the book where the Cover Semantics (Chapter~\ref{cha:coversemantics}) for Relevant Implication is defined and demonstrates soundness and completeness results. 
-    The outlines also outlines the ideas behind ``admissable semantics'' and Cover Semantics and shows that Quantified Relevant Implication is also sound and complete with resect to the natural extension of the semantic system. 
+    It also outlines the ideas behind ``admissable semantics'' and Cover Semantics, and shows that Quantified Relevant Implication is also sound and complete with resect to the natural extension of the semantic system. 
     \item[A General Logic] by \citet{slaney1990ND} 
     outlines a class of Natural Deduction systems based around connecting propositions in two different ways, being set and multiset unions. Slaney also identifies the structural rules that give rise to Relevant Implication. 
     \item[The Semantics of Entailment] by \citet{ROUTLEY1973199} is the text that defines a Kripke style Semantic System for Relevant Implication and demonstrates shows its soundness and completeness results.
-    \item[Notes on Relevant Logic] by \citet{SlaneyNotes}\footnote{Same as above, but with Definitions~\ref{def:slaney-prop} and \ref{def:slaney-provable}.} provided a different axiomatisation for Relevant Implication which was used in Chapter~\ref{cha:proof-systems}. 
+    \item[Notes on Relevant Logic] by \citet{SlaneyNotes}\footnote{Same as above, but with Definitions~\ref{def:slaney-prop} and \ref{def:slaney-provable}.} provides a different axiomatisation for Relevant Implication which was used in Chapter~\ref{cha:proof-systems}. 
 \end{description}
 
 \section{Thesis Outline}
@@ -88,19 +88,19 @@ This thesis mechanises a number of different proofs from different texts each of
     \caption{The Relevant Pentagram}
     \label{fig:relevant-pentagram}
 \end{figure}
-Figure~\ref{fig:relevant-pentagram} represents the work that this thesis contains. R and S are two different Hilbert axiomatisations for Relevant Implication, ND is a Natural Deduction system for \textbf{R}, RM is the Routley-Meyer semantics, and CS is the Cover Semantics, each line represents a proof of syntactic or semantic equivalence. 
+Figure~\ref{fig:relevant-pentagram} illustrates the work that this thesis contains. R and S are two different Hilbert axiomatisations for Relevant Implication, ND is a Natural Deduction system for \textbf{R}, RM is the Routley-Meyer semantics, and CS is the Cover Semantics, each line representing a proof of syntactic or semantic equivalence. 
 
-This thesis has a total of 5 chapters including this one. 
+This thesis has a total of five chapters including this one. 
 Chapter~\ref{cha:proof-systems} introduces and mechanises the proof systems for \textbf{R} and establishes equivalence between them.
 Chapter~\ref{cha:rmsemantics} introduces and mechanises the Routley-Meyer semantics as well as shows that the Routley-Meyer semantics are both sound and complete with respect to \textbf{R}.
 Chapter~\ref{cha:coversemantics} introduces and mechanises the Goldblatt Cover semantics as well as shows that these semantics are sound and complete with respect to \textbf{R}.
-Chapter~\ref{cha:conc} concludes this thesis by summarising the main results of each chapter then and offers a perspective to the breadth and scope of immediate future work for the mechanisation of Relevant Logics. 
+Chapter~\ref{cha:conc} concludes this thesis by summarising the main results of each chapter  and offers a perspective to the breadth and scope of immediate future work for the mechanisation of Relevant Logics. 
 
 \section{How to read this thesis}
 \label{sec:reading}
 
-This thesis attempts to outline exactly what structures and results that were needed to show the equivalence between these proof systems as well as the soundness and completeness results between the proof systems and the semantic systems. In this sense, this thesis provides captures the entirety of what is required to show each target theorem. 
+This thesis attempts to outline exactly what structures and results that were needed to show the equivalence between the Hilbert and natural Dedcution proof systems. It also outlines what is needed to show the soundness and completeness results between the proof systems and the Routley-Meyer and the Goldblatt Cover semantic systems. In this sense, this thesis captures the entirety of what is required to show each target theorem. 
 
-While this thesis omits some proofs that are uninteresting or routine, care has been taken to ensure that any omittion does not detract from the intention of this thesis. Furthermore all results used in this thesis, regardless of omittion from this text, have been formally verified inside the HOL4 theorem prover.     
+While this thesis omits some proofs that are uninteresting or routine, care has been taken to ensure that any omission does not detract from the intention of this thesis. Furthermore all results used in this thesis, regardless of omission from this text, have been formally verified inside the HOL4 theorem prover.     
 
-The HOL source files used for this thesis can be found here: \fix{add hyperlink here before submittion}
+The HOL source files used for this thesis can be on found on \href{https://github.com/jimttaylor/Relevant-Logic/tree/9f9b09dba042420f57e952d51776383f8178e98e}{\underline{GitHub}}.

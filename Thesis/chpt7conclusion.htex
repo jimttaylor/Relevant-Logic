@@ -5,7 +5,7 @@
 \end{tikzpicture}
 
 This thesis mechanised the Relevant Logic \textbf{R} as two different Hilbert Systems, a Natural Deduction system, the Routley-Meyer Semantics for \textbf{R}, and the Goldblatt Cover Semantics for \textbf{R}. 
-It also provides equivalence results between the Hilbert systems  as well as between the  Natural Deduction system and Goldblatt axiomatisation. 
+It also provided equivalence results between the Hilbert systems as well as between the  Natural Deduction system and Goldblatt axiomatisation. 
 Finally we also showed both Soundness and Completeness results between the Goldblatt axiomatisation and both of the semantic systems that were mechanised. 
 With these results we are able to show all equivalence results between our different characterisations of \textbf{R} and thus complete the Relevant Pentagram with red denoting mechanised proofs and black denoting equivalence results that are immediate from these proofs (see Figure~\ref{fig:theorems-on-star}). 
 
@@ -27,7 +27,7 @@ This would not matter in the grand scheme of the results we were trying to show 
 
 \section{Future Work}
 \label{sec:future}
-As a final note, there are several different routes that could build off the work done in this thesis. Here we will provide a non-exhaustive list of directions that research here could take and outline the first steps in their mechanisation. 
+As a final note, there are several different routes that could build off the work done in this thesis. Here we will provide a non-exhaustive list of directions that future research could take and outlines the first steps in their potential mechanisation in HOL. 
 
 \begin{description}
 	\item[Alternative Relevant Logics:] \citet[pp.~287-290]{RoutleyRLTR} express the the basic Relevant Logic \textbf{B} along with a number of different systems that are build off \textbf{B} (including \textbf{R}) by adding new axioms schemes to the Hilbert system. \citet[pp.~298-301]{RoutleyRLTR} also state what conditions on the ternary relation \HOLtm{R} added to the \emph{B model structures} correspond to which axiom schema. 
@@ -37,17 +37,17 @@ As a final note, there are several different routes that could build off the wor
 	\item[Goldblatt cover completeness for \textbf{RQ}:] \citet[pp.~231-239]{GoldblattRobert2011Qpai} demonstrates that there is an extension of the cover semantics that is sound and complete with respect to \textbf{RQ}. 
 	This would involve similar work to the incompleteness result above, that is, extending \textbf{R} to \textbf{RQ} and the cover semantics to its quantified extension before then showing the soundness and completeness results. 
 	\item[Decidability of Relevant Fragments:] Many fragments of \textbf{R} have been shown to be decidable such as $\textbf{R}_\rightarrow$, $\textbf{R}_{\rightarrow,\&}$, $\textbf{R}_{\rightarrow,\sim}$, and \textbf{LR} \citep{dunn2002relevance}. $\textbf{R}_\rightarrow$ at least has been already been mechanised by \citet{larchey2020constructive}  while \citet{DawsonGore2017} have verified that most of the decidability proof of $\textbf{T}_\rightarrow$ by \citet{10.2307/43303645} but have not yet shown the proof in its entirety. 
-	To mechanise this fully in HOL4 this would require that the axiomatisation for whatever logic fragment to be shown to be decidable, be implimented entirely in lambda calculus in order to establish formal decidability, though there is flexibility in this. 
+	To mechanise this fully in HOL4 this would require that the axiomatisation for whatever logic fragment to be shown to be decidable, be implemented entirely in lambda calculus in order to establish formal decidability, though there is flexibility in this. 
 	\item[Undecidability of R:] \citet{10.2307/2274261} shows that \textbf{E}, \textbf{R}, and \textbf{T} are undecidable through showing that it is equivalent to the \emph{word problem} by defining lattice-like on subsets of propositions. 
 	In order to mechanise the undecidability of any of these logics in HOL one would have to first show that the proofs that \citet{10.2307/2274261} relies on are true, in particular the undecidability of the \emph{word problem} which has not yet been done in HOL, though it has been shown to be undecidable in Coq \citep{undecidabilityCoq}. 
 	Then, just like in showing decidability, one would have to implement the axiomatisation entirely in lambda calculus before showing the proof. 
 	\item[Modal and Modal-Like Relevant Logics:] These are logics that extend any of the Relevant Logics, such as \textbf{B} or \textbf{R} with one or many modal or modal-like operators $\square$ as well as axiomatic schema that govern them. 
-	Introducing modalities extends Relevant Logics to allow for them to reason about knowledge (epistemic relevant logic) or time (temporal relevant logic) amoung others. 
+	Introducing modalities extends Relevant Logics to allow for them to reason about knowledge (epistemic relevant logic) or time (temporal relevant logic), among others. 
 	\citet{Fuhrmann1990} showed that a number of these modal extensions were complete with respect to the unreduced Routley-Meyer semantics. 
-	The next steps for this extension would be to extend the Routley-Meyer semantics to the unreduced case, show that \textbf{R} is sound and complete with respect to the unreduced case and then extend the unreduced system and \textbf{R} to its modal extension before showing completeness.
+	The next steps for this extension would be to extend the Routley-Meyer semantics to the unreduced case, show that \textbf{R} is sound and complete with respect to the unreduced case, and then extend the unreduced system and \textbf{R} to its modal extension before showing completeness.
 \end{description}
 It should be noted that extending the work of this thesis in these directions will likely only result in gains inside the study of Relevant Logic due to there being limited use of Relevant Logics outside of the field of philosophical logic. 
-There may be a few exceptions to this however given that there is some minor research being done by \citet{cheng2004temporal} where a Temporal extension of Relevant Logic is used as the basis of a class of anticipatory systems; or the use of an further extension of Relevant Logic as a basis for Air Traffic Control by \citet{han2016research}. 
+There may be a few exceptions to this, however, given that there is some minor research being done by \citet{cheng2004temporal} where a Temporal extension of Relevant Logic is used as the basis of a class of anticipatory systems; or the use of an further extension of Relevant Logic as a basis for Air Traffic Control by \citet{han2016research}. 
 At this stage however, it is still too early to say whether this research will yield use cases for Relevant Logic outside of philosophy.
 
 

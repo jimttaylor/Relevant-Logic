@@ -3,7 +3,7 @@
 
 While Hilbert system presents a theory of logic as a collection of axioms and ways to transform propositions using rules of inference, it is not the only way that we could present a logic. 
 A \emph{Natural Deduction} system has very few `axioms' (if any) and instead encodes the structure of the logic inside many different rules that govern how connectives behave under certain conditions.
-It should be noted that Natural Deduction operates using \emph{sequents}, or \emph{assumption}-\emph{conclusion} pairs where the conclusion is a result of the assumption, rather than propositions by themselves, like seen in Hilbert systems. 
+It should be noted that Natural Deduction operates using \emph{sequents}, or \emph{assumption}-\emph{conclusion} pairs, where the conclusion is a result of the assumption, rather than propositions by themselves (like seen in Hilbert systems). 
 An \emph{assumption} is generally a structured collection of propositions while a conclusion is just a proposition by itself. 
 
 Just as we demonstrated an equivalent Hilbert system in the previous section, we shall consider a Natural Deduction system for Relevant Implication and show that it is equivalent to the previous Hilbert systems. 
@@ -22,10 +22,10 @@ But the comma $(\bm{,})$ could also be read as the conjunction $(\bm{\land})$ be
 \UnaryInfC{$\Gamma\bm{,} a \Vdash c$}
 \UnaryInfC{$\Gamma\Vdash a \rightarrow c$}
 \end{prooftree}
-This poses a problem for the creation of a Natural Deduction system for relevant implication where we are still able to weaken assumptions and shift assumptions into the conclusion while also maintaining the desirable characteristics of \HOLtm{$-->}:  being that we cannot introduce extra antecedents given that a known conclusion already holds from an assumption. 
+This poses a problem for the creation of a Natural Deduction system for relevant implication where we are still able to weaken assumptions and shift assumptions into the conclusion while also maintaining that we avoid paradoxes of material implication.
 
 Luckily \citet{slaney1990ND} gives us a solution by structuring our assumption with not one, but two different connectives: The first \HOLtm{$，} is coupled with conjunction, while the second \HOLtm{$；} is associated with implication. 
-Of course, in HOL this means that we will need a new data-type for these connectives and, taking inspiration from \citet{slaney1990ND}, we will also call these bunches. 
+Of course, in HOL this means that we will need a new data-type for these connectives and, taking inspiration from \citet{slaney1990ND}, we will also call these bunches:
 \begin{defn}[Bunches]\label{def:bunch}
 	A \HOLty{:Bunch} is formalized in HOL as an inductive type: 
 	\begin{holmath}
@@ -224,7 +224,7 @@ In order to show this we need the following lemmata:
 
 	We note that \HOLtm{|- (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)) --> C)} holds from the inductive assumptions and the Goldblatt provable rule. 
 	Then, by the Goldblatt Axioms, it suffices to show \HOLtm{|- (bg (REPLACE Γ (PROP  A)) V bg (REPLACE Γ (PROP  B)) --> C)}.
-	by specializing Lemma~\ref{lem:CONTEXT-IMP} appropriately we get that this follows from Lemma~\ref{lem:OR-bunch-rule}, Suffixing and Modus Ponens.
+	By specializing Lemma~\ref{lem:CONTEXT-IMP} appropriately we get that this follows from Lemma~\ref{lem:OR-bunch-rule}, Suffixing and Modus Ponens.
 \end{proof}
 Theorem~\ref{thm:ND-to-hil} shows that we can take sequents to Goldblatt provable proposition, but not that the original sequent is recoverable from the Goldblatt proposition, though this is definitely the case:
 \begin{thm}\label{thm:bg-trans}

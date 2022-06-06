@@ -59,6 +59,11 @@ Holds 1 \ensuremath{\models}
 
 (MHOLDS1) 1 \ensuremath{\models}
 
+(nHOLDS1) 2 \ensuremath{,\,} 
+(nHOLDS2) 1 \ensuremath{\not\models}
+
+(nMHOLDS1) 1 \ensuremath{\not\models}
+
 (Ti1) 1 \ensuremath{\theta\sb{
 (Ti2) 1 }(
 (Ti3) 1 )}
