@@ -109,22 +109,20 @@ We say that a set \HOLtm{X} is \HOLtm{Localized} in a Cover System CS when all l
 	\HOLthm[nostile]{CoverSemantics.Localized_def}
 	\end{holmath}
 \end{defn}
-\begin{defn}[\HOLtm{Is_Prop}]\label{defn:is-prop-def}
+\begin{defn}[\HOLtm{Is_Prop}]\label{def:is-prop-def}
 	We say that a set is a \emph{Proposition} with respect to a \HOLtm{Is_Relevant_Cover_System RCS} if it is both \HOLtm{Localized} and an \HOLtm{Upset (to_CS RCS)} with respect to \HOLtm{RCS}.
 	\begin{holmath}
 		\HOLthm[nostile]{CoverSemantics.Is_Prop_def}
 	\end{holmath}
 \end{defn}
-
+We also can show that:
 \begin{lem}\label{lem:lemma6-3-1}
 	If \HOLtm{CS} is a Cover System, and \HOLtm{X} is an Upset in \HOLtm{CS} then all members of \HOLtm{X} are also \emph{local members} of \HOLtm{X}. Or rather:
 	\begin{holmath}
 		\HOLthm{CoverSemantics.lemma6_3_1}
 	\end{holmath}
 \end{lem}
-\begin{proof}
-	\fix{add proof}
-\end{proof}
+
 
 \subsection{Making Cover Systems Relevant}
 In order to make this semantic appropriate for Relevant Implication, we need to introduce a number of extra relationships to our cover systems: 
@@ -209,18 +207,15 @@ We can show the following properties of any \HOLtm{Is_Relevant_Cover_System}:
 		 \HOLthm{CoverSemantics.lemma6_4_1_8}
 \end{holmath}
 \end{lem}
-\begin{proof}
+\begin{proof} 
+The only non-routine case of this Lemma is 2.\footnote{We should note however, that these results do build off each other and are proved in ascending order} which we will show now:
 	\begin{enumerate}
-		\item
-		\item
-		\item
-		\item
-		\item
-		\item
-		\item
-		\item 
+		\item[2.] After applying Definitions~\ref{def:is-prop-def}, \ref{def:localized}, and \ref{def:orthcomp-orthjoin-imp} we show:
+		\begin{itemize}
+			\item[($\Leftarrow$):] Given \HOLtm{X ⊆ RCS.W} show that \HOLtm{{y | y ∈ RCS.W ∧ ∀x. x ∈ X ⇒ y ⊥ₐ x\}} is an Upset. This direction follows straightforwardly from  Definition~\ref{def:relevant-cover-system}.12. 
+			\item[($\Rightarrow$):] We use 1. to show that we are required to show that \HOLtm{(x ⬝ₐ y) ⊥ₐ RCS.E} given \HOLtm{Z ▹ₐ x} and \HOLtm{∀z. z ∈ Z ⇒ (z ⬝ₐ y) ⊥ₐ RCS.E} Which follows immedately from Definitions~\ref{def:relevant-cover-system}.11 and \ref{def:relevant-cover-system}.13.
+		\end{itemize}
 	\end{enumerate}
-	\fix{add proof}
 \end{proof}
 
 It follows immediately from Lemma~\ref{lem:lemma6-4-1} that:
@@ -309,11 +304,11 @@ With these conditions we are now able to the soundness result for the Cover Sema
 		\item[Contraction:] After simplifying with Definitions~\ref{def:model-function} and \ref{def:orthcomp-orthjoin-imp}, and resolving the trivial cases, we are required to show that \HOLtm{x ⬝ y ∈ M B} given \HOLtm{x ∈ RCS.W} and \HOLtm{y ∈ M A}. 
 
 		We note that \HOLtm{Upset (M B)} which means that it suffices to show that 
-		\HOLtm{x ⬝ y ∈ (to_CS RCS).W} and that there exists a \HOLtm{d} such that \HOLtm{d ∈ M B ∧ (to_CS RCS).REF d (x ⬝ y)}. The first condition is immediate and setting \HOLtm{d = (x ⬝ y) ⬝ y} makes \HOLtm{RCS.REF ((x ⬝ y) ⬝ y) (x ⬝ y)} obvious due to the conditions of how Fusion interacts with \HOLtm{$≼ₐ}.
+		\HOLtm{x ⬝ y ∈ (to_CS RCS).W} and that there exists a \HOLtm{d} such that \HOLtm{d ∈ M B ∧ d ≼ (x ⬝ y)}. The first condition is immediate and setting \HOLtm{d = (x ⬝ y) ⬝ y} makes \HOLtm{((x ⬝ y) ⬝ y) ≼ (x ⬝ y)} obvious due to the conditions of how Fusion interacts with \HOLtm{$≼ₐ}.
 		\item[Contradiction:] After simplifying with Definitions~\ref{def:model-function} and \ref{def:orthcomp-orthjoin-imp}, and resolving the trivial cases, we get that we need to show that \HOLtm{ (x ⬝ y) ⊥ z} given that \HOLtm{x ∈ RCS.W} and \HOLtm{y ∈ M B} and \HOLtm{z ∈ M A} While also assuming:
 		\begin{holmath}
 		\begin{matrix*}[l]
-			1. & \HOLtm{∀x''. x'' ∈ M A ⇒ x ⬝ x'' ∈ RCS.W ∧ ∀x'. x' ∈ M B ⇒ (x ⬝ x'') ⊥ x'}
+			1. & \HOLtm[width=100]{∀x''. x'' ∈ M A ⇒ x ⬝ x'' ∈ RCS.W ∧ ∀x'. x' ∈ M B ⇒ (x ⬝ x'') ⊥ x'}
 		\end{matrix*}
 		\end{holmath}
 		We then specialise 1. with \HOLtm{z} and the result then follow from the conditions on \HOLtm{$⊥}.
@@ -443,7 +438,11 @@ When \citet{GoldblattRobert2011Qpai} defined fusion and orthogonality for the ca
 	\end{holmath}
 \end{thm}
 \begin{proof}
-	\fix{add proof}
+	We simplify with Definition~\ref{def:canfusion} And then prove equality using the anti-symmetry of \HOLtm{$⊆}
+		\begin{itemize}
+		\item[$\supseteq$:] We rewrite with Definition~\ref{def:Theory-union-def} then it suffices to show that there exists \HOLtm{y ∈ gens (Theory A)} and \HOLtm{z ∈ gens (Theory B)} such that \HOLtm{x ∈ Theory y ∘ᵣ z} given that we already have \HOLtm{x ∈ Theory A ∘ᵣ B}. The result follows immedately.
+		\item[$\subseteq$:] This requires that given \HOLtm{y ∈ gens (Theory A)}, \HOLtm{z ∈ gens (Theory B)}, and \HOLtm{x ∈ Theory y ∘ᵣ z}, show that \HOLtm{x ∈ Theory A ∘ᵣ B}. This then follows from Propositions~\ref{prop:entails-results}.3, \ref{prop:entails-results}.11, and \ref{prop:theory-results}.4. 
+	\end{itemize}
 \end{proof}
 
 \begin{thm}\label{thm:can-orth-alt}
@@ -453,7 +452,7 @@ When \citet{GoldblattRobert2011Qpai} defined fusion and orthogonality for the ca
 	\end{holmath}
 \end{thm}
 \begin{proof}
-	\fix{add proof}
+	This follows immedately from Propositions~\ref{prop:entails-results}.3 and \ref{prop:entails-results}.7.
 \end{proof}
 
 \subsection{The Canonical System and Completeness}
@@ -518,13 +517,31 @@ There is also an equivalence between the Goldblatt Propositions and the structur
 	\end{holmath}	
 \end{lem}
 \begin{proof}
-	\fix{add proof}
+	We ommit 1. and 2. as as they are routine proofs. 
 	\begin{enumerate}
-		\item 
-		\item 
-		\item 
-		\item 
-		\item 
+		\item[3.] We show equality though the anti-symmetry of \HOLtm{$⊆}:
+		\begin{itemize}
+			\item[$\supseteq$:] We are required to show that given \HOLtm{x ∈ Canonical_System.W} and \begin{holmath}
+				\HOLtm{∀y. A ∈ y ∧ y ∈ Canonical_System.W ⇒ x ⊥ₘ y}
+			\end{holmath}
+			That we can show \HOLtm{~A ∈ x}. We first specialise the above statement with \HOLtm{Theory A} and then simpilfying against Theorem~\ref{thm:canorth}. The result then follows straighforwardly from the definition of \HOLtm{Canonical_System}.
+			\item[$\subseteq$:] Follows straightforwardly using Theorem~\ref{thm:canorth} and Propositions~\ref{prop:entails-results}.3 and \ref{prop:entails-results}.6.
+		\end{itemize}
+		\item[4.] We show equality though the anti-symmetry of \HOLtm{$⊆}:
+		\begin{itemize}
+			\item[$\subseteq$:] This direction requires that we show  \HOLtm{A --> B ∈ Theory C} given 
+			\begin{holmath}
+				\HOLtm{{CAN_FUSION (Theory C) x' | A ∈ x' ∧ ∃A. x' = Theory A\} ⊆
+        {w | B ∈ w ∧ ∃A. w = Theory A\}}
+			\end{holmath} 
+			We can then show that this is equivalent to showing \HOLtm{A --> B ∈ Theory C} from 
+			\begin{holmath}
+				\HOLtm{(A ∈ Theory A) ⇒ ∃D. ((B ∈ Theory (C ∘ᵣ A)) ∧ (Theory (C ∘ᵣ A) = Theory D))}
+			\end{holmath}
+			The result then follows immediately from Proposition~\ref{prop:entails-results}.2 and \ref{prop:entails-results}.12.
+			\item[$\supseteq$:] Immediate from Definition~\ref{def:orthcomp-orthjoin-imp}.
+		\end{itemize}
+		\item[5.] Immediate given 2. and 3.
 	\end{enumerate}
 \end{proof}
 
@@ -577,7 +594,7 @@ Now that we actually have that \HOLtm{Canonical_System} and \HOLtm{Canonical_Sys
 		Then we are required to show that this is a \HOLtm{Model_Function} with respect to the \HOLtm{Canonical_System} and \HOLtm{Canonical_System_Ps}. The \HOLtm{g_VAR} case follows from Definition~\ref{def:Canonical-System-Ps}. The
 		\HOLtm{$&}, \HOLtm{$-->}, and \HOLtm{$~} cases follow from Lemma~\ref{lem:lemma6-5-3}.2, .4, and .3 respectively. And the \HOLtm{tau} case follows from the definition of \HOLtm{Canonical_System.E} and Lemma~\ref{lem:lemma6_5_3}.4.
 
-		Now that we have our model dunction, we only need to show that when \HOLtm{C_Holds Canonical_System Canonical_System_Ps (λx. EQUIV_W x)
+		Now that we have our model function, we only need to show that when \HOLtm{C_Holds Canonical_System Canonical_System_Ps (λx. EQUIV_W x)
           Canonical_System.E p} then \HOLtm{p} which, when unpacking the definitions for \HOLtm{Canonical_System}, \HOLtm{Canonical_System_Ps}, \HOLtm{EQUIV_W}, and $(\models)$ gives us that we only need to show that \HOLtm{|- p} given \HOLtm{tau |-^ p} which follows immediately. 
 	\end{description}
 	}
@@ -593,4 +610,4 @@ Which yields the completeness result:
 \section{Summary}
 This chapter introduced the Goldblatt Cover semantics for Relevant Implication
 and formalised both semantic soundness and completeness between the Goldblatt axiomatisation and the Goldblatt Cover semantics. Inside the HOL development, this required
-2211\fix{fix at end of chapter proofs} lines of source code contained entirely inside \texttt{CoverSemanticsScript.sml} and completes our investigation opn Relevant Implication. 
+1286\fix{fix at end of chapter proofs} lines of source code contained entirely inside \texttt{CoverSemanticsScript.sml} and completes our investigation opn Relevant Implication. 
