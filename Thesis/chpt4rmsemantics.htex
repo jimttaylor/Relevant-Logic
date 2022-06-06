@@ -500,30 +500,26 @@ Showing the first eight postulates of \HOLtm{R_Frame} are relatively straightfor
 	\end{holmath}
 \end{lem}
 \begin{proof}
-	
+	Given that \HOLtm{set γ ⊆ Theta p} and \HOLtm{CONJl γ --> q ∈ Theta p} we are required to show that \HOLtm{q ∈ Theta p}. We get that because \HOLtm{Theta p} is an \HOLtm{R_Theory} that \HOLtm{CONJl γ ∈ Theta p}. From here we then use \HOLtm{R_Theory} along with Proposition~\ref{prop:some-theorems-R-1}.8 to show the result.
 \end{proof}
 Together with Theorem~\ref{thm:theta-prime} gives us that \HOLtm{Theta p} is in fact inside \HOLtm{(Canonical_Frame p).W}. 
-We also need to show that \HOLtm{(Canonical_Frame p).W} is closed under \HOLtm{STAR}: 
-\begin{lem}\label{lem:star-in-canonical-frame}
-	Where we have that \HOLtm{¬ |- p} and \HOLtm{x ∈ (Canonical_Frame p).W} then we also know that \HOLtm{(Canonical_Frame p).STAR x ∈ (Canonical_Frame p).W} 
-	\begin{holmath}
-		\HOLthm[p//A]{RMSemantics.STAR_IN_CANONICAL_FRAME}
-	\end{holmath}
-\end{lem} 
-\begin{proof}
-	
-\end{proof}
-
-Finally we also need that \HOLtm{STAR} is its own inverse (or equivalently is of order 2), note that we don't need \HOLtm{p} to be a non-theorem for this case:
+We also need that \HOLtm{STAR} is its own inverse (or equivalently is of order 2), note that we don't need \HOLtm{p} to be a non-theorem for this case:
 \begin{lem}\label{lem:Canonical-Frame-STAR-STAR}
 	\begin{holmath}
 		\HOLthm[p//A]{RMSemantics.Canonical_Frame_STAR_STAR}
 	\end{holmath}
 \end{lem}
 \begin{proof}
-	
+	This is immediate from the fact that we can get \HOLtm{Ordinary (Theta p)} from \HOLtm{S_Theory (Theta A) x}. The result then follows from the regularity of \HOLtm{Theta p} and that \HOLtm{|- (a --> ~~a)} and  \HOLtm{|- (~~a --> a)}. 
 \end{proof}
-\fix{need to do proofs}
+Finally we also need to that \HOLtm{(Canonical_Frame p).W} is closed under \HOLtm{STAR}: 
+\begin{lem}\label{lem:star-in-canonical-frame}
+	Where we have that \HOLtm{¬ |- p} and \HOLtm{x ∈ (Canonical_Frame p).W} then we also know that \HOLtm{(Canonical_Frame p).STAR x ∈ (Canonical_Frame p).W} 
+	\begin{holmath}
+		\HOLthm[p//A]{RMSemantics.STAR_IN_CANONICAL_FRAME}
+	\end{holmath}
+\end{lem} 
+Though we omit the proof due to its length.  
 
 Now we could go on to show postulates 1-8 from Definition~\ref{def:r-frame} right now, but we will hold off on the full proof of Theorem~\ref{thm:canonical-frame-is-r-frame} as it turns out that showing that the final postulate 9 holds for \HOLtm{Canonical_Frame p} when \HOLtm{p} is a non-theorem is a bit more involved. 
 
@@ -854,6 +850,6 @@ Armed with the truth (lemma) we can now complete our completeness result:
 	We then assume that \HOLtm{p ∈ Theta p} and derive a contradiction using \HOLthm[nostile,p//A]{GoldblattRL.g_identity}. 
 \end{proof}
 \section{Summary}
-This chapter introduced the Routley-Meyer semantic system for Relevant Implication and formalised both semantic soundness and completeness between the Goldblatt axiomatisation and the Routley-Meyer system. Inside the HOL development, this required 2211 lines of source code contained entirely inside \texttt{RMSemanticsScript.sml}. 
+This chapter introduced the Routley-Meyer semantic system for Relevant Implication and formalised both semantic soundness and completeness between the Goldblatt axiomatisation and the Routley-Meyer system. Inside the HOL development, this required 2212 lines of source code contained entirely inside \texttt{RMSemanticsScript.sml}. 
 
 We shall now take a look at an alternative semantic system for \HOLtm{R_set}.    

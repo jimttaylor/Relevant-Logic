@@ -253,7 +253,7 @@ This chapter introduced, formalised, and showed the equivalence of two different
 Inside the HOL4 development: the introduction of the Goldblatt System (in \texttt{GoldblattRLScript.sml}) consists of 146 lines of source code; 
 the introduction of the Slaney system (in \texttt{SlaneyRLScript.sml}) consists of 244 lines of source code; 
 showing the equivalence between the Goldblatt and Slaney systems requires a further 102 lines of source code in \texttt{GoldblattSlaneyEquivScript.sml}; 
-and the introduction and equivalence results of the Natural Deduction system consists of 435 lines of HOL4 in \texttt{NaturalDeductionScript.sml}; for a total of 927 lines of HOL4.
+and the introduction and equivalence results of the Natural Deduction system consists of 434 lines of HOL4 in \texttt{NaturalDeductionScript.sml}; for a total of 926 lines of HOL4.
 There was also further work done in support of this chapter in the \texttt{RLRulesScript.sml} notably Propositions~\ref{prop:some-theorems-R-1}.6 and \ref{prop:some-theorems-R-1}.7.
 Now that we have thoroughly explored our \emph{syntactic} systems, it follows that we should now consider our first \emph{semantic} one. 
 \end{sloppypar}

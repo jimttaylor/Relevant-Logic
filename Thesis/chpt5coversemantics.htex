@@ -610,4 +610,4 @@ Which yields the completeness result:
 \section{Summary}
 This chapter introduced the Goldblatt Cover semantics for Relevant Implication
 and formalised both semantic soundness and completeness between the Goldblatt axiomatisation and the Goldblatt Cover semantics. Inside the HOL development, this required
-1286\fix{fix at end of chapter proofs} lines of source code contained entirely inside \texttt{CoverSemanticsScript.sml} and completes our investigation opn Relevant Implication. 
+1286 lines of source code contained entirely inside \texttt{CoverSemanticsScript.sml} and completes our investigation opn Relevant Implication. 
