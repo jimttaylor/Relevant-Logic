@@ -1,0 +1,15 @@
+RELEVANT_DIR = $(HOLDIR)/examples/logic/relevant-logic
+
+INCLUDES = $(RELEVANT_DIR)
+
+MASTER_THEORY = prettyPrintingTheory
+
+MUNGOPT = -mcc
+
+EXTRA_CLEANS = holtexbasic.sty proof.sty munger
+
+holtexbasic.sty: $(HOLDIR)/src/TeX/holtexbasic.sty
+	$(CP) $< $@
+
+proof.sty: $(HOLDIR)/Manual/LaTeX/proof.sty
+	$(CP) $< $@

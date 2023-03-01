@@ -1,4 +1,4 @@
-RELEVANT_DIR = ../
+RELEVANT_DIR = $(HOLDIR)/examples/logic/relevant-logic
 
 INCLUDES = $(RELEVANT_DIR)
 
